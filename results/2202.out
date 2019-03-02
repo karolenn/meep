@@ -1,0 +1,94 @@
+Total Flux: [1.2426963554458899] Flux farfield: [0.13549216] ratio: [0.10903079] simulation_time: 5 dpml: 0.1 res: 40 r: 300 npts: 1600
+
+Elapsed run time = 854.1014 s
+
+Total Flux: [1.4311457492579593] Flux farfield: [0.138966] ratio: [0.09710122] simulation_time: 10 dpml: 0.1 res: 40 r: 300 npts: 1600
+
+Elapsed run time = 913.6293 s
+
+Total Flux: [3.500566577249263] Flux farfield: [0.13915352] ratio: [0.03975171] simulation_time: 15 dpml: 0.1 res: 40 r: 300 npts: 1600
+
+Elapsed run time = 823.4341 s
+
+
+Total Flux: [3.5017253096837466] Flux farfield: [0.13894589] ratio: [0.03967927] simulation_time: 20 dpml: 0.1 res: 40 r: 300 npts: 1600
+
+Elapsed run time = 1216.6219 s
+
+Total Flux: [3.4648744851357147] Flux farfield: [0.13669831] ratio: [0.0394526] simulation_time: 40 dpml: 0.1 res: 40 r: 300 npts: 1600
+
+Elapsed run time = 978.5785 s
+
+Total Flux: [3.4651073215657195] Flux farfield: [0.1367114] ratio: [0.03945373] simulation_time: 80 dpml: 0.1 res: 40 r: 300 npts: 1600
+
+Elapsed run time = 1343.8640 s
+
+
+Total Flux: [3.4298735028907914] Flux farfield: [0.15330509] ratio: [0.04469701] simulation_time: 40 dpml: 0.1 res: 80 r: 300 npts: 1600
+
+Elapsed run time = 5498.3034 s
+
+Total Flux: [3.4287714941734264] Flux farfield: [0.15326343] ratio: [0.04469922] simulation_time: 15 dpml: 0.1 res: 80 r: 300 npts: 1600
+
+Elapsed run time = 4467.0043 s
+
+Total Flux: [3.4299726816108973] Flux farfield: [0.15329359] ratio: [0.04469237] simulation_time: 20 dpml: 0.1 res: 80 r: 300 npts: 1600
+
+Elapsed run time = 4756.7717 s
+
+Total Flux: [1.2137297361081127] Flux farfield: [0.15116347] ratio: [0.12454459] simulation_time: 5 dpml: 0.1 res: 80 r: 300 npts: 1600
+
+Elapsed run time = 3604.0534 s
+
+Total Flux: [1.632068420723226] Flux farfield: [0.15323356] ratio: [0.09388918] simulation_time: 10 dpml: 0.1 res: 80 r: 300 npts: 1600
+
+Total Flux: [3.5045779540042363] Flux farfield: [0.16826176] ratio: [0.04801199] simulation_time: 15 dpml: 0.1 res: 120 r: 300 npts: 1600
+
+Elapsed run time = 13095.2083 s
+
+Total Flux: [0.06577121469535703] Flux farfield: [0.01066615] ratio: [0.16217052] simulation_time: 15 dpml: 0.1 res: 10 r: 300 npts: 1600
+
+Elapsed run time = 52.2463 s
+
+Total Flux: [2.401015089425653] Flux farfield: [0.10958278] ratio: [0.04564019] simulation_time: 15 dpml: 0.1 res: 20 r: 300 npts: 1600
+
+Elapsed run time = 204.2002 s
+
+Total Flux: [3.453686957465799] Flux farfield: [0.14549792] ratio: [0.04212829] simulation_time: 15 dpml: 0.1 res: 60 r: 300 npts: 1600
+Elapsed run time = 2091.2623 s
+Total Flux: [3.521489014386861] Flux farfield: [0.17503297] ratio: [0.04970425] simulation_time: 15 dpml: 0.1 res: 140 r: 300 npts: 1600
+Elapsed run time = 17319.2332 s
+
+Total Flux: [3.4287714941734264] Flux farfield: [0.15326218] ratio: [0.04469886] simulation_time: 15 dpml: 0.1 res: 80 r: 300 npts: 3200
+
+Elapsed run time = 7710.4399 s
+
+Total Flux: [3.4537243704551748] Flux farfield: [0.14549193] ratio: [0.0421261] simulation_time: 15 dpml: 0.2 res: 60 r: 300 npts: 1600
+
+Elapsed run time = 2424.1760 s
+
+Total Flux: [3.5044485389756437] Flux farfield: [0.16823524] ratio: [0.04800619] simulation_time: 20 dpml: 0.2 res: 120 r: 300 npts: 3200
+
+Elapsed run time = 20257.2409 s
+
+Total Flux: [3.453686957465799] Flux farfield: [0.14549697] ratio: [0.04212801] simulation_time: 15 dpml: 0.1 res: 60 r: 900 npts: 1600
+
+Elapsed run time = 2077.2910 s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

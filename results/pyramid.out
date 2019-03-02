@@ -1,0 +1,4 @@
+Total Flux: [3.453686957465799] Flux farfield: [0.14549792] ratio: [0.04212829] simulation_time: 15 dpml: 0.1 res: 60 r: 300 npts: 1600
+Elapsed run time = 2091.2623 s
+Total Flux: [3.521489014386861] Flux farfield: [0.17503297] ratio: [0.04970425] simulation_time: 15 dpml: 0.1 res: 140 r: 300 npts: 1600
+Elapsed run time = 17319.2332 s

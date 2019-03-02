@@ -1,0 +1,12 @@
+-Runs on 19/02 seems to imply own ff_farfield function ~<=> meeps own function for closed surface in air. own ff function also faster. This warrants further testing. 
+Things to test for. Time? Sim time was 5 sec. Increase? Also, polarization was Ey. Test for different polarisation. Why is far field not equal to close field? Increased resolution needed? Too big of a difference probably. What else could it be.. According to poyntings theorem, should be the same. Ardavan Oskooi claims it shouldn't. Further testing needed. Only used 2 fold symmetry here.
+
+Why on earth does the ff change with different polarisation? Makes no sense.
+
+Run on 20/02. Increase sim time slightly and try other polarisation. 3-fold symmetry used to increase run-time.
+
+21/02. Figure out why Ex and Ey polarisation is different? Should be the same for geometry ff fields? When completed, figure out the needed resolution for converged ff calculations. Seems to be fixed. ff within ~1% for res 40 and 160. Check ff ratio for theta=pi/6 same as analytical answer?
+
+25/02 Does DPML layers affect anything? Do I need to increase it for higher resolution? Increased resolution seems to increase far field flux? Dependent on npts or something else? Future problem? It seems that ff needs all sides of the simulation, check this. Can I only make do with the upper ff field? Is it depending on r? Check for different r. Discuss with Fredrik.
+
+Check DPML layers and npts for higher res. Test MEEPs far field vs my own.
