@@ -13,7 +13,7 @@ import time
 #from mpl_toolkits.mplot3d import Axes3D
 
 
-if (len(sys.argv)) != 3:
+if (len(sys.argv)) != 4:
     print("Not enough arguments")
     exit(0)
 
@@ -25,7 +25,8 @@ sy=sx
 sz=4 								#size of cell in x,y direction
 dpml=0.1 							#thickness of pml layers
 resolution= int(sys.argv[1])	
-print("resolution: ", resolution)						#resolution, #pixels/unit_distance
+simulation_time=int(sys.argv[2])
+source_pos=float(sys.argv[3])							#pos of source measured						#resolution, #pixels/unit_distance
 cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
 padding=0.1							#distance from pml_layers to flux regions so PML don't overlap flux regions
 
@@ -35,8 +36,8 @@ source_direction=mp.Ey
 
 use_symmetries = 'true'						#run sim with 8-fold symmetries? reduces calc time by 1/8th
 
-simulation_time=int(sys.argv[2])
-print("simulation_time: ", simulation_time)						#Multiply by a and divide by c to get time in femtoseconds.
+
+						#Multiply by a and divide by c to get time in femtoseconds.
 
 a=10e-6								#length in meters
 
@@ -46,8 +47,7 @@ use_geometry = 'true'
 "Pyramid variables"
 #offset=1							#offset the geometry by +y, not yet implemented
 pyramid_height=3.2						#height of the pyramid in meep units
-pyramid_width=2.6						#width of the pyramid measured from perpendicular side from -x to x
-source_pos=1/10							#pos of source measured from top, fraction of total pyramid length
+pyramid_width=2.6						#width of the pyramid measured from perpendicular side from -x to x from top, fraction of total pyramid length
 "Substrate variables"
 substrate_height=0.5						#Height measured from top of PML
 
@@ -251,15 +251,16 @@ pml_layer=[mp.PML(dpml)]
 ###SOURCE#######################################################################
 
 "A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
-#big_offset = sz/2-sh-pyramid_height+pyramid_height*(1/source_pos)
+
+abs_source_pos=sz/2-sh-pyramid_height+pyramid_height*(source_pos)
 
 source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2),	#gaussian current-source
 		component=source_direction,
-		center=mp.Vector3(0,0,sz/2-sh-pyramid_height+pyramid_height*(source_pos)))]
+		center=mp.Vector3(0,0,abs_source_pos))]
 
 sim=mp.Simulation(cell_size=cell,
 		geometry=Substrate,
-		#symmetries=symmetry,
+		symmetries=symmetry,
 		sources=source,
 		dimensions=3,
 		material_function=isInsidexy,
@@ -418,7 +419,7 @@ else:
 		#calculate fields for near field region (?)
 
 ###RUN##########################################################################
-sim.run(until=simulation_time)
+sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
 sim.display_fluxes(flux_total)
 
@@ -531,10 +532,10 @@ if calculate_flux == 'true':
 
 		print('Total Flux:',flux_tot_out,'Flux farfield:',P_tot_ff,'ratio:',flux_tot_ff_ratio
 #,'ff_flux:',ff_flux
-,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'npts:',npts)
+,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'npts:',npts,'source_pos:',source_pos)
 
 	else:
-		print('Total Flux:',flux_tot_out,'ff_flux:',ff_flux,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',res_ff)
+		print('Total Flux:',flux_tot_out,'ff_flux:',ff_flux,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',res_ff, 'source_pos:',source_pos)
 
 
 
