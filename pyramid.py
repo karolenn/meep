@@ -20,9 +20,9 @@ if (len(sys.argv)) != 4:
 "z 0.5a ovanför pml"
 "x,y=5a + 2*dpml"
 "Simulation cell"
-sx=3
+sx=4
 sy=sx
-sz=4 								#size of cell in x,y direction
+sz=5 								#size of cell in x,y direction
 dpml=0.1 							#thickness of pml layers
 resolution= int(sys.argv[1])	
 simulation_time=int(sys.argv[2])
@@ -53,7 +53,7 @@ substrate_height=0.5						#Height measured from top of PML
 
 "Frequency parameters for gaussian source"
 fcen=2								#center frequency
-df=1.2	   							#frequency span, ranging from 1.7-2.3 
+df=0.4	   							#frequency span, ranging from 1.7-2.3 
 nfreq=1								#number of frequencies sampled
 
 "Calculation and plotting parameters"
@@ -80,7 +80,8 @@ SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
 
 "Pyramid variables, h is length from origo to parallel edge, v is length from center of edge to first corner."
 h=pyramid_width/2
-v=h*math.tan(math.pi/6)
+#v=h*math.tan(math.pi/6)
+v=h
 sh=substrate_height
 
 vertice1=mp.Vector3(h,0,0)
@@ -221,6 +222,9 @@ def planepts(r,nptsline,theta):
 
 		for m in range(nptsline):
 			yPts.append(-d+delta*m)
+
+def output_power(sim):
+	print('Total flux:',mp.get_fluxes(flux_total))
 
 		
 
@@ -419,7 +423,11 @@ else:
 		#calculate fields for near field region (?)
 
 ###RUN##########################################################################
-sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
+#sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
+sim.run(
+#mp.at_beginning(mp.output_epsilon),
+mp.at_every(2,output_power),
+until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
 sim.display_fluxes(flux_total)
 

@@ -11,6 +11,8 @@ Run on 20/02. Increase sim time slightly and try other polarisation. 3-fold symm
 
 Check DPML layers and npts for higher res. Test MEEPs far field vs my own.
 
-what r should we have?
+what r should we have? solved - doesnt matter. whole point of the far field.
 
 06/03 Total flux differs for different source pos and sim_time=15. (obviously). Use same total flux (flux from source without geometry) for all simulations? Removes total flux calculation time and same comparison for total flux for all sims. Also, ff field is not covering whole sim cell. So higher source pos might have bigger difference. Adding probe for sim time is not optimal but seems to be required. This furthers investigation on cut-off time for source as well..
+
+13/03 Check if to add some air and extend ff layers and comment on results. That we I can ignore that possibility hopefully. I think prio now is narrow down the simulation space so I can continue on with output and optimization. Check dpmls, ff&air, ff calculation differences. Anything else? If not, move on to optimization hopefully.

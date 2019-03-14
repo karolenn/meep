@@ -1,6 +1,5 @@
-res: 120 simulation_time: 30 source_pos: 0.01
-res: 120 simulation_time: 30 source_pos: 0.08
-res: 120 simulation_time: 30 source_pos: 0.12
-res: 120 simulation_time: 30 source_pos: 0.18
+res: 120 simulation_time: 60 source_pos: 0.01
+res: 120 simulation_time: 60 source_pos: 0.08
+res: 120 simulation_time: 60 source_pos: 0.12
 
 
