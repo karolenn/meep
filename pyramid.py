@@ -17,18 +17,22 @@ if (len(sys.argv)) != 4:
     print("Not enough arguments")
     exit(0)
 
-"z 0.5a ovanför pml"
-"x,y=5a + 2*dpml"
-"Simulation cell"
-sx=4
+"1 unit distance is meep is thought of as 1 micrometer here."
+
+
+pyramid_height=3.2						#height of the pyramid in meep units
+pyramid_width=2.6						#width measured from edge to edge
+substrate_height=pyramid_height/10				#height of the substrate, measured as fraction of pyramid height
+padding=0.1							#add some padding between pml-layers and rest of the cell
+sx=pyramid_width*(10/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
 sy=sx
-sz=5 								#size of cell in x,y direction
+sz=pyramid_height*(10/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.							
 dpml=0.1 							#thickness of pml layers
-resolution= int(sys.argv[1])	
-simulation_time=int(sys.argv[2])
+resolution= int(sys.argv[1])					#resolution of the pyramid. Measured as number of pixels / unit distance
+simulation_time=int(sys.argv[2])				#simulation time for the sim. Measured as 
 source_pos=float(sys.argv[3])							#pos of source measured						#resolution, #pixels/unit_distance
 cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
-padding=0.1							#distance from pml_layers to flux regions so PML don't overlap flux regions
+						#distance from pml_layers to flux regions so PML don't overlap flux regions
 
 "Direction for source"
 source_direction=mp.Ey
@@ -46,10 +50,9 @@ use_geometry = 'true'
 "Pyramid edge 1.5 micrometer, 2,6 bredd mellan parallella kanter, height 3.2 micrometer"
 "Pyramid variables"
 #offset=1							#offset the geometry by +y, not yet implemented
-pyramid_height=3.2						#height of the pyramid in meep units
-pyramid_width=2.6						#width of the pyramid measured from perpendicular side from -x to x from top, fraction of total pyramid length
-"Substrate variables"
-substrate_height=0.5						#Height measured from top of PML
+
+
+
 
 "Frequency parameters for gaussian source"
 fcen=2								#center frequency
@@ -111,6 +114,20 @@ def isInsidexy(vec):
 			return GaN
 		else:
 			return air 
+	else:
+		return air
+
+def isInside(vec):
+	m=(3+math.sqrt(3))/2
+	k=-m
+	v=pyramid_width/(2*pyramid_height)*vec.z-(pyramid_width/(2*pyramid_height))*(sz/2-sh-pyramid_height)
+
+	while (vec.z <= sz/2-sh-1 and vec.z >= sz/2-sh-pyramid_height):
+		if (vec.y <= h*math.cos(math.pi/6) and vec.y >= 0 and vec.x <= (vec.y-m)/k):
+			return GaN
+		else:
+			return air
+
 	else:
 		return air
 
@@ -425,8 +442,8 @@ else:
 ###RUN##########################################################################
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
 sim.run(
-#mp.at_beginning(mp.output_epsilon),
-mp.at_every(2,output_power),
+mp.at_beginning(mp.output_epsilon),
+#mp.at_every(2,output_power),
 until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
 sim.display_fluxes(flux_total)
@@ -435,7 +452,7 @@ sim.display_fluxes(flux_total)
 
 fibsphere = 'true'
 planeff = 'false'
-r=sx*100
+r=(1/fcen)*50
 if far_field_calculation == 'true':
 	P_tot_ff = np.zeros(nfreq)
 							#distance to far-field
@@ -540,7 +557,8 @@ if calculate_flux == 'true':
 
 		print('Total Flux:',flux_tot_out,'Flux farfield:',P_tot_ff,'ratio:',flux_tot_ff_ratio
 #,'ff_flux:',ff_flux
-,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'npts:',npts,'source_pos:',source_pos)
+,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'npts:',npts,'source_pos:',source_pos,'pyramid_height:',pyramid_height,
+'pyramid_width:',pyramid_width)
 
 	else:
 		print('Total Flux:',flux_tot_out,'ff_flux:',ff_flux,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',res_ff, 'source_pos:',source_pos)
