@@ -29,11 +29,13 @@ def test_for(in_file):
             print("\r simulation: {}".format(count) , end="")
             count +=1
             try:
-                g = re.match(r"res:\s*(\-*\d+)\s*simulation_time:\s*(\-*\d+)\s*source_pos:\s*((\-*\d+\.\d+))", line, re.M|re.I )
+                g = re.match(r"res:\s*(\-*\d+)\s*simulation_time:\s*(\-*\d+)\s*source_pos:\s*(\-*\d+\.\d+)\s*pyramid_height:\s*(\-*\d+\.\d+)\s*pyramid_width:\s*(\-*\d+\.\d+)", line, re.M|re.I )
                 args1 = g.group(1)
                 args2 = g.group(2) 
                 args3 = g.group(3)
-                os.system('mpirun -np 3 python {}.py {} {} {} |grep "Total Flux:*\|Elapsed run time*" >> results/{}.out'.format(file_name, args1, args2, args3, in_file.replace(".in",'')))
+                args4 = g.group(4)
+                args5 = g.group(5)
+                os.system('mpirun -np 3 python {}.py {} {} {} {} {} |grep "Total Flux:*\|Elapsed run time*" >> results/{}.out'.format(file_name, args1, args2, args3, args4, args5, in_file.replace(".in",'')))
             except :
                 print("\n{}Failed {} - {} In file: {} {} {} At row: {}{}".format(RED, NULL, BLUE, NULL, in_file, BLUE, NULL,  count))
 

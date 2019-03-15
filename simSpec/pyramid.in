@@ -1,5 +1,5 @@
-res: 120 simulation_time: 60 source_pos: 0.01
-res: 120 simulation_time: 60 source_pos: 0.08
-res: 120 simulation_time: 60 source_pos: 0.12
+res: 20 simulation_time: 5 source_pos: 0.01 pyramid_height: 2.4 pyramid_width: 2
+res: 20 simulation_time: 5 source_pos: 0.08 pyramid_height: 2.6 pyramid_width: 2.2
+res: 20 simulation_time: 5 source_pos: 0.12 pyramid_height: 2.8 pyramid_width: 1.4
 
 

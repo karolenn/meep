@@ -13,45 +13,35 @@ import time
 #from mpl_toolkits.mplot3d import Axes3D
 
 
-if (len(sys.argv)) != 4:
+if (len(sys.argv)) != 6:
     print("Not enough arguments")
     exit(0)
 
 "1 unit distance is meep is thought of as 1 micrometer here."
 
-
-pyramid_height=3.2						#height of the pyramid in meep units
-pyramid_width=2.6						#width measured from edge to edge
-substrate_height=pyramid_height/10				#height of the substrate, measured as fraction of pyramid height
-padding=0.1							#add some padding between pml-layers and rest of the cell
-sx=pyramid_width*(10/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
+"Structure Geometry"
+pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
+pyramid_width=float(2.4)					#width measured from edge to edge 2.6
+substrate_height=pyramid_height/20				#height of the substrate, measured as fraction of pyramid height
+"Cell size"
+sx=pyramid_width*(6/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
 sy=sx
-sz=pyramid_height*(10/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.							
+sz=pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
+
+					
 dpml=0.1 							#thickness of pml layers
+padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
+
+"Inarguments for the simulation"
 resolution= int(sys.argv[1])					#resolution of the pyramid. Measured as number of pixels / unit distance
-simulation_time=int(sys.argv[2])				#simulation time for the sim. Measured as 
-source_pos=float(sys.argv[3])							#pos of source measured						#resolution, #pixels/unit_distance
+simulation_time=int(sys.argv[2])				#simulation time for the sim. #Multiply by a and divide by c to get time in fs.
+source_pos=float(sys.argv[3])					#pos of source measured	measured as fraction of tot. pyramid height from top. 
 cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
-						#distance from pml_layers to flux regions so PML don't overlap flux regions
+						
 
 "Direction for source"
-source_direction=mp.Ey
-		#symmetry has normal in x & y-direction, phase-even z-dir 
-
-use_symmetries = 'true'						#run sim with 8-fold symmetries? reduces calc time by 1/8th
-
-
-						#Multiply by a and divide by c to get time in femtoseconds.
-
-a=10e-6								#length in meters
-
-
-use_geometry = 'true'
-"Pyramid edge 1.5 micrometer, 2,6 bredd mellan parallella kanter, height 3.2 micrometer"
-"Pyramid variables"
-#offset=1							#offset the geometry by +y, not yet implemented
-
-
+source_direction=mp.Ey						#polasation of the gaussian source. 
+								#symmetry has normal in x & y-direction, phase-even z-dir 
 
 
 "Frequency parameters for gaussian source"
@@ -59,19 +49,15 @@ fcen=2								#center frequency
 df=0.4	   							#frequency span, ranging from 1.7-2.3 
 nfreq=1								#number of frequencies sampled
 
+
 "Calculation and plotting parameters"
+use_symmetries = 'true'						#run sim with 4-fold symmetries? reduces calc time by ~1/4th
 calculate_flux = 'true'
 plot_epsilon = 'false'						#Plot epsilon data in xy,yz,xz slices
 angle = math.pi/6						#calculate flux at angle measured from top of the pyramid
 far_field_calculation = 'true'					#calculate far fields
 mp_ff_calculation = 'false'					#calculate far fields using meeps function
 								
-"Parameters for several runs and convergence testing"
-
-Resolutions = [10]					#Resolution for each run	
-number_of_runs = len(Resolutions)				#Number of runs which is equal to the length of the Resolutions array
-
-
 
 ###GEOMETRY FOR THE SIMULATION#################################################
 
@@ -83,16 +69,10 @@ SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
 
 "Pyramid variables, h is length from origo to parallel edge, v is length from center of edge to first corner."
 h=pyramid_width/2
-#v=h*math.tan(math.pi/6)
 v=h
 sh=substrate_height
 
-vertice1=mp.Vector3(h,0,0)
-vertice2=mp.Vector3(h,v,0)
-
 "Function for creating pyramid"
-
-center=vertice2
 
 "isInsidexy checks if a point is inside the pyramid or not. If true, sets epsilon to 5.76, if false, sets it to 1. "
 "the function loops over the height of the pyramid in z-direction. It transform the test point to vertice 2. It then performs 3 test to check if the point"
@@ -117,6 +97,7 @@ def isInsidexy(vec):
 	else:
 		return air
 
+"Not working. Alternative of drawing the pyramid by using constant planes to check material."
 def isInside(vec):
 	m=(3+math.sqrt(3))/2
 	k=-m
@@ -135,42 +116,15 @@ def isInside(vec):
 
 Substrate = []
 
-if use_geometry == 'true':
-	Substrate=[mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
+
+Substrate=[mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
 			size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
 			material=SubstrateEps)]
 
-#Blob = []
-#npts=10
-#r=2
-
-#theta=math.pi
-	
-#offset=2/npts
-#range_npts=int((theta/math.pi)*npts)
-#increment = math.pi*(3 - math.sqrt(5))
-
-#for n in range(range_npts):
-#	y=r*((n*offset-1)+(offset/2))
-#	R = r*math.sqrt(1-pow(y/r,2))
-#	phi = (n % npts)*increment
-#	x=(R*math.cos(phi))
-#	z=(R*math.sin(phi))
-#	Blob.append(mp.Sphere(center=mp.Vector3(x,y,z),radius=0.4,material=SubstrateEps))
-
-#for n in range(npts):
-	#angleN=math.pi/2-angle/2+(n/npts)*angle
-	#angleN=-angle/2+(n/npts)*angle
-#	angleN=(n/npts)*math.pi*2
-#	for m in range(npts):
-		#angleM=math.pi/2-angle/2+(m/npts)*angle
-		#angleM=(m/npts)*angle		#angleM loops between pi/12 and -pi/12
-#		angleM=(m/npts)*math.pi
-#		Blob.append(mp.Sphere(center=mp.Vector3(r*math.sin(angleM)*math.cos(angleN),r*math.sin(angleM)*math.sin(angleN),-r*math.cos(angleM)), radius=0.1,material=SubstrateEps))
 
 
 ###FUNCTIONS##########################################################
-
+"Functions for the simulation. TODO: Move to another folder."
 def fibspherepts(r,theta,npts):
 	startTime=time.time()
 	global xPts
@@ -250,7 +204,7 @@ def output_power(sim):
 
 
 ###SYMMETRIES#########################################################
-
+"Symmetry logic."
 if use_symmetries == 'true':
 
 	if source_direction ==	mp.Ex:
@@ -273,6 +227,7 @@ pml_layer=[mp.PML(dpml)]
 
 "A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
+"Source position"
 abs_source_pos=sz/2-sh-pyramid_height+pyramid_height*(source_pos)
 
 source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2),	#gaussian current-source
@@ -328,7 +283,7 @@ if calculate_flux == 'true':
 
 ###ANGLE REGION#################################################################
 
-	"This region is the area corresponding to an 'angle' above the pyramid." 
+	"This region is the area corresponding to an 'angle' above the pyramid. TODO: Check relationship between this flux and far field flux" 
 
 
 	#region_size=(sz/2-padding)*math.tan(angle/2)
@@ -354,101 +309,54 @@ if calculate_flux == 'true':
 
 ###FAR FIELD REGION#############################################################
 
+"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
 
-
-if use_geometry == 'true':
-
-	nearfieldregion1=mp.Near2FarRegion(
+nearfieldregion1=mp.Near2FarRegion(
 		center=mp.Vector3(sx/2,0,-sh/2),
 		size=mp.Vector3(0,sy,sz-sh-padding*2),
 		direction=mp.X)
 
-	nearfieldregion2=mp.Near2FarRegion(
+nearfieldregion2=mp.Near2FarRegion(
 		center=mp.Vector3(-sx/2,0,-sh/2),
 		size=mp.Vector3(0,sy,sz-sh-padding*2),
 		direction=mp.X,
 		weight=-1)
 
-	nearfieldregion3=mp.Near2FarRegion(
+nearfieldregion3=mp.Near2FarRegion(
 		center=mp.Vector3(sy/2,0,-sh/2),
 		size=mp.Vector3(sx,0,sz-sh-padding*2),
 		direction=mp.Y)
 
-	nearfieldregion4=mp.Near2FarRegion(
+nearfieldregion4=mp.Near2FarRegion(
 		center=mp.Vector3(-sy/2,0,-sh/2),
 		size=mp.Vector3(sx,0,sz-sh-padding*2),
 		direction=mp.Y,
 		weight=-1)
 
-	nearfieldregion5=mp.Near2FarRegion(					#nearfield -z. above pyramid.		
-		center=mp.Vector3(0,0,-sz/2+padding),
-		size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-		direction=mp.Z,
-		weight=-1)
-
-	nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,nearfieldregion4,nearfieldregion5)
-		#nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion5)
-
-else:
-	nearfieldregion1=mp.Near2FarRegion(
-		center=mp.Vector3(sx/2-padding,0,0),
-		size=mp.Vector3(0,sy-padding*2,sz-padding*2),
-		direction=mp.X)
-
-	nearfieldregion2=mp.Near2FarRegion(
-		center=mp.Vector3(-sx/2+padding,0,0),
-		size=mp.Vector3(0,sy-padding*2,sz-padding*2),
-		direction=mp.X,
-		weight=-1)
-
-	nearfieldregion3=mp.Near2FarRegion(
-		center=mp.Vector3(0,sy/2-padding,0),
-		size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-		direction=mp.Y)
-
-	nearfieldregion4=mp.Near2FarRegion(
-		center=mp.Vector3(0,-sy/2+padding,0),
-		size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-		direction=mp.Y,
-		weight=-1)
-
-	nearfieldregion5=mp.Near2FarRegion(					#nearfield z. below pyramid.		
-		center=mp.Vector3(0,0,sz/2-padding),
-		size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-		direction=mp.Z)
-
-	nearfieldregion6=mp.Near2FarRegion(					#nearfield -z. above pyramid.		
+nearfieldregion5=mp.Near2FarRegion(					#nearfield -z. above pyramid.		
 		center=mp.Vector3(0,0,-sz/2+padding),
 		size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 		direction=mp.Z,
 		weight=-1)
 
 
-	nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,
-	nearfieldregion4,nearfieldregion5,nearfieldregion6)
+nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,nearfieldregion4,nearfieldregion5)
 
 
-		
-
-###FAR FIELD CALCULATIONS#######################################################
-
-
-
-		#nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,nearfieldregion4,nearfieldregion5)
-		#nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion5)	
-
-		#calculate fields for near field region (?)
 
 ###RUN##########################################################################
+"The run constructor for meep."
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
 sim.run(
 mp.at_beginning(mp.output_epsilon),
 #mp.at_every(2,output_power),
 until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
-sim.display_fluxes(flux_total)
+
 
 ###OUTPUT CALCULATIONS##########################################################
+
+"Calculate the poynting flux given the far field values of E, H."
 
 fibsphere = 'true'
 planeff = 'false'
@@ -492,18 +400,14 @@ if far_field_calculation == 'true':
 			Pz=(ff[i]*np.conjugate(ff[i+4])-ff[i+1]*np.conjugate(ff[i+3]))
 			Pz=Pz.real
 			Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))					
-			#Pr=(Px)*math.cos(angleN)*math.sin(angleM)-(Py)*math.sin(angleN)*math.sin(angleM)-(Pz)*math.cos(angleM)
-			#surface_Element=math.pow(r,2)*math.pow(angle,2)*math.pow((1/npts),2)
 			surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/npts
 			P_tot_ff[k] += surface_Element*(1)*np.real(Pr)
 
 			i=i+6
-			
-			#print("vector3:",[r*math.sin(angleM)*math.cos(angleN),-r*math.sin(angleM)*math.sin(angleN),-	r*math.cos(angleM)],"ff:",ff,"Px:",Px,"Py:",Py,"Pz:",Pz,"Pr:",Pr,P_tot_ff[k])
+
 
 			"P_tot_ff[k] is calculated for each freq. Now the loop should make the spacing between two points larger the further down the sphere we goes and surface_elements might overlap here. Check in the future the errors."
-	print(P_tot_ff)
-	print(surface_Element)
+
 
 	##CALCULATE FLUX OUT FROM BOX###########################################
 if calculate_flux == 'true':
@@ -517,32 +421,11 @@ if calculate_flux == 'true':
 
 	if mp_ff_calculation == 'true':
 		volr=mp.Volume(center=mp.Vector3(0,0,-r),size=mp.Vector3(2*r*math.tan(angle/2),2*r*math.tan(angle/2),0),dims=3)
-		#volx=mp.Volume(center=mp.Vector3(r,0,0),size=mp.Vector3(0,2*r,2*r),dims=3)
-		#volmx=mp.Volume(center=mp.Vector3(-r,0,0),size=mp.Vector3(0,2*r,2*r),dims=3)
-		#voly=mp.Volume(center=mp.Vector3(0,r,0),size=mp.Vector3(2*r,0,2*r),dims=3)
-		#volmy=mp.Volume(center=mp.Vector3(0,-r,0),size=mp.Vector3(2*r,0,2*r),dims=3)
-		#volz=mp.Volume(center=mp.Vector3(0,0,r),size=mp.Vector3(2*r,2*r,0),dims=3)
-		#volmz=mp.Volume(center=mp.Vector3(0,0,-r),size=mp.Vector3(2*r,2*r,0),dims=3)
-
 		flux_tot_freqs = mp.get_flux_freqs(flux_total)			#save flux frequencies
 		res_ff=0.3
 		ff_flux = -nearfield.flux(mp.Z,volr,res_ff)[0]
-		#ff_flux = nearfield.flux(mp.X,volx,res_ff)[0] - nearfield.flux(mp.X,volmx,res_ff)[0]+ nearfield.flux(mp.Y,voly,res_ff)[0]- nearfield.flux(mp.Y,volmy,res_ff)[0]+ nearfield.flux(mp.Z,volz,res_ff)[0]- nearfield.flux(mp.Z,volmz,res_ff)[0]
+
 		print('ff_flux',ff_flux)
-	#print('volx:',mp.get_center_and_size(volx))
-	#print('volmx:',mp.get_center_and_size(volmx))
-	#print('voly:',mp.get_center_and_size(voly))
-	#print('volmy:',mp.get_center_and_size(volmy))
-	#print('volz:',mp.get_center_and_size(volz))
-	#print('volmz:',mp.get_center_and_size(volmz))
-	#print('ff_flux:',ff_flux)
-		
-#		flux_tot_pf_ratio.append(flux_top_out[i]/flux_tot_out[i])	#takes the ratio of flux top/total out for each frequency
-
-	#ratioTop=flux_top_value/flux_tot_value				#takes the total ratio of flux out top/total
-
-
-	#print("Flux out of top / Total flux:",ratioTop)
 	
 	#print('Total Flux:',flux_tot_out,'time:',simulation_time,'dpml:',dpml,'res:',resolution,'offset:',big_offset)
 
@@ -562,71 +445,6 @@ if calculate_flux == 'true':
 
 	else:
 		print('Total Flux:',flux_tot_out,'ff_flux:',ff_flux,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',res_ff, 'source_pos:',source_pos)
-
-
-
-
-###MANY RUNS####################################################################
-
-PowerRatio = []
-
-if number_of_runs > 10:
-
-	while(PowerRatio[i+1]/PowerRatio[i]):
-
-		sim.run(until=simulation_time)
-
-		"Approximately t=300 time run for decay 1e-2 for Ez"
-
-#sim.run(until_after_sources=mp.stop_when_fields_decayed(50,mp.Ez,mp.Vector3(0,0,-2*pyramid_height),1e-2))
-
-		"get_fluxes converts the flux data into a more readable form, an array."
-
-
-
-	#	flux_top_out = mp.get_fluxes(flux_top)				#save top flux data
-
-		flux_tot_out = mp.get_fluxes(flux_total)			#save total flux data
-
-		flux_tot_freqs = mp.get_flux_freqs(flux_total)			#save flux frequencies
-
-		flux_angle_out = mp.get_fluxes(flux_angle)		#save flux angle data
-
-		PowerRatioInsert = CalculatePowerRatio(flux_angle_out,flux_tot_out,nfreq)
-
-		PowerRatio.append(PowerRatioInsert)
-
-		print("PowerRatio",PowerRatio)	
-
-		sim.reset_meep()
-
-		sim=mp.Simulation(cell_size=cell,
-			geometry=Substrate,
-			symmetries=symmetry,
-			sources=source,
-			dimensions=3,
-			material_function=isInsidexy,
-			boundary_layers=pml_layer,
-			resolution=Resolutions[i+1])
-
-		flux_total=sim.add_flux(fcen,df,nfreq,
-			fluxregion1,fluxregion2,fluxregion3,fluxregion4,fluxregion5,fluxregion6)	#calculate flux for flux regions
-		
-		flux_angle=sim.add_flux(fcen,df,nfreq,fluxregion_angle)
-
-		
-		print('PowerRatio',PowerRatio)
-		print('Resolutions',Resolutions)
-
-		plt.plot(Resolutions,PowerRatio)
-		plt.xlabel('resolution')
-		plt.ylabel('PowerRatio (angle)')
-		plt.show()
-
-
-	#load flux data??
-
-
 
 
 
@@ -654,6 +472,8 @@ if number_of_runs > 10:
 ###OUTPUT DATA##################################################################
 
 "Plot convergence data"
+
+"Some plotting. Do not use if you run the script and iterate over many simulations."
 
 
 
