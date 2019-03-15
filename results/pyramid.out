@@ -176,15 +176,14 @@ Elapsed run time = 10.5411 s
 Total Flux: [0.9139439425224986] Flux farfield: [0.15194998] ratio: [0.16625744] simulation_time: 5 dpml: 0.1 res: 20 r: 25.0 npts: 1600 source_pos: 0.08 pyramid_height: 1.6 pyramid_width: 2
 Elapsed run time = 10.5667 s
 Total Flux: [0.8930704821780724] Flux farfield: [0.14424414] ratio: [0.16151485] simulation_time: 5 dpml: 0.1 res: 20 r: 25.0 npts: 1600 source_pos: 0.12 pyramid_height: 1.6 pyramid_width: 2
-Elapsed run time = 10.6049 s
-Elapsed run time = 0.2131 s
-Elapsed run time = 0.2159 s
-Elapsed run time = 0.2187 s
-Total Flux: [0.8177193460813545] Flux farfield: [0.11745857] ratio: [0.14364167] simulation_time: 5 dpml: 0.1 res: 20 r: 25.0 npts: 1600 source_pos: 0.01 pyramid_height: 2.4 pyramid_width: 2.4
-Elapsed run time = 18.0633 s
+
+
+
 Total Flux: [1.0295097851597865] Flux farfield: [0.19053642] ratio: [0.1850749] simulation_time: 5 dpml: 0.1 res: 20 r: 25.0 npts: 1600 source_pos: 0.08 pyramid_height: 2.6 pyramid_width: 2.4
-Elapsed run time = 18.8606 s
+Elapsed run time = 19.0159 s
 Total Flux: [0.5066241901879127] Flux farfield: [0.09051445] ratio: [0.17866192] simulation_time: 5 dpml: 0.1 res: 20 r: 25.0 npts: 1600 source_pos: 0.12 pyramid_height: 2.8 pyramid_width: 2.4
-Elapsed run time = 21.9543 s
-Elapsed run time = 0.2171 s
-Elapsed run time = 0.2145 s
+Elapsed run time = 21.3119 s
+Total Flux: [0.972615847504407] Flux farfield: [0.14613937] ratio: [0.15025394] simulation_time: 5 dpml: 0.1 res: 20 r: 25.0 npts: 1600 source_pos: 0.08 pyramid_height: 2.6 pyramid_width: 2.2
+Elapsed run time = 16.7681 s
+Total Flux: [1.0675281831760945] Flux farfield: [0.14795847] ratio: [0.13859912] simulation_time: 5 dpml: 0.1 res: 20 r: 25.0 npts: 1600 source_pos: 0.12 pyramid_height: 2.8 pyramid_width: 1.4
+Elapsed run time = 9.6393 s

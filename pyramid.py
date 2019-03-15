@@ -21,7 +21,7 @@ if (len(sys.argv)) != 6:
 
 "Structure Geometry"
 pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
-pyramid_width=float(2.4)					#width measured from edge to edge 2.6
+pyramid_width=float(sys.argv[5])					#width measured from edge to edge 2.6
 substrate_height=pyramid_height/20				#height of the substrate, measured as fraction of pyramid height
 "Cell size"
 sx=pyramid_width*(6/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
