@@ -348,7 +348,7 @@ nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearf
 "The run constructor for meep."
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
 sim.run(
-mp.at_beginning(mp.output_epsilon),
+#mp.at_beginning(mp.output_epsilon),
 #mp.at_every(2,output_power),
 until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))

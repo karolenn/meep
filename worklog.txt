@@ -18,3 +18,7 @@ what r should we have? solved - doesnt matter. whole point of the far field.
 13/03 Check if to add some air and extend ff layers and comment on results. That we I can ignore that possibility hopefully. I think prio now is narrow down the simulation space so I can continue on with output and optimization. Check dpmls, ff&air, ff calculation differences. Anything else? If not, move on to optimization hopefully.
 
 14/03 Oh boy, making sim cell a function of pyramid size could bring trouble. First and foremost. If the ratio between sh and ph is constant, is flux ratio the same? Hopefully, otherwise I have some trouble (?). I need to check this. Larger sim cells seems to require longer sim times. Would make sense. waves in air travel at 1v. I want the sim cell as small as possible. total flux is a function of sim cell size and sh, but ff flux isn't. So it makes sense to make sh as small as possible. I just need to check that larger sim cells with ratio consant converges. 
+
+15/03 Find a good time convergence criteria. Measure total flux every sec? Might be very time consuming. Probing seems difficult to find a good balance between different sim specs (?). Different geometries require different sim times. Discuss with Nisse and Torbjörn.
+
+Implement sim for several frequencies.

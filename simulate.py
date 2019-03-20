@@ -29,7 +29,7 @@ def test_for(in_file):
             print("\r simulation: {}".format(count) , end="")
             count +=1
             try:
-                g = re.match(r"res:\s*(\-*\d+)\s*simulation_time:\s*(\-*\d+)\s*source_pos:\s*(\-*\d+\.\d+)\s*pyramid_height:\s*(\-*\d+\.\d+)\s*pyramid_width:\s*(\-*\d+\.\d+)", line, re.M|re.I )
+                g = re.match(r"res:\s*(\-*\d+)\s*simulation_time:\s*(\-*\d+)\s*source_pos:\s*(\-*\d+\.\d+)\s*pyramid_height:\s*(\-*\d+\.*\d*)\s*pyramid_width:\s*(\-*\d+\.*\d*)", line, re.M|re.I )
                 args1 = g.group(1)
                 args2 = g.group(2) 
                 args3 = g.group(3)

@@ -42,11 +42,77 @@ ratio3=[0.12115113,0.14638241,0.13083482,0.08723537,0.06515418,0.07657071,0.0508
 ff3=[0.13560147,0.02609257,0.04613723,0.07285158,0.10397151,0.15109467,0.16553987,0.15326343,0.13277171,0.13124342,0.16065732,0.16926118,0.14269187]
 ratio4=[0.14055834,0.20569364,0.1679512,0.10858052,0.07870621,0.0852075,0.05632203,0.04801199,0.03569256,0.06172507,0.05850669,0.05966408,0.03958694] #res120
 ff4=[0.1511039,0.03485354,0.06040833,0.09153319,0.12219786,0.170601,0.18392262,0.16826176,0.14397012,0.14355228,0.17814082,0.18627938,0.15479655]
+ratio5=[0.12250754,0.0782157,0.08377253,0.05947859,0.05387471,0.04232462,0.06329465]
 source_pos=[0.00,0.01,0.02,0.03,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.20]
+source_pos2=[0.02,0.04,0.06,0.08,0.1,0.12,0.14]
 plt.title('res vs ratio')
 plt.plot(source_pos,ratio1,'-b',label='res40')
 plt.plot(source_pos,ratio2,'-r',label='res60')
 plt.plot(source_pos,ratio3,'-g',label='res80')
 plt.plot(source_pos,ratio4,'-y',label='res120')
+plt.plot(source_pos2,ratio5,'-m',label='res60 mod')
 plt.legend(loc='best')
 plt.show()
+
+#sim time 15 vs 30 res 60 & 120 r25 w: 2
+ffres60time15=[0.06371619,0.06757367,0.0705059,0.07504808,0.07715915,0.08123487]
+ffres60time30=[0.06364598,0.06687307,0.06876609,0.07201424,0.07234061,0.07383285]
+ffres120time15=[0.07867831,0.08261531,0.0867849,0.09076825,0.09365536,0.09759907]
+ffres120time30=[0.07855445,0.08207726,0.08506158,0.08748889,0.08828049,0.08961337]
+pyramid_height=[2,2.2,2.4,2.6,2.8,3]
+plt.title('ratio vs height, res 60,120 time 15,30 source pos 0.08 width 2')
+plt.plot(pyramid_height,ffres60time15,'-b',label='res60time15')
+plt.plot(pyramid_height,ffres60time30,'-r',label='res60time30')
+plt.plot(pyramid_height,ffres120time15,'-g',label='res120time15')
+plt.plot(pyramid_height,ffres120time30,'-y',label='res120time30')
+plt.legend(loc='best')
+plt.show()
+
+#sim time 15 vs 30 res 60 & 120 r25 h:2 
+ffres60time15=[0.06371619,0.06434675,0.06157799,0.05676274,0.0509754,0.04529857]
+ffres60time30=[0.06364598,0.06423138,0.06145444,0.05658717,0.05074117,0.04499835]
+ffres120time15=[0.07867831,0.07879913,0.07517366,0.06944685,0.06208138,0.05541809]
+ffres120time30=[0.07855445,0.07868183,0.07505526,0.06931134,0.0619043,0.05518246]
+pyramid_width=[2,2.2,2.4,2.6,2.8,3]
+plt.title('ratio vs width, res 60,120 time 15,30 source pos 0.08 height 2')
+plt.plot(pyramid_width,ffres60time15,'-b',label='res60time15')
+plt.plot(pyramid_width,ffres60time30,'-r',label='res60time30')
+plt.plot(pyramid_width,ffres120time15,'-g',label='res120time15')
+plt.plot(pyramid_width,ffres120time30,'-y',label='res120time30')
+plt.legend(loc='best')
+plt.show()
+
+#sim time 30 res 120 h 3.2 width 2.6 
+ff=[0.04758858,0.03576409,0.06211406,0.05927045,0.05970783,0.03944187,0.04855358,0.06464785,0.054472,0.05552831,0.0402258]
+source_pos=[0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3]
+plt.title('ratio vs source pos res 120 time 30 height 3.2 width 2.6')
+plt.plot(source_pos,ff,'b',label='ratio vs source pos')
+plt.legend(loc='best')
+plt.show()
+
+#res 40 varying sim time and heights source pos 0.08
+ff=[0.06064515,0.06172062,0.06656544,0.06824451,0.07087384,0.07643811]
+ff2=[0.06036476,0.06089221,0.06457197,0.06485711,0.06451808,0.06820764]
+ff3=[0.06036606,0.06089248,0.06457025,0.06487448,0.06453824,0.06814887]
+ff4=[0.06036582,0.06089295,0.06457027,0.0648731,0.06453857,0.06814744]
+ff5=[0.06364588,0.06687382,0.06876565,0.07201437,0.07234035,0.07383302]
+ffres120time15=[0.07867831,0.08261531,0.0867849,0.09076825,0.09365536,0.09759907]
+ffres120time30=[0.07855445,0.08207726,0.08506158,0.08748889,0.08828049,0.08961337]
+#ff6=[0.06064515,0.05619095,0.05438018,0.05142827,0.0452633,0.04150612]
+
+height=[2,2.2,2.4,2.6,2.8,3]
+plt.title('ratio vs height res 40')
+plt.plot(height,ff,'-b',label='res40time15')
+plt.plot(height,ff2,'-r',label='res40time30')
+plt.plot(height,ff3,'-g',label='res40time45')
+plt.plot(height,ff4,'-y',label='res40time60')
+plt.plot(height,ff5,'-m',label='res60time45')
+plt.plot(height,ffres120time15,'-k',label='res120time15')
+plt.plot(height,ffres120time30,'-c',label='res120time30')
+plt.legend(loc='best')
+plt.show()
+
+
+
+
+
