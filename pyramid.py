@@ -5,6 +5,7 @@ import sys
 from mpl_toolkits.mplot3d import Axes3D
 import math as math
 import time
+#from functions import fibspherepts
 #import functions
 #from functions import CalculatePowerRatio 			#import function that calculates ratio of total and angle out
 
@@ -29,7 +30,7 @@ sy=sx
 sz=pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 
 					
-dpml=0.1 							#thickness of pml layers
+dpml=0.8 							#thickness of pml layers
 padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
 
 "Inarguments for the simulation"
@@ -47,7 +48,7 @@ source_direction=mp.Ey						#polasation of the gaussian source.
 "Frequency parameters for gaussian source"
 fcen=2								#center frequency
 df=0.4	   							#frequency span, ranging from 1.7-2.3 
-nfreq=1								#number of frequencies sampled
+nfreq=6								#number of frequencies sampled
 
 
 "Calculation and plotting parameters"
@@ -413,7 +414,7 @@ if far_field_calculation == 'true':
 if calculate_flux == 'true':
 	"Initialize variables to be used, pf stands for 'per frequency'"
 	flux_tot_value = np.zeros(nfreq)						#total flux out from box
-	flux_tot_ff_ratio=np.zeros(nfreq)						
+	flux_tot_ff_ratio = np.zeros(nfreq)						
 	flux_tot_pf = []
 	flux_tot_pf_ratio = []
 
@@ -432,16 +433,16 @@ if calculate_flux == 'true':
 	if far_field_calculation == 'true':
 		"the for loop sums up the flux for all frequencies and stores it in flux_tot_value and flux_top_value"
 		"it also calculates the ratio betwewen top and total flux out for all frequencies and stores it in an array 'flux_tot_pf_ratio'"
+		ff_freqs = mp.get_near2far_freqs(nearfield)
 
 		for i in range(nfreq):
 
 			flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
-		print('flux_tot_ff_ratio',flux_tot_ff_ratio)
 
 		print('Total Flux:',flux_tot_out,'Flux farfield:',P_tot_ff,'ratio:',flux_tot_ff_ratio
 #,'ff_flux:',ff_flux
 ,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'npts:',npts,'source_pos:',source_pos,'pyramid_height:',pyramid_height,
-'pyramid_width:',pyramid_width)
+'pyramid_width:',pyramid_width,'freqs:', ff_freqs)
 
 	else:
 		print('Total Flux:',flux_tot_out,'ff_flux:',ff_flux,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',res_ff, 'source_pos:',source_pos)
