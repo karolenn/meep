@@ -24,3 +24,5 @@ what r should we have? solved - doesnt matter. whole point of the far field.
 Implement sim for several frequencies. Done.
 
 Try comparing my ff calcs with meeps. Is mine close enough? Also, convergence criteria. Take an upper limit on time or implement some based on total flux? upper time seems simpler. Just need to find it. Check dpml differences for higher resolutions
+
+dpml seems to be ok. upper limit 30 time units possibly? check ff with flux angle? run time seems dependent on height and freq a lot?

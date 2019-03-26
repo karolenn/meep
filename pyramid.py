@@ -30,7 +30,7 @@ sy=sx
 sz=pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 
 					
-dpml=0.8 							#thickness of pml layers
+dpml=0.1 							#thickness of pml layers
 padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
 
 "Inarguments for the simulation"
@@ -41,14 +41,14 @@ cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell i
 						
 
 "Direction for source"
-source_direction=mp.Ey						#polasation of the gaussian source. 
+source_direction=mp.Ez						#polasation of the gaussian source. 
 								#symmetry has normal in x & y-direction, phase-even z-dir 
 
 
 "Frequency parameters for gaussian source"
 fcen=2								#center frequency
-df=0.4	   							#frequency span, ranging from 1.7-2.3 
-nfreq=6								#number of frequencies sampled
+df=1	   							#frequency span, ranging from 1.7-2.3 
+nfreq=3								#number of frequencies sampled
 
 
 "Calculation and plotting parameters"
@@ -58,6 +58,7 @@ plot_epsilon = 'false'						#Plot epsilon data in xy,yz,xz slices
 angle = math.pi/6						#calculate flux at angle measured from top of the pyramid
 far_field_calculation = 'true'					#calculate far fields
 mp_ff_calculation = 'false'					#calculate far fields using meeps function
+calculate_at_an_angle = 'true'
 								
 
 ###GEOMETRY FOR THE SIMULATION#################################################
@@ -195,8 +196,25 @@ def planepts(r,nptsline,theta):
 		for m in range(nptsline):
 			yPts.append(-d+delta*m)
 
+flux1=1
+flux2=0
+
 def output_power(sim):
-	print('Total flux:',mp.get_fluxes(flux_total))
+	return(mp.get_fluxes(flux_total)[0])
+
+def flux1_step(sim):
+	global flux1
+	flux1 = output_power(sim)
+
+def flux2_step(sim):
+	global flux2
+	flux2 = output_power(sim)
+
+def ratio_test(sim):
+	return abs(flux2/flux1 - 1) < 0.01
+
+
+
 
 		
 
@@ -287,13 +305,13 @@ if calculate_flux == 'true':
 	"This region is the area corresponding to an 'angle' above the pyramid. TODO: Check relationship between this flux and far field flux" 
 
 
-	#region_size=(sz/2-padding)*math.tan(angle/2)
+	region_size=(sz/2-padding)*math.tan(angle/2)
 
-	#fluxregion_angle=mp.FluxRegion(
-	#		center=mp.Vector3(0,0,-sz/2+padding),
-	#		size=mp.Vector3(region_size*2,region_size*2,0),
-	#		direction=mp.Z,
-	#		weight=-1)
+	fluxregion_angle=mp.FluxRegion(
+			center=mp.Vector3(0,0,-sz/2+padding),
+			size=mp.Vector3(region_size*2,region_size*2,0),
+			direction=mp.Z,
+			weight=-1)
 
 ###FIELD CALCULATIONS###########################################################
 
@@ -306,7 +324,7 @@ if calculate_flux == 'true':
 
 ###ANGLE FIELD CALCULATIONS#####################################################
 
-#flux_angle=sim.add_flux(fcen,df,nfreq,fluxregion_angle)			#calculate flux for angle region
+	flux_angle=sim.add_flux(fcen,df,nfreq,fluxregion_angle)			#calculate flux for angle region
 
 ###FAR FIELD REGION#############################################################
 
@@ -343,15 +361,13 @@ nearfieldregion5=mp.Near2FarRegion(					#nearfield -z. above pyramid.
 
 nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,nearfieldregion4,nearfieldregion5)
 
-
-
 ###RUN##########################################################################
 "The run constructor for meep."
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
 sim.run(
 #mp.at_beginning(mp.output_epsilon),
-#mp.at_every(2,output_power),
-until=simulation_time)
+mp.at_every(3,flux1_step), mp.at_every(5,flux2_step),
+until=ratio_test)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
 
 
@@ -420,6 +436,7 @@ if calculate_flux == 'true':
 
 	flux_tot_out = mp.get_fluxes(flux_total)			#save total flux data
 
+
 	if mp_ff_calculation == 'true':
 		volr=mp.Volume(center=mp.Vector3(0,0,-r),size=mp.Vector3(2*r*math.tan(angle/2),2*r*math.tan(angle/2),0),dims=3)
 		flux_tot_freqs = mp.get_flux_freqs(flux_total)			#save flux frequencies
@@ -439,10 +456,7 @@ if calculate_flux == 'true':
 
 			flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
 
-		print('Total Flux:',flux_tot_out,'Flux farfield:',P_tot_ff,'ratio:',flux_tot_ff_ratio
-#,'ff_flux:',ff_flux
-,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'npts:',npts,'source_pos:',source_pos,'pyramid_height:',pyramid_height,
-'pyramid_width:',pyramid_width,'freqs:', ff_freqs)
+		print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_pos:',source_pos,'p_height:',pyramid_height,'p_width:',pyramid_width,'freqs:', ff_freqs)
 
 	else:
 		print('Total Flux:',flux_tot_out,'ff_flux:',ff_flux,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',res_ff, 'source_pos:',source_pos)
@@ -453,20 +467,20 @@ if calculate_flux == 'true':
 	##CALCULATES FLUX OUT FROM BOX AT AN ANGLE#############################
 "This function does the same as above but the calculations area for the area above the pyramid corresponding to 'angle'"
 "THIS IS DEFINED IN A FUNCTION, CALCULATEPOWERATIO INSTEAD!!!!"
-	#if calculate_at_an_angle == 'true':
+if calculate_at_an_angle == 'true':
+	flux_angle_out = mp.get_fluxes(flux_angle)
+	flux_angle_value = 0
+	flux_angle_pf = []
+	flux_tot_pf_angleratio = []
 
-	#	flux_angle_value = 0
-	#	flux_angle_pf = []
-	#	flux_tot_pf_angleratio = []
+	for i in range(nfreq):
 
-	#	for i in range(nfreq):
+		flux_angle_value +=flux_angle_out[i]		#sums up the total flux out at an angle
 
-	#		flux_angle_value +=flux_angle_out[i]		#sums up the total flux out at an angle
+		flux_tot_pf_angleratio.append(flux_angle_out[i]/flux_tot_out[i])	#takes ratio flux angle/total for each freq
 
-	#		flux_tot_pf_angleratio.append(flux_angle_out[i]/flux_tot_out[i])	#takes ratio flux angle/total for each freq
-
-	#	ratioAngle=flux_angle_value/flux_tot_value		#takes the ratio for all flux, same as above
-	#	print("Flux at an angle / Total flux:",ratioAngle)
+	#ratioAngle=flux_angle_value/flux_tot_value		#takes the ratio for all flux, same as above
+	print("Flux at an angle / Total flux:",flux_tot_pf_angleratio)
 
 
 
