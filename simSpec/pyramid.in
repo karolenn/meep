@@ -1,18 +1,10 @@
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2.2 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2.4 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2.6 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2.8 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 3 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.4
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.6
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.8
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 3
-res: 60 sim_time: 30 source_pos: 0.02 p_height: 2.8 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.04 p_height: 2.8 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.08 p_height: 2.8 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.16 p_height: 2.8 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.32 p_height: 2.8 p_width: 2
-res: 60 sim_time: 30 source_pos: 0.64 p_height: 2.8 p_width: 2
+res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.1
+res: 60 sim_time: 60 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.1
+res: 60 sim_time: 120 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.1
+res: 60 sim_time: 240 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.1
+res: 60 sim_time: 480 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.1
+res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.4
+res: 60 sim_time: 60 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.4
+res: 60 sim_time: 120 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.4
+res: 60 sim_time: 240 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.4
+res: 60 sim_time: 480 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.4

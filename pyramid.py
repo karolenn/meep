@@ -30,7 +30,7 @@ sy=sx
 sz=pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 
 					
-dpml=0.1 							#thickness of pml layers
+dpml=float(sys.argv[6]) 							#thickness of pml layers
 padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
 
 "Inarguments for the simulation"
@@ -47,8 +47,8 @@ source_direction=mp.Ez						#polasation of the gaussian source.
 
 "Frequency parameters for gaussian source"
 fcen=2								#center frequency
-df=1	   							#frequency span, ranging from 1.7-2.3 
-nfreq=3								#number of frequencies sampled
+df=0.5	   							#frequency span, ranging from 1.7-2.3 
+nfreq=1								#number of frequencies sampled
 
 
 "Calculation and plotting parameters"
@@ -200,7 +200,8 @@ flux1=1
 flux2=0
 
 def output_power(sim):
-	return(mp.get_fluxes(flux_total)[0])
+	print(mp.get_fluxes(flux_total)[0])
+	#return(mp.get_fluxes(flux_total)[0])
 
 def flux1_step(sim):
 	global flux1
@@ -211,6 +212,12 @@ def flux2_step(sim):
 	flux2 = output_power(sim)
 
 def ratio_test(sim):
+	global simulation_time
+	simulation_time=sim.meep_time()
+	print('time step1:',3*15/(1+sim.meep_time()))
+	print('time step2:',4*15/(1+sim.meep_time()))
+	print('sim time:',simulation_time)
+	print('fluxrat:',abs(flux2/flux1 - 1))
 	return abs(flux2/flux1 - 1) < 0.01
 
 
@@ -249,7 +256,7 @@ pml_layer=[mp.PML(dpml)]
 "Source position"
 abs_source_pos=sz/2-sh-pyramid_height+pyramid_height*(source_pos)
 
-source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2),	#gaussian current-source
+source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2*5),	#gaussian current-source
 		component=source_direction,
 		center=mp.Vector3(0,0,abs_source_pos))]
 
@@ -366,8 +373,10 @@ nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearf
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
 sim.run(
 #mp.at_beginning(mp.output_epsilon),
-mp.at_every(3,flux1_step), mp.at_every(5,flux2_step),
-until=ratio_test)
+#mp.at_every(3*30/(1+sim.meep_time()),flux1_step), mp.at_every(4*30/(1+sim.meep_time()),flux2_step),
+#mp.at_every(10,output_power),
+#until=ratio_test)
+until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
 
 
