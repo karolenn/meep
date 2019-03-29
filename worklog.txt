@@ -27,4 +27,16 @@ Try comparing my ff calcs with meeps. Is mine close enough? Also, convergence cr
 
 dpml seems to be ok. upper limit 30 time units possibly? check ff with flux angle? run time seems dependent on height and freq a lot?
 
+<<<<<<< HEAD
 for large time to flux diverges. Why? Need to investigate both dpml and absorbers. First of, do we need just thicker dpml/absorbers? Eventually. Why do they only diverge after a large amount of time? t>360 for absorbers and cutoff=10. t>180 cutoff=2 for dpml. TODO: plot
+=======
+Compare array get metadata integral with my own.. 
+
+Results differ a lot when changing polarization to Ey. Need to redo a lot of runs to get some 1D plots. check how much energy convergence and runnig for fixed time differs. for res 40 seems to be about 2% 
+
+TODO:
+
+Importance 1: Check how to implement utility function and automate the process
+Importance 2: Compare my ff calcs with meep, compare array get metadata integal with my own check how varying sim cell sizes affect output
+Importance 3:Time differs from fixed sim time to energy convergence.
+>>>>>>> f52a4f01a5a00b30a944442baac43065471cfbad
