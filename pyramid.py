@@ -14,7 +14,7 @@ import time
 #from mpl_toolkits.mplot3d import Axes3D
 
 
-if (len(sys.argv)) != 6:
+if (len(sys.argv)) != 7:
     print("Not enough arguments")
     exit(0)
 
@@ -41,7 +41,7 @@ cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell i
 						
 
 "Direction for source"
-source_direction=mp.Ez						#polasation of the gaussian source. 
+source_direction=mp.Ey						#polasation of the gaussian source. 
 								#symmetry has normal in x & y-direction, phase-even z-dir 
 
 
@@ -238,7 +238,7 @@ if use_symmetries == 'true':
 	elif source_direction == mp.Ey:
 		symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1)]
 	elif source_direction == mp.Ez:
-		symmetry =[mp.Mirror(mp.X),mp.Mirror(mp.Z,phase=-1)]
+		symmetry =[mp.Mirror(mp.X)]
 	else:
 		symmetry = []
 

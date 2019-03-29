@@ -63,3 +63,58 @@ Total_Flux: [0.0008707470674533752, 10.116447523018785, 0.0015357697520943033] F
 Elapsed run time = 791.6432 s
 Total_Flux: [0.0, 0.0, 0.0] Flux_ff: [0. 0. 0.] ratio: [nan nan nan] sim_time: 60 dpml: 0.1 res: 60 source_pos: 0.64 p_height: 4.4 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
 Elapsed run time = 786.6631 s
+Total_Flux: [0.0006251280747314392, 2.809780409884308, 0.003013173175864093] Flux_ff: [4.19331821e-05 1.02853610e-01 1.80234558e-04] ratio: [0.06707935 0.03660557 0.05981553] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 293.4856 s
+Total_Flux: [0.0003771559344272228, 6.0980749970791, 0.0028169516187095786] Flux_ff: [3.29811045e-05 2.48031685e-01 1.54462936e-04] ratio: [0.08744687 0.04067377 0.05483337] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.2 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 349.2777 s
+Total_Flux: [0.0004272646609638053, 5.511509174350706, 0.002825356456792409] Flux_ff: [2.09612711e-05 2.22772572e-01 1.36421657e-04] ratio: [0.04905922 0.04041952 0.04828476] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.4 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 375.0231 s
+Total_Flux: [0.0004174777113540955, 5.142913874541923, 0.0018308840035369373] Flux_ff: [2.15808551e-05 2.17412455e-01 1.20883726e-04] ratio: [0.05169343 0.04227418 0.06602479] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.6 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 399.6901 s
+Total_Flux: [0.0008370870989479251, 5.095814717604885, 0.0030611382352041527] Flux_ff: [3.77257221e-05 1.93755135e-01 1.26671996e-04] ratio: [0.04506786 0.03802241 0.04138068] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.8 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 343.6993 s
+Total_Flux: [0.0007900957636044184, 5.792682325973126, 0.001809047966683632] Flux_ff: [2.58002899e-05 2.46717044e-01 8.34436730e-05] ratio: [0.03265464 0.04259116 0.04612574] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 3.0 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 356.6702 s
+Total_Flux: [0.0006251280747314392, 2.809780409884308, 0.003013173175864093] Flux_ff: [4.19331821e-05 1.02853610e-01 1.80234558e-04] ratio: [0.06707935 0.03660557 0.05981553] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 304.9895 s
+Total_Flux: [0.0014078140138040522, 4.688545648762073, 0.00605439332782535] Flux_ff: [5.07206778e-05 1.80876779e-01 3.07862698e-04] ratio: [0.03602797 0.03857844 0.05084947] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.2 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 381.5449 s
+Total_Flux: [0.001535926527015633, 7.407041131520227, 0.0038085305031795354] Flux_ff: [7.40201450e-05 2.91065600e-01 2.35604497e-04] ratio: [0.0481925  0.0392958  0.06186231] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.4 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 424.8538 s
+Total_Flux: [0.0021147476889071697, 13.764602118604671, 0.009392313611747714] Flux_ff: [7.33113641e-05 6.31183734e-01 5.39675236e-04] ratio: [0.03466672 0.04585557 0.05745924] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.6 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 461.8029 s
+Total_Flux: [0.008460387484311277, 1.9089535708175918, 0.008332960613406711] Flux_ff: [0.00012723 0.09007777 0.00069175] ratio: [0.01503868 0.04718699 0.08301321] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.8 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 510.2706 s
+Total_Flux: [0.008966020483802262, 5.557964658102399, 0.014333911019401593] Flux_ff: [1.67718450e-04 2.40019755e-01 1.03377718e-03] ratio: [0.01870601 0.04318483 0.07212108] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 3.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 551.7222 s
+Total_Flux: [0.001833590533016494, 5.139352431531702, 0.002655772748229924] Flux_ff: [7.26667961e-05 2.41962239e-01 1.36348959e-04] ratio: [0.03963087 0.0470803  0.0513406 ] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.02 p_height: 2.8 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 341.5174 s
+Total_Flux: [0.001830207371201732, 4.494780548810915, 0.002425751673661146] Flux_ff: [7.15682605e-05 1.95094924e-01 1.17767784e-04] ratio: [0.03910391 0.04340477 0.04854899] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.04 p_height: 2.8 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 331.3964 s
+Total_Flux: [0.0008370870989479251, 5.095814717604885, 0.0030611382352041527] Flux_ff: [3.77257221e-05 1.93755135e-01 1.26671996e-04] ratio: [0.04506786 0.03802241 0.04138068] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.8 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 338.3262 s
+Total_Flux: [0.0016935361321282639, 15.021467380984229, 0.003908621073240068] Flux_ff: [8.63171701e-05 5.71218249e-01 2.20553216e-04] ratio: [0.0509686  0.03802679 0.05642737] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.16 p_height: 2.8 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 337.0527 s
+Total_Flux: [0.002852516617968237, 8.72061494795783, 0.004518902369022255] Flux_ff: [1.37049503e-04 4.51651746e-01 4.39721591e-04] ratio: [0.04804512 0.05179127 0.09730717] sim_time: 30 dpml: 0.1 res: 60 source_pos: 0.32 p_height: 2.8 p_width: 2.0 freqs: [1.5, 2.0, 2.5]
+Elapsed run time = 339.7249 s
+Elapsed run time = 45.3875 s
+Elapsed run time = 0.2136 s
+Elapsed run time = 0.2134 s
+Elapsed run time = 0.2162 s
+Elapsed run time = 0.2181 s
+Elapsed run time = 0.2190 s
+Elapsed run time = 0.2168 s
+Elapsed run time = 0.2184 s
+Elapsed run time = 0.2171 s
+Elapsed run time = 0.2183 s
+Elapsed run time = 0.2141 s
+Total_Flux: [11.944917200075794] Flux_ff: [0.44112189] ratio: [0.03692967] sim_time: 360 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [2.0]
+Elapsed run time = 1377.9766 s
+Total_Flux: [818040075.0235798] Flux_ff: [1252686.93166358] ratio: [0.00153133] sim_time: 480 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [2.0]
+Elapsed run time = 1803.0656 s
+Total_Flux: [1.3800059524617748e+36] Flux_ff: [2.30277084e+33] ratio: [0.00166867] sim_time: 760 dpml: 0.1 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [2.0]
+Elapsed run time = 2775.6366 s
+Total_Flux: [11.821847021807226] Flux_ff: [0.42029037] ratio: [0.03555201] sim_time: 360 dpml: 0.4 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [2.0]
+Elapsed run time = 2277.5653 s
+Total_Flux: [1121727498.6815557] Flux_ff: [1845610.29862351] ratio: [0.00164533] sim_time: 480 dpml: 0.4 res: 60 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [2.0]
+Elapsed run time = 3056.6336 s
