@@ -26,3 +26,13 @@ Implement sim for several frequencies. Done.
 Try comparing my ff calcs with meeps. Is mine close enough? Also, convergence criteria. Take an upper limit on time or implement some based on total flux? upper time seems simpler. Just need to find it. Check dpml differences for higher resolutions
 
 dpml seems to be ok. upper limit 30 time units possibly? check ff with flux angle? run time seems dependent on height and freq a lot?
+
+Compare array get metadata integral with my own.. 
+
+Results differ a lot when changing polarization to Ey. Need to redo a lot of runs to get some 1D plots. check how much energy convergence and runnig for fixed time differs. for res 40 seems to be about 2% 
+
+TODO:
+
+Importance 1: Check how to implement utility function and automate the process
+Importance 2: Compare my ff calcs with meep, compare array get metadata integal with my own check how varying sim cell sizes affect output
+Importance 3:Time differs from fixed sim time to energy convergence.

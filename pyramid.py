@@ -14,7 +14,7 @@ import time
 #from mpl_toolkits.mplot3d import Axes3D
 
 
-if (len(sys.argv)) != 6:
+if (len(sys.argv)) != 7:
     print("Not enough arguments")
     exit(0)
 
@@ -41,7 +41,7 @@ cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell i
 						
 
 "Direction for source"
-source_direction=mp.Ez						#polasation of the gaussian source. 
+source_direction=mp.Ey						#polasation of the gaussian source. 
 								#symmetry has normal in x & y-direction, phase-even z-dir 
 
 
@@ -196,29 +196,39 @@ def planepts(r,nptsline,theta):
 		for m in range(nptsline):
 			yPts.append(-d+delta*m)
 
-flux1=1
-flux2=0
+flux1=0
+flux2=1
+time_st=1000
 
 def output_power(sim):
-	print(mp.get_fluxes(flux_total)[0])
-	#return(mp.get_fluxes(flux_total)[0])
+	#print(mp.get_fluxes(flux_total)[0])
+	return(mp.get_fluxes(flux_total)[0])
 
 def flux1_step(sim):
 	global flux1
 	flux1 = output_power(sim)
+	print('flux1 step:', flux1)
 
 def flux2_step(sim):
 	global flux2
 	flux2 = output_power(sim)
+	print('flux2 step:',flux2)
 
 def ratio_test(sim):
 	global simulation_time
 	simulation_time=sim.meep_time()
-	print('time step1:',3*15/(1+sim.meep_time()))
-	print('time step2:',4*15/(1+sim.meep_time()))
-	print('sim time:',simulation_time)
-	print('fluxrat:',abs(flux2/flux1 - 1))
-	return abs(flux2/flux1 - 1) < 0.01
+	#print('time step1:',round(3*15/(1+sim.meep_time())))
+	#print('time step2:',round(4*15/(1+sim.meep_time())))
+	#print('time_st',3*sim.meep_time(),5*sim.meep_time())
+	print('flux1:',flux1)
+	print('flux2:',flux2)
+	#print('sim time:',simulation_time)
+	#print('fluxrat:',abs(flux2/flux1 - 1))
+	return abs(flux1/flux2 - 1) < 0.01
+
+def time_func(sim):
+	global time_st
+	time_st=sim.meep_time()
 
 
 
@@ -238,7 +248,7 @@ if use_symmetries == 'true':
 	elif source_direction == mp.Ey:
 		symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1)]
 	elif source_direction == mp.Ez:
-		symmetry =[mp.Mirror(mp.X),mp.Mirror(mp.Z,phase=-1)]
+		symmetry =[mp.Mirror(mp.X)]
 	else:
 		symmetry = []
 
@@ -373,8 +383,9 @@ nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearf
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(2, source_direction, mp.Vector3(0,0,abs_source_pos+0.2), 1e-3))
 sim.run(
 #mp.at_beginning(mp.output_epsilon),
-#mp.at_every(3*30/(1+sim.meep_time()),flux1_step), mp.at_every(4*30/(1+sim.meep_time()),flux2_step),
-#mp.at_every(10,output_power),
+#mp.at_every(3,flux1_step), mp.at_every(4*30/(1+sim.meep_time()),flux2_step),s
+#mp.after_time(15,time_func),
+#mp.at_every(7,flux1_step), mp.at_every(8,flux2_step),
 #until=ratio_test)
 until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
