@@ -36,7 +36,7 @@ def test_for(in_file):
                 args4 = g.group(4)
                 args5 = g.group(5)
                 args6 = g.group(6)
-                os.system('mpirun -np 3 python {}.py {} {} {} {} {} {} |grep "Total_Flux:*\|Elapsed run time*" >> results/{}.out'.format(file_name, args1, args2, args3, args4, args5, args6, in_file.replace(".in",'')))
+                os.system('mpirun -np 2 python {}.py {} {} {} {} {} {} |grep "Total_Flux:*\|Elapsed run time*" >> results/{}.out'.format(file_name, args1, args2, args3, args4, args5, args6, in_file.replace(".in",'')))
             except :
                 print("\n{}Failed {} - {} In file: {} {} {} At row: {}{}".format(RED, NULL, BLUE, NULL, in_file, BLUE, NULL,  count))
 

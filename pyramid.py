@@ -58,7 +58,7 @@ plot_epsilon = 'false'						#Plot epsilon data in xy,yz,xz slices
 angle = math.pi/6						#calculate flux at angle measured from top of the pyramid
 far_field_calculation = 'true'					#calculate far fields
 mp_ff_calculation = 'false'					#calculate far fields using meeps function
-calculate_at_an_angle = 'true'
+calculate_at_an_angle = 'false'
 								
 
 ###GEOMETRY FOR THE SIMULATION#################################################

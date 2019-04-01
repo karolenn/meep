@@ -1,3 +1,29 @@
+<<<<<<< HEAD
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.2 p_width: 2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.4 p_width: 2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.6 p_width: 2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.8 p_width: 2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 3.0 p_width: 2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.4 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.6 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2.8 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 3 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.2 p_width: 2.2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.2 p_width: 2.4 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.2 p_width: 2.6 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.2 p_width: 2.8 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.2 p_width: 3.0 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.4 p_width: 2.2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.6 p_width: 2.2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.8 p_width: 2.2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 3 p_width: 2.2 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.4 p_width: 2.4 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.6 p_width: 2.4 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 2.8 p_width: 2.4 dpml: 0.1
+res: 40 sim_time: 30 source_pos: 0.08 p_height: 3 p_width: 2.4 dpml: 0.1
+=======
 res: 60 sim_time: 30 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 1
 res: 60 sim_time: 60 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 1
 res: 60 sim_time: 120 source_pos: 0.08 p_height: 2 p_width: 2 dpml: 1
@@ -138,3 +164,4 @@ r: 40 time: 15 s_pos: 0.08 p_height: 3.0 p_width: 2.7 pml: 0.1
 r: 40 time: 15 s_pos: 0.08 p_height: 3.0 p_width: 2.8 pml: 0.1
 r: 40 time: 15 s_pos: 0.08 p_height: 3.0 p_width: 2.9 pml: 0.1
 r: 40 time: 15 s_pos: 0.08 p_height: 3.0 p_width: 3.0 pml: 0.1
+>>>>>>> f52a4f01a5a00b30a944442baac43065471cfbad
