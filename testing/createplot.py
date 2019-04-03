@@ -7,7 +7,7 @@ import math as math
 
 
 #def plotdata(ff, height, width, position, freq):
-data= np.loadtxt("pyramidcopy.out",delimiter=' ',dtype=list,usecols=(5,13,15,17,19))
+data= np.loadtxt("pyramid.out",delimiter=' ',dtype=list,usecols=(5,13,15,17,19))
 lendata=len(data)
 ff_array = []
 print(data)
@@ -59,7 +59,7 @@ def convert2double(narray):
 		Darray.append(float(Sarray))
 	return(Darray)
 
-def plotarray(Ynarray,Xnarray,labely,labelx)
+#def plotarray(Ynarray,Xnarray,labely,labelx)
 	
 		
 

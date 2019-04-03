@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import sys
 from mpl_toolkits.mplot3d import Axes3D
 import math as math
-#from functions import CalculatePowerRatio 			#import function that calculates ratio of total and angle out
+
+
 
 ###PARAMETERS FOR THE SIMULATION##############################################
 
-#from mpl_toolkits.mplot3d import Axes3D
 
 if (len(sys.argv)) != 3:
     print("Not enough arguments")
@@ -17,17 +17,17 @@ if (len(sys.argv)) != 3:
 "z 0.5a ovanför pml"
 "x,y=5a + 2*dpml"
 "Simulation cell"
-sx=6
+sx=8
 sy=sx
-sz=6								#size of cell in x,y direction
-dpml=0.5 							#thickness of pml layers
+sz=8								#size of cell in x,y direction
+dpml=0.1 							#thickness of pml layers
 resolution= int(sys.argv[1])	
 print("resolution: ", resolution)						#resolution, #pixels/unit_distance
 cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
 padding=0.1							#distance from pml_layers to flux regions so PML don't overlap flux regions
 
 "Direction for source"
-source_direction=mp.Ez
+source_direction=mp.Ey
 		#symmetry has normal in x & y-direction, phase-even z-dir 
 
 use_symmetries = 'true'						#run sim with 8-fold symmetries? reduces calc time by 1/8th
@@ -54,8 +54,8 @@ nfreq=1								#number of frequencies sampled
 "Calculation and plotting parameters"
 calculate_flux = 'true'
 plot_epsilon = 'false'						#Plot epsilon data in xy,yz,xz slices
-angle = math.pi/6						#calculate flux at angle measured from top of the pyramid
-far_field_calculation = 'true'					#calculate far fields, not implemented yet.
+angle = math.pi*2						#calculate flux at angle measured from top of the pyramid
+far_field_calculation = 'false'					#calculate far fields, not implemented yet.
 								
 "Parameters for several runs and convergence testing"
 
@@ -114,10 +114,10 @@ SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
 #			material=SubstrateEps)]
 
 Blob = []
-npts=30
-r=2.5
+npts=600
+r=4
 
-theta=math.pi
+theta=math.pi/6
 	
 offset=2/npts
 range_npts=int((theta/math.pi)*npts)
@@ -129,7 +129,7 @@ for n in range(range_npts):
 	phi = (n % npts)*increment
 	x=(R*math.cos(phi))
 	z=(R*math.sin(phi))
-	Blob.append(mp.Sphere(center=mp.Vector3(x,y,z),radius=1,material=SubstrateEps))
+	Blob.append(mp.Sphere(center=mp.Vector3(x,y,z),radius=0.1,material=SubstrateEps))
 
 #for n in range(npts):
 	#angleN=math.pi/2-angle/2+(n/npts)*angle
@@ -145,7 +145,7 @@ for n in range(range_npts):
 
 ###SYMMETRIES#########################################################
 
-if use_symmetries == 'true':
+if use_symmetries == 'trueE':
 
 	if source_direction ==	mp.Ex:
 		symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1),mp.Mirror(mp.Z)]
@@ -181,6 +181,7 @@ source2=[mp.Source(mp.ContinuousSource(frequency=fcen,start_time=0,end_time=1),
 
 sim=mp.Simulation(cell_size=cell,
 		geometry=Blob,
+		eps_averaging=False,
 		#symmetries=symmetry,
 		sources=source,
 		dimensions=3,
@@ -192,31 +193,33 @@ sim=mp.Simulation(cell_size=cell,
 
 "These regions define the borders of the cell with distance 'padding' between the flux region and the dpml region to avoid calculation errors."
 
-fluxregion1=mp.FluxRegion(					#region -y to calculate flux from
-		center=mp.Vector3(0,-sy/2+padding,0),
-		size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-		direction=mp.Y,
-		weight=-1)
+fluxregion1=mp.FluxRegion(					#region x to calculate flux from
+		center=mp.Vector3(sx/2-padding,0,0),
+		size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+		direction=mp.X)
 
-fluxregion2=mp.FluxRegion(					#region y to calculate flux from
-		center=mp.Vector3(0,sy/2-padding,0),
-		size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-		direction=mp.Y)
-
-fluxregion3=mp.FluxRegion(					# region -x to calculate flux from
+fluxregion2=mp.FluxRegion(					# region -x to calculate flux from
 		center=mp.Vector3(-sx/2+padding,0,0),
 		size=mp.Vector3(0,sy-padding*2,sz-padding*2),
 		direction=mp.X,
 		weight=-1)
 
-fluxregion4=mp.FluxRegion(					#region x to calculate flux from
-		center=mp.Vector3(sx/2-padding,0,0),
-		size=mp.Vector3(0,sy-padding*2,sz-padding*2),
-		direction=mp.X)
+fluxregion3=mp.FluxRegion(					#region y to calculate flux from
+		center=mp.Vector3(0,sy/2-padding,0),
+		size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+		direction=mp.Y)
+
+fluxregion4=mp.FluxRegion(					#region -y to calculate flux from
+		center=mp.Vector3(0,-sy/2+padding,0),
+		size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+		direction=mp.Y,
+		weight=-1)
+
+
 
 fluxregion5=mp.FluxRegion(					#z-bottom region to calculate flux from
 		center=mp.Vector3(0,0,sz/2-padding),
-		size=mp.Vector3(sx-padding*2,sz-padding*2,0),
+		size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 		direction=mp.Z)
 
 fluxregion6=mp.FluxRegion(					#z-top region to calculate flux from
@@ -255,42 +258,39 @@ flux_total=sim.add_flux(fcen,df,nfreq,
 
 if far_field_calculation == 'true':
 
-		nearfieldregion1=mp.Near2FarRegion(					#nearfield -z. above pyramid.		
-			center=mp.Vector3(0,-sz/2+2*padding,0),
-			size=mp.Vector3(sx/2,sy/2,0),
-			direction=mp.Z,
-			weight=-1)
 
-		nearfieldregion6=mp.Near2FarRegion(					#nearfield z. below pyramid.		
-			center=mp.Vector3(0,sz/2-2*padding,0),
-			size=mp.Vector3(sx/2-padding*2,sy/2-padding*2,0),
-			direction=mp.Z)
-
-		nearfieldregion2=mp.Near2FarRegion(
-			center=mp.Vector3(sx/2-padding*2,0,0),
-			size=mp.Vector3(0,sy/2-padding*2,sz/2-padding*2),
+		nearfieldregion1=mp.Near2FarRegion(
+			center=mp.Vector3(sx/2-padding,0,0),
+			size=mp.Vector3(0,sy-padding*2,sz-padding*2),
 			direction=mp.X)
 
-		nearfieldregion3=mp.Near2FarRegion(
-			center=mp.Vector3(-sx/2+padding*2,0,0),
-			size=mp.Vector3(0,sy/2-padding*2,sz/2-padding*2),
+		nearfieldregion2=mp.Near2FarRegion(
+			center=mp.Vector3(-sx/2+padding,0,0),
+			size=mp.Vector3(0,sy-padding*2,sz-padding*2),
 			direction=mp.X,
 			weight=-1)
 
-		nearfieldregion4=mp.Near2FarRegion(
-			center=mp.Vector3(0,sy/2-padding*2,0),
-			size=mp.Vector3(sx/2-padding*2,0,sz/2-padding*2),
+		nearfieldregion3=mp.Near2FarRegion(
+			center=mp.Vector3(0,sy/2-padding,0),
+			size=mp.Vector3(sx-padding*2,0,sz-padding*2),
 			direction=mp.Y)
 
-		nearfieldregion5=mp.Near2FarRegion(
-			center=mp.Vector3(0,-sy/2+padding*2,0),
-			size=mp.Vector3(sx/2-padding*2,0,sz/2-padding*2),
+		nearfieldregion4=mp.Near2FarRegion(
+			center=mp.Vector3(0,-sy/2+padding,0),
+			size=mp.Vector3(sx-padding*2,0,sz-padding*2),
 			direction=mp.Y,
 			weight=-1)
 
+		nearfieldregion5=mp.Near2FarRegion(					#nearfield z. below pyramid.		
+			center=mp.Vector3(0,0,sz/2-padding),
+			size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+			direction=mp.Z)
 
-
-
+		nearfieldregion6=mp.Near2FarRegion(					#nearfield -z. above pyramid.		
+			center=mp.Vector3(0,0,-sz/2+padding),
+			size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+			direction=mp.Z,
+			weight=-1)
 
 ###FAR FIELD CALCULATIONS#######################################################
 
@@ -300,7 +300,9 @@ if far_field_calculation == 'true':
 		nearfieldregion4,nearfieldregion5,nearfieldregion6)	
 
 ###RUN##########################################################################
-sim.run(mp.at_beginning(mp.output_epsilon),until=simulation_time)
+sim.run(
+mp.at_beginning(mp.output_epsilon),
+until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
 sim.display_fluxes(flux_total)
 
@@ -313,59 +315,47 @@ fibpts = 'true'
 if far_field_calculation == 'true':
 	P_tot_ff = np.zeros(nfreq)
 	r=sx*20						#distance to far-field
-	npts=8							#number of far-field points
+	npts=1600							#number of far-field points
 
-	if fibpts == 'true':
-		Px=0
-		Py=0
-		Pz=0
+	Px=0
+	Py=0
+	Pz=0
 
-		theta=math.pi
+	theta=math.pi
 	
-		offset=2/npts
-		range_npts=int((theta/math.pi)*npts)
-		increment = math.pi*(3 - math.sqrt(5))
+	offset=2/npts
+	range_npts=int((theta/math.pi)*npts)
+	increment = math.pi*(3 - math.sqrt(5))
 
-		for n in range(range_npts):
-			y=r*((n*offset-1)+(offset/2))
-			R = r*math.sqrt(1-pow(y/r,2))
-			phi = (n % npts)*increment
-			x=(R*math.cos(phi))
-			z=(R*math.sin(phi))
+	for n in range(npts):
+		y=r*((n*offset-1)+(offset/2))
+		R = r*math.sqrt(1-pow(y/r,2))
+		phi = (n % npts)*increment
+		x=(R*math.cos(phi))
+		z=(R*math.sin(phi))
 		
 
-			ff=sim.get_farfield(nearfield, mp.Vector3(x,y,z))
+		ff=sim.get_farfield(nearfield, mp.Vector3(x,y,z))
 
-	else:
-		theta=math.pi
-		phi=math.pi*2
-
-		for n in range(npts):
-			angleN=(n/npts)*phi
 
 		
-			for m in range(npts):
-			#angleM=math.pi/2-angle/2+(m/npts)*angle
-			#angleM=(m/npts)*angle			#angleM loops between pi/12 and -pi/12
-				angleM=(m/npts)*theta
-				ff=sim.get_farfield(nearfield, mp.Vector3(r*math.sin(angleM)*math.cos(angleN),-r*math.sin(angleM)*math.sin(angleN),-r*math.cos(angleM)))
 		"P_tot_ff calculated as (1/2)Re(E x H*)scalar-product(sin(angleM)cos(angleN),sin(angleM)sin(angleN),-cos(angleM)) where H* is the complex conjugate and this corresponds to the average power density in radial direction from the simulation cell at a distance of r micrometers."
 
-	i=0
-	for k in range(nfreq):
-		Px=(ff[i+1]*np.conjugate(ff[i+5])-ff[i+2]*np.conjugate(ff[i+4]))
-		Px=Px.real
-		Py=(ff[i+2]*np.conjugate(ff[i+3])-ff[i]*np.conjugate(ff[i+5]))
-		Py=Py.real
-		Pz=(ff[i]*np.conjugate(ff[i+4])-ff[i+1]*np.conjugate(ff[i+3]))
-		Pz=Pz.real
-		Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))					
+		i=0
+		for k in range(nfreq):
+			Px=(ff[i+1]*np.conjugate(ff[i+5])-ff[i+2]*np.conjugate(ff[i+4]))
+			Px=Px.real
+			Py=(ff[i+2]*np.conjugate(ff[i+3])-ff[i]*np.conjugate(ff[i+5]))
+			Py=Py.real
+			Pz=(ff[i]*np.conjugate(ff[i+4])-ff[i+1]*np.conjugate(ff[i+3]))
+			Pz=Pz.real
+			Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))					
 		#Pr=(Px)*math.cos(angleN)*math.sin(angleM)-(Py)*math.sin(angleN)*math.sin(angleM)-(Pz)*math.cos(angleM)
 		#surface_Element=math.pow(r,2)*math.pow(angle,2)*math.pow((1/npts),2)
-		surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/npts
-		P_tot_ff[k] += surface_Element*(1)*np.real(Pr)
+			surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/npts
+			P_tot_ff[k] += surface_Element*(1)*np.real(Pr)
 
-		i=i+6
+			i=i+6
 			
 		#print("vector3:",[r*math.sin(angleM)*math.cos(angleN),-r*math.sin(angleM)*math.sin(angleN),-	r*math.cos(angleM)],"ff:",ff,"Px:",Px,"Py:",Py,"Pz:",Pz,"Pr:",Pr,P_tot_ff[k])
 

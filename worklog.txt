@@ -36,44 +36,16 @@ Results differ a lot when changing polarization to Ey. Need to redo a lot of run
 
 TODO:
 
+
+
 Importance 1: Check how to implement utility function and automate the process
 Importance 2: Compare my ff calcs with meep, compare array get metadata integal with my own check how varying sim cell sizes affect output
-Importance 3:Time differs from fixed sim time to energy convergence.
-<<<<<<< HEAD
+Importance 3:Time differs from fixed sim time to energy convergence. Done. Go with probe.
 
-run 0 finished at t = 35.0 (5600 timesteps)
-time taken: 0.052671194076538086
-Total_Flux: [24.251325775153624] Flux_ff: [0.95142467] ratio: [0.03923186] sim_time: 35 dpml: 0.1 res: 80 source_pos: 0.08 p_height: 3.0 p_width: 3.0 freqs: [2.0]
-Flux at an angle / Total flux: [0.10526799982001889]
+--- April
+Importance 1: Check and verify ff-calculations as good as possible once and for all
+Importance 2: Implement utility function. Look how to optimize outdata, automate the process-chain.
 
-Elapsed run time = 2396.6479 s
+1: closed flux now works. The next, and I guess final test is to compare to some analytical solution for some radiator pattern antenna or something. Tricky to couple the gaussian source to something, but should be solvable.
+Fix fibsphere pts, they seem to place on the x-axis on the simulation cell now. LOL!!
 
-run 0 finished at t = 40.00625 (6401 timesteps)
-time taken: 0.004448890686035156
-Total_Flux: [24.252193691072527] Flux_ff: [0.95121561] ratio: [0.03922184] sim_time: 40.00625 dpml: 0.1 res: 80 source_pos: 0.08 p_height: 3.0 p_width: 3.0 freqs: [2.0]
-
-Elapsed run time = 2675.3661 s
-
-Field time usage:
-     connecting chunks: 15.6827 s
-         time stepping: 1015.62 s
-         communicating: 158.76 s
-    Fourier transforming: 382.933 s
-       everything else: 60.1996 s
-
-run 0 finished at t = 40.0 (6400 timesteps)
-time taken: 0.031694889068603516
-Total_Flux: [24.25219133501465] Flux_ff: [0.95121566] ratio: [0.03922184] sim_time: 40 dpml: 0.1 res: 80 source_pos: 0.08 p_height: 3.0 p_width: 3.0 freqs: [2.0]
-
-Elapsed run time = 2561.6147 s
-
-Field time usage:
-     connecting chunks: 13.0236 s
-         time stepping: 986.527 s
-         communicating: 159.787 s
-    Fourier transforming: 373.715 s
-       everything else: 47.3579 s
-
-=======
->>>>>>> f52a4f01a5a00b30a944442baac43065471cfbad
->>>>>>> 8e7e12e1b92d48b0f9f69a933c2ca7fe658923e0
