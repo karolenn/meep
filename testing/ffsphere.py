@@ -17,9 +17,9 @@ if (len(sys.argv)) != 3:
 "z 0.5a ovanför pml"
 "x,y=5a + 2*dpml"
 "Simulation cell"
-sx=8
+sx=1
 sy=sx
-sz=8								#size of cell in x,y direction
+sz=1								#size of cell in x,y direction
 dpml=0.1 							#thickness of pml layers
 resolution= int(sys.argv[1])	
 print("resolution: ", resolution)						#resolution, #pixels/unit_distance
@@ -27,7 +27,7 @@ cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell i
 padding=0.1							#distance from pml_layers to flux regions so PML don't overlap flux regions
 
 "Direction for source"
-source_direction=mp.Ey
+source_direction=mp.Ex
 		#symmetry has normal in x & y-direction, phase-even z-dir 
 
 use_symmetries = 'true'						#run sim with 8-fold symmetries? reduces calc time by 1/8th
@@ -48,14 +48,14 @@ a=10e-6								#length in meters
 
 "Frequency parameters for gaussian source"
 fcen=2								#center frequency
-df=1.2	   							#frequency span, ranging from 1.7-2.3 
+df=0.5	   							#frequency span, ranging from 1.7-2.3 
 nfreq=1								#number of frequencies sampled
 
 "Calculation and plotting parameters"
 calculate_flux = 'true'
 plot_epsilon = 'false'						#Plot epsilon data in xy,yz,xz slices
 angle = math.pi*2						#calculate flux at angle measured from top of the pyramid
-far_field_calculation = 'false'					#calculate far fields, not implemented yet.
+far_field_calculation = 'true'					#calculate far fields, not implemented yet.
 								
 "Parameters for several runs and convergence testing"
 
@@ -124,13 +124,21 @@ range_npts=int((theta/math.pi)*npts)
 increment = math.pi*(3 - math.sqrt(5))
 
 for n in range(range_npts):
-	y=r*((n*offset-1)+(offset/2))
-	R = r*math.sqrt(1-pow(y/r,2))
+	z=r*((n*offset-1)+(offset/2))
+	R = r*math.sqrt(1-pow(z/r,2))
 	phi = (n % npts)*increment
 	x=(R*math.cos(phi))
-	z=(R*math.sin(phi))
-	Blob.append(mp.Sphere(center=mp.Vector3(x,y,z),radius=0.1,material=SubstrateEps))
+	y=(R*math.sin(phi))
+	Blob.append(mp.Sphere(center=mp.Vector3(x,y,z),radius=0.3,material=SubstrateEps))
 
+sh=0.3
+
+Blob.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
+			size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
+			material=SubstrateEps))
+Blob.append(mp.Cone(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
+		height=3,
+		radius=3,material=SubstrateEps))
 #for n in range(npts):
 	#angleN=math.pi/2-angle/2+(n/npts)*angle
 	#angleN=-angle/2+(n/npts)*angle
@@ -145,14 +153,14 @@ for n in range(range_npts):
 
 ###SYMMETRIES#########################################################
 
-if use_symmetries == 'trueE':
+if use_symmetries == 'true':
 
 	if source_direction ==	mp.Ex:
-		symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1),mp.Mirror(mp.Z)]
+		symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1)]
 	elif source_direction == mp.Ey:
-		symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1),mp.Mirror(mp.Z)]
+		symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1)]
 	elif source_direction == mp.Ez:
-		symmetry =[mp.Mirror(mp.X),mp.Mirror(mp.Z,phase=-1),mp.Mirror(mp.Y)]
+		symmetry =[mp.Mirror(mp.X)]
 	else:
 		symmetry = []
 
@@ -180,13 +188,14 @@ source2=[mp.Source(mp.ContinuousSource(frequency=fcen,start_time=0,end_time=1),
 
 
 sim=mp.Simulation(cell_size=cell,
-		geometry=Blob,
-		eps_averaging=False,
-		#symmetries=symmetry,
+		#geometry=Blob,
+		#eps_averaging=False,
+		symmetries=symmetry,
 		sources=source,
 		dimensions=3,
 		#material_function=isInsidexy,
 		boundary_layers=pml_layer,
+		split_chunks_evenly=False,
 		resolution=resolution)
 
 ###REGIONS######################################################################
@@ -301,7 +310,7 @@ if far_field_calculation == 'true':
 
 ###RUN##########################################################################
 sim.run(
-mp.at_beginning(mp.output_epsilon),
+#mp.at_beginning(mp.output_epsilon),
 until=simulation_time)
 #sim.run(until_after_sources=mp.stop_when_fields_decayed(10,mp.Ez,mp.Vector3(0,0.5,0),1e-2))
 sim.display_fluxes(flux_total)
@@ -315,24 +324,24 @@ fibpts = 'true'
 if far_field_calculation == 'true':
 	P_tot_ff = np.zeros(nfreq)
 	r=sx*20						#distance to far-field
-	npts=1600							#number of far-field points
+	npts=3000							#number of far-field points
 
 	Px=0
 	Py=0
 	Pz=0
 
-	theta=math.pi
+	theta=math.pi/2
 	
 	offset=2/npts
 	range_npts=int((theta/math.pi)*npts)
 	increment = math.pi*(3 - math.sqrt(5))
 
-	for n in range(npts):
-		y=r*((n*offset-1)+(offset/2))
-		R = r*math.sqrt(1-pow(y/r,2))
+	for n in range(range_npts):
+		z=r*((n*offset-1)+(offset/2))
+		R = r*math.sqrt(1-pow(z/r,2))
 		phi = (n % npts)*increment
 		x=(R*math.cos(phi))
-		z=(R*math.sin(phi))
+		y=(R*math.sin(phi))
 		
 
 		ff=sim.get_farfield(nearfield, mp.Vector3(x,y,z))
@@ -352,7 +361,7 @@ if far_field_calculation == 'true':
 			Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))					
 		#Pr=(Px)*math.cos(angleN)*math.sin(angleM)-(Py)*math.sin(angleN)*math.sin(angleM)-(Pz)*math.cos(angleM)
 		#surface_Element=math.pow(r,2)*math.pow(angle,2)*math.pow((1/npts),2)
-			surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/npts
+			surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
 			P_tot_ff[k] += surface_Element*(1)*np.real(Pr)
 
 			i=i+6

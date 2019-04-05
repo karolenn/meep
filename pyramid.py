@@ -44,7 +44,7 @@ source_direction=mp.Ey						#polasation of the gaussian source.
 
 
 "Frequency parameters for gaussian source"
-fcen=1								#center frequency
+fcen=2								#center frequency
 df=0.5	   							#frequency span, ranging from 1.7-2.3 
 nfreq=1								#number of frequencies sampled
 
@@ -64,8 +64,8 @@ GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4
 air = mp.Medium(epsilon=1)					#air dielectric value
 SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
 
-sh=substrate_height
-
+#sh=substrate_height
+sh=0
 
 
 "Geometry to define the Substrate"
@@ -134,14 +134,14 @@ abs_source_pos=sz/2-sh-pyramid_height+pyramid_height*(source_pos)
 
 source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2),	#gaussian current-source
 		component=source_direction,
-		center=mp.Vector3(0,0,abs_source_pos))]
-vec=mp.Vector3(0,0,0)
+		center=mp.Vector3(0,0,0))]
+
 sim=mp.Simulation(cell_size=cell,
-		geometry=Substrate,
+		#geometry=Substrate,
 		symmetries=symmetry,
 		sources=source,
 		dimensions=3,
-		material_function=isInsidexy,
+		#material_function=isInsidexy,
 		boundary_layers=pml_layer,
 		split_chunks_evenly=False,
 		resolution=resolution)
@@ -219,10 +219,10 @@ nearfieldregion4=mp.Near2FarRegion(
 		direction=mp.Y,
 		weight=-1)
 #under the substrate
-#nearfieldregion5=mp.Near2FarRegion(
-#		center=mp.Vector3(0,0,sz/2-padding),
-#		size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-#		direction=mp.Z)		
+nearfieldregion5=mp.Near2FarRegion(
+		center=mp.Vector3(0,0,sz/2-padding),
+		size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+		direction=mp.Z)		
 
 nearfieldregion6=mp.Near2FarRegion(					#nearfield -z. above pyramid.		
 		center=mp.Vector3(0,0,-sz/2+padding),
@@ -233,14 +233,14 @@ nearfieldregion6=mp.Near2FarRegion(					#nearfield -z. above pyramid.
 
 
 
-nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,nearfieldregion4,nearfieldregion6)
+nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,nearfieldregion4,nearfieldregion5,nearfieldregion6)
 
 ###RUN##########################################################################
 "The run constructor for meep."
 sim.run(
 #mp.at_beginning(mp.output_epsilon),
-until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,abs_source_pos+0.2),1e-2))
-#until=simulation_time)
+#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,abs_source_pos+0.2),1e-2))
+until=simulation_time)
 
 
 ###OUTPUT CALCULATIONS##########################################################
@@ -248,15 +248,15 @@ until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,abs_sourc
 "Calculate the poynting flux given the far field values of E, H."
 
 							#how to pick ff-points, this uses fibbonaci-sphere distribution
-r=2*math.pow(pyramid_height,2)*fcen*2 				# 2 times the Fraunhofer-distance
+r=2*math.pow(pyramid_height,2)*fcen*2*10 				# 2 times the Fraunhofer-distance
 if far_field_calculation == 'true':
 	P_tot_ff = np.zeros(nfreq)
 							
-	npts=16000							#number of far-field points
+	npts=1000							#number of far-field points
 	Px=0
 	Py=0
 	Pz=0
-	theta=math.pi/6
+	theta=math.pi/4
 	phi=math.pi*2
 	"How many points on the ff-sphere"
 	range_npts=int((theta/math.pi)*npts)
@@ -293,7 +293,7 @@ if far_field_calculation == 'true':
 			Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))
 			"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
 			"divided by npts and we get evenly sized area chunks" 					
-			surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/npts
+			surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
 			P_tot_ff[k] += surface_Element*(1)*np.real(Pr)
 
 			i=i+6

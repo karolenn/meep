@@ -49,3 +49,5 @@ Importance 2: Implement utility function. Look how to optimize outdata, automate
 1: closed flux now works. The next, and I guess final test is to compare to some analytical solution for some radiator pattern antenna or something. Tricky to couple the gaussian source to something, but should be solvable.
 Fix fibsphere pts, they seem to place on the x-axis on the simulation cell now. LOL!!
 
+Fibsphere seems to place points correctly now.
+
