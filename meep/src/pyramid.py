@@ -108,39 +108,40 @@ class Pyramid():
 		return fluxregion
 
 	def define_nearfield_regions(self, sx, sy, sz, sh, padding):
-		nearfieldregion=[]
-		nearfieldregion.append(mp.Near2FarRegion(
+		nearfieldregions=[]
+		nearfieldregions.append(mp.Near2FarRegion(
 				center=mp.Vector3(sx/2-padding,0,-sh/2),
 				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
 				direction=mp.X))
 
-		nearfieldregion.append(mp.Near2FarRegion(
+		nearfieldregions.append(mp.Near2FarRegion(
 				center=mp.Vector3(-sx/2+padding,0,-sh/2),
 				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
 				direction=mp.X,
 				weight=-1))
 
-		nearfieldregion.append(mp.Near2FarRegion(
+		nearfieldregions.append(mp.Near2FarRegion(
 				center=mp.Vector3(0,sy/2-padding,-sh/2),
 				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
 				direction=mp.Y))
 
-		nearfieldregion.append(mp.Near2FarRegion(
+		nearfieldregions.append(mp.Near2FarRegion(
 				center=mp.Vector3(0,-sy/2+padding,-sh/2),
 				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
 				direction=mp.Y,
 				weight=-1))
 		#under the substrate
-		nearfieldregion.append(mp.Near2FarRegion(
+		nearfieldregions.append(mp.Near2FarRegion(
 				center=mp.Vector3(0,0,sz/2-padding),
 				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 				direction=mp.Z))
 
-		nearfieldregion.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
+		nearfieldregions.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
 				center=mp.Vector3(0,0,-sz/2+padding),
 				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 				direction=mp.Z,
 				weight=-1))
+		return nearfieldregions
 
 
 	def simulate(self, resolution, simulation_time, dpml):
@@ -240,7 +241,8 @@ class Pyramid():
 		###FAR FIELD REGION#############################################################
 
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
-		nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = self.define_nearfield_regions(sx, sy, sz, sh, padding)
+		nearfieldregions = self.define_nearfield_regions(sx, sy, sz, sh, padding)
+		nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = nearfieldregions
 		nearfield=sim.add_near2far(fcen,df,nfreq,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
 
 		###RUN##########################################################################
