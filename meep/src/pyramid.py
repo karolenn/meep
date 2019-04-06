@@ -26,7 +26,7 @@ class Pyramid():
 		if self.debug:
 			print(**kvargs)
 	 	
-	def create_symetry(self, source_direction):
+	def create_symetry(self):
 		if self.source_direction ==	mp.Ex:
 			symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1)]
 			self.print('symmetry:','Ex')
