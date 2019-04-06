@@ -15,16 +15,29 @@ import time
 
 
 class Pyramid():
-	def __init__(self, use_symmetries = True, calculate_flux = True, far_field_calculation = True, debug=False, source_direction=mp.Ey  ):
+	def __init__(self, \
+				 source_pos, \
+				 pyramid_height, \
+				 pyramid_width, \
+				 use_symmetries = True, \
+				 calculate_flux = True, \
+				 far_field_calculation = True, \
+				 debug=False, \
+				 source_direction=mp.Ey, \
+				 ):
+		self.source_pos = source_pos
+		self.pyramid_height = pyramid_height
+		self.pyramid_width = pyramid_width
 		self.use_symmetries = use_symmetries
 		self.calculate_flux = calculate_flux
 		self.far_field_calculation = far_field_calculation
 		self.source_direction = source_direction
+
 		self.debug = debug
 
 	def print(self,*args):
 		if self.debug:
-			print(args)
+			print(args.spit())
 	 	
 	def create_symetry(self):
 		if self.source_direction ==	mp.Ex:
@@ -58,18 +71,54 @@ class Pyramid():
 			else:
 				return air
 
-	def simulate(self, resolution, simulation_time, source_pos, pyramid_height, pyramid_width, dpml):
+	def define_flux_regions(sx, sy, sz, padding):
+		fluxregion = []
+		fluxregion.append(mp.FluxRegion(					#region x to calculate flux from
+			center=mp.Vector3(sx/2-padding,0,0),
+			size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+			direction=mp.X))
 
-		substrate_height=pyramid_height/20				#height of the substrate, measured as fraction of pyramid height
+		fluxregion.append(mp.FluxRegion(					# region -x to calculate flux from
+			center=mp.Vector3(-sx/2+padding,0,0),
+			size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+			direction=mp.X,
+			weight=-1))
+
+		fluxregion.append(mp.FluxRegion(					#region y to calculate flux from
+			center=mp.Vector3(0,sy/2-padding,0),
+			size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+			direction=mp.Y))
+
+		fluxregion.append(mp.FluxRegion(					#region -y to calculate flux from
+			center=mp.Vector3(0,-sy/2+padding,0),
+			size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+			direction=mp.Y,
+			weight=-1))
+
+		fluxregion.append(mp.FluxRegion(					#z-bottom region to calculate flux from
+			center=mp.Vector3(0,0,sz/2-padding),
+			size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+			direction=mp.Z))
+
+		fluxregion.append(mp.FluxRegion(					#z-top region to calculate flux from
+			center=mp.Vector3(0,0,-sz/2+padding),
+			size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+			direction=mp.Z,
+			weight=-1))
+		return tuple(fluxregion)
+
+
+	def simulate(self, resolution, simulation_time, dpml):
+
+		substrate_height=self.pyramid_height/20				#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
-		sx=pyramid_width*(6/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
+		sx=self.pyramid_width*(6/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
 		sy=sx
-		sz=pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
+		sz=self.pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 		padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		#"Inarguments for the simulation"
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
 		#"Direction for source"
-		source_direction=mp.Ey						#polasation of the gaussian source. 
 										#symmetry has normal in x & y-direction, phase-even z-dir 
 		#"Frequency parameters for gaussian source"
 		fcen=2								#center frequency
@@ -93,8 +142,6 @@ class Pyramid():
 
 		#"Geometry to define the Substrate"
 
-		Substrate = []
-
 		Substrate=[mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
 					size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
 					material=SubstrateEps)]
@@ -106,9 +153,6 @@ class Pyramid():
 			symmetry = self.create_symetry()
 		
 
-
-
-
 		# "Function for creating pyramid"
 
 		# "isInsidexy checks if a point is inside the pyramid or not. If true, sets epsilon to 5.76, if false, sets it to 1. "
@@ -116,7 +160,7 @@ class Pyramid():
 		# "is inside a hexagonal area or not. Decreasing/increasing h over the span of z then forms a pyramid. Courtesy to playchilla.com for logic test if a point is inside a hexagon or not."
 		# "loops over the height of the pyramid in z-direction. "
 		def isInsidexy(vec):
-			return self.isInsidexy(vec, pyramid_width, pyramid_height, sz, sh)
+			return self.isInsidexy(vec, self.pyramid_width, self.pyramid_height, sz, sh)
 
 		###PML_LAYERS###################################################################
 
@@ -127,10 +171,10 @@ class Pyramid():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
 		#"Source position"
-		abs_source_pos=sz/2-sh-pyramid_height+pyramid_height*(source_pos)
+		abs_source_pos=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_pos)
 
 		source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2),	#gaussian current-source
-				component=source_direction,
+				component=self.source_direction,
 				center=mp.Vector3(0,0,0))]
 
 		sim=mp.Simulation(cell_size=cell,
@@ -147,46 +191,14 @@ class Pyramid():
 
 		#"These regions define the borders of the cell with distance 'padding' between the flux region and the dpml region to avoid calculation errors."
 		if self.calculate_flux:
-			fluxregion1=mp.FluxRegion(					#region x to calculate flux from
-				center=mp.Vector3(sx/2-padding,0,0),
-				size=mp.Vector3(0,sy-padding*2,sz-padding*2),
-				direction=mp.X)
-
-			fluxregion2=mp.FluxRegion(					# region -x to calculate flux from
-				center=mp.Vector3(-sx/2+padding,0,0),
-				size=mp.Vector3(0,sy-padding*2,sz-padding*2),
-				direction=mp.X,
-				weight=-1)
-
-			fluxregion3=mp.FluxRegion(					#region y to calculate flux from
-				center=mp.Vector3(0,sy/2-padding,0),
-				size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-				direction=mp.Y)
-
-			fluxregion4=mp.FluxRegion(					#region -y to calculate flux from
-				center=mp.Vector3(0,-sy/2+padding,0),
-				size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-				direction=mp.Y,
-				weight=-1)
-
-			fluxregion5=mp.FluxRegion(					#z-bottom region to calculate flux from
-				center=mp.Vector3(0,0,sz/2-padding),
-				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-				direction=mp.Z)
-
-			fluxregion6=mp.FluxRegion(					#z-top region to calculate flux from
-				center=mp.Vector3(0,0,-sz/2+padding),
-				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-				direction=mp.Z,
-				weight=-1)
+			flux_regions = define_flux_regions(sx,sy,sz, padding)
 
 
 		###FIELD CALCULATIONS###########################################################
 
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
 			
-			flux_total=sim.add_flux(fcen,df,nfreq,
-				fluxregion1,fluxregion2,fluxregion3,fluxregion4,fluxregion5,fluxregion6)	#calculate flux for flux regions
+			flux_total=sim.add_flux(fcen,df,nfreq,flux_regions)	#calculate flux for flux regions
 
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
 
@@ -245,7 +257,7 @@ class Pyramid():
 		#"Calculate the poynting flux given the far field values of E, H."
 
 									#how to pick ff-points, this uses fibbonaci-sphere distribution
-		r=2*math.pow(pyramid_height,2)*fcen*2*10 				# 2 times the Fraunhofer-distance
+		r=2*math.pow(self.pyramid_height,2)*fcen*2*10 				# 2 times the Fraunhofer-distance
 		if self.far_field_calculation:
 			P_tot_ff = np.zeros(nfreq)
 									
@@ -314,12 +326,12 @@ class Pyramid():
 				for i in range(nfreq):
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
-				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_pos:',source_pos,'p_height:',pyramid_height,'p_width:',pyramid_width,'freqs:', ff_freqs)
-				return flux_tot_out, P_tot_ff, flux_tot_ff_ratio, simulation_time, dpml, resolution, source_pos, pyramid_height, pyramid_width, ff_freqs
+				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_pos:',self.source_pos,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
+				return flux_tot_out, P_tot_ff, flux_tot_ff_ratio, simulation_time, dpml, resolution, self.source_pos, self.pyramid_height, self.pyramid_width, ff_freqs
 
 			else:
-				self. print('Total Flux:',flux_tot_out,'ff_flux:',ff_flux,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',res_ff, 'source_pos:',source_pos)
-				return flux_tot_out, None , ff_flux, simulation_time, dpml, resolution, r, res_ff, source_pos, None
+				self. print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_pos:',self.source_pos)
+				return flux_tot_out, None , None, simulation_time, dpml, resolution, r, None , self.source_pos, None
 
 
 
