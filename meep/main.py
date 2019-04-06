@@ -11,5 +11,5 @@ source_pos=float(sys.argv[3])					#pos of source measured	measured as fraction o
 pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
 pyramid_width=float(sys.argv[5])					#width measured from edge to edge 2.6
 dpml=float(sys.argv[6])
-pyramid = Pyramid(debug = True)
-pyramid.simulate(resolution, simulation_time, source_pos, pyramid_height, pyramid_width, dpml)
+pyramid = Pyramid(source_pos, pyramid_height, pyramid_width, debug = True)
+pyramid.simulate(resolution, simulation_time,dpml)
