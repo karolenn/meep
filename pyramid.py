@@ -252,11 +252,13 @@ r=2*math.pow(pyramid_height,2)*fcen*2*10 				# 2 times the Fraunhofer-distance
 if far_field_calculation == 'true':
 	P_tot_ff = np.zeros(nfreq)
 							
-	npts=1000							#number of far-field points
+	fibsphere='true'	
+	npts=16000							#number of far-field points
 	Px=0
 	Py=0
 	Pz=0
-	theta=math.pi/4
+	surface_tot=0
+	theta=math.pi
 	phi=math.pi*2
 	"How many points on the ff-sphere"
 	range_npts=int((theta/math.pi)*npts)
@@ -268,17 +270,29 @@ if far_field_calculation == 'true':
 
 	global zPts
 	zPts=[]
+
+	deltaPhi=phi/math.sqrt(range_npts)
+	deltaTheta=theta/math.sqrt(range_npts)
 	"fibspherepts defined in functions/functions.py"
-	fibspherepts(r,theta,npts,xPts,yPts,zPts)
+	if fibsphere=='true':
+		fibspherepts(r,theta,npts,xPts,yPts,zPts)
+		npts=range_npts
+	else:
+		sphericalpts(r,theta,phi,npts,xPts,yPts,zPts)
+		npts=int(math.pow(npts,2))
 	#print(xPts)
 
-	for n in range(range_npts):
+	print('radius:',r)
 
+	for n in range(npts):
+		Act_Theta=math.acos(zPts[n]/r)	#theta for current pt, pass to surface element
 
 		ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
 		"P_tot_ff calculated as (1/2)Re(E x H*)scalar-product(sin(angleM)cos(angleN),sin(angleM)sin(angleN),-cos(angleM)) where H* is the complex conjugate and this corresponds to the average power density in radial direction from the simulation cell at a distance of r micrometers."
 
 		"Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and numerically integrate it "
+		print('Act_Theta:',Act_Theta)
+		#print('zPtn[n]:',zPts[n])
 
 		i=0
 		for k in range(nfreq):
@@ -293,15 +307,22 @@ if far_field_calculation == 'true':
 			Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))
 			"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
 			"divided by npts and we get evenly sized area chunks" 					
-			surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
+			#surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
+			surface_Element=math.pow(r,2)*math.sin(Act_Theta)*deltaPhi*deltaTheta
+			#print('surface_Element:',surface_Element)
+			surface_tot += surface_Element
 			P_tot_ff[k] += surface_Element*(1)*np.real(Pr)
 
 			i=i+6
 
 
 			"P_tot_ff[k] is calculated for each freq. Now the loop should make the spacing between two points larger the further down the sphere we goes and surface_elements might overlap here. Check in the future the errors."
-
-
+#print('x',xPts)
+#print('y',yPts)
+#print('z',zPts)
+print('surf_tot:',surface_tot)
+print('surf_tot2:',2*math.pi*pow(r,2)*(1-math.cos(theta)))
+print('npts:',npts)
 	##CALCULATE FLUX OUT FROM BOX###########################################
 if calculate_flux == 'true':
 	"Initialize variables to be used, pf stands for 'per frequency'"

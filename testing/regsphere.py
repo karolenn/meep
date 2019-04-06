@@ -3,31 +3,59 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math as math
-from functions import CalculatePowerRatio 			
-Theta=math.pi
-Phi=math.pi*2
-npts=20
-r=50
-x=[]
-y=[]
-z=[]
+			
+r=10
+theta=math.pi
+phi=math.pi*2
+npts=40
+
+xPts=[]
+yPts=[]
+zPts=[]
 
 
-for n in range(npts):
-	angleN=Theta*(n/npts)
-		
+def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):
+
+	for n in range(npts):
+		angleTheta=(n/npts)*theta
+		for m in range(npts):
+			anglePhi=(m/npts)*phi
+			xPts.append(r*math.sin(angleTheta)*math.cos(anglePhi))
+			yPts.append(r*math.sin(angleTheta)*math.sin(anglePhi))
+			zPts.append(-r*math.cos(angleTheta))
+
+	return(xPts,yPts,zPts)
+
+def sphericalpts2(r,theta,phi,npts,xPts,yPts,zPts):
+
 	for m in range(npts):
-		angleM=Phi*(m/npts)
-		x.append(r*math.sin(angleM)*math.cos(angleN))
-		y.append(r*math.sin(angleM)*math.sin(angleN))
-		z.append(r*math.cos(angleM))
+		anglePhi=(m/npts)*phi
+		for n in range(npts):
+			angleTheta=(n/npts)*theta
+			xPts.append(r*math.sin(angleTheta)*math.cos(anglePhi))
+			yPts.append(r*math.sin(angleTheta)*math.sin(anglePhi))
+			zPts.append(-r*math.cos(angleTheta))
+
+	return(xPts,yPts,zPts)
 
 #print('x',x)
 #print('y',y)
 #print('z',z)
+sphericalpts(r,theta,phi,npts,xPts,yPts,zPts)
 
 fig = plt.figure()
 ax = Axes3D(fig)
 plt.axis('on')
-ax.scatter3D(x,y,z)
+ax.scatter3D(xPts,yPts,zPts)
+plt.show()
+
+xPts=[]
+yPts=[]
+zPts=[]
+
+sphericalpts2(r,theta,phi,npts,xPts,yPts,zPts)
+fig = plt.figure()
+ax = Axes3D(fig)
+plt.axis('on')
+ax.scatter3D(xPts,yPts,zPts)
 plt.show()
