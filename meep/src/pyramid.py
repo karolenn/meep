@@ -107,6 +107,41 @@ class Pyramid():
 			weight=-1))
 		return fluxregion
 
+	def define_nearfield_regions(self, sx, sy, sz, sh, padding):
+		nearfieldregion=[]
+		nearfieldregion.append(mp.Near2FarRegion(
+				center=mp.Vector3(sx/2-padding,0,-sh/2),
+				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
+				direction=mp.X))
+
+		nearfieldregion.append(mp.Near2FarRegion(
+				center=mp.Vector3(-sx/2+padding,0,-sh/2),
+				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
+				direction=mp.X,
+				weight=-1))
+
+		nearfieldregion.append(mp.Near2FarRegion(
+				center=mp.Vector3(0,sy/2-padding,-sh/2),
+				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
+				direction=mp.Y))
+
+		nearfieldregion.append(mp.Near2FarRegion(
+				center=mp.Vector3(0,-sy/2+padding,-sh/2),
+				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
+				direction=mp.Y,
+				weight=-1))
+		#under the substrate
+		nearfieldregion.append(mp.Near2FarRegion(
+				center=mp.Vector3(0,0,sz/2-padding),
+				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+				direction=mp.Z))
+
+		nearfieldregion.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
+				center=mp.Vector3(0,0,-sz/2+padding),
+				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+				direction=mp.Z,
+				weight=-1))
+
 
 	def simulate(self, resolution, simulation_time, dpml):
 
@@ -192,57 +227,21 @@ class Pyramid():
 		#"These regions define the borders of the cell with distance 'padding' between the flux region and the dpml region to avoid calculation errors."
 		if self.calculate_flux:
 			flux_regions = self.define_flux_regions(sx,sy,sz, padding)
-			r1,r2, r3, r4, r5, r6 = flux_regions
+			fr1,fr2, fr3, fr4, fr5, fr6 = flux_regions
 
 		###FIELD CALCULATIONS###########################################################
 
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
 			
-			flux_total=sim.add_flux(fcen, df, nfreq, r1, r2, r3, r4, r5, r6 )	#calculate flux for flux regions
+			flux_total=sim.add_flux(fcen, df, nfreq, fr1,fr2, fr3, fr4, fr5, fr6 )	#calculate flux for flux regions
 
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
 
 		###FAR FIELD REGION#############################################################
 
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
-
-		nearfieldregion1=mp.Near2FarRegion(
-				center=mp.Vector3(sx/2-padding,0,-sh/2),
-				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
-				direction=mp.X)
-
-		nearfieldregion2=mp.Near2FarRegion(
-				center=mp.Vector3(-sx/2+padding,0,-sh/2),
-				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
-				direction=mp.X,
-				weight=-1)
-
-		nearfieldregion3=mp.Near2FarRegion(
-				center=mp.Vector3(0,sy/2-padding,-sh/2),
-				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
-				direction=mp.Y)
-
-		nearfieldregion4=mp.Near2FarRegion(
-				center=mp.Vector3(0,-sy/2+padding,-sh/2),
-				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
-				direction=mp.Y,
-				weight=-1)
-		#under the substrate
-		nearfieldregion5=mp.Near2FarRegion(
-				center=mp.Vector3(0,0,sz/2-padding),
-				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-				direction=mp.Z)		
-
-		nearfieldregion6=mp.Near2FarRegion(					#nearfield -z. above pyramid.		
-				center=mp.Vector3(0,0,-sz/2+padding),
-				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-				direction=mp.Z,
-				weight=-1)
-
-
-
-
-		nearfield=sim.add_near2far(fcen,df,nfreq,nearfieldregion1,nearfieldregion2,nearfieldregion3,nearfieldregion4,nearfieldregion5,nearfieldregion6)
+		nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = define_nearfield_regions(sx, sy, sz, sh, padding)
+		nearfield=sim.add_near2far(fcen,df,nfreq,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
 
 		###RUN##########################################################################
 		#"The run constructor for meep."
