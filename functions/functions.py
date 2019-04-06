@@ -20,6 +20,7 @@ def fibspherepts(r,theta,npts,xPts,yPts,zPts):
 		yPts.append(R*math.sin(phi))
 
 	return(xPts,yPts,zPts)
+	
 
 def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):
 

@@ -15,16 +15,48 @@ import time
 
 
 class Pyramid():
-	def __init__(self, use_symmetries = True, calculate_flux = True, far_field_calculation = True, debug=False ):
+	def __init__(self, use_symmetries = True, calculate_flux = True, far_field_calculation = True, debug=False, source_direction=mp.Ey  ):
 		self.use_symmetries = use_symmetries
 		self.calculate_flux = calculate_flux
 		self.far_field_calculation = far_field_calculation
+		self.source_direction = source_direction
 		self.debug = debug
 
 	def print(self,**kvargs):
 		if self.debug:
 			print(**kvargs)
 	 	
+	def create_symetry(self, source_direction):
+		if self.source_direction ==	mp.Ex:
+			symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1)]
+			self.print('symmetry:','Ex')
+		elif self.source_direction == mp.Ey:
+			symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1)]
+			self.print('symmetry:','Ey')
+		elif self.source_direction == mp.Ez:
+			symmetry =[mp.Mirror(mp.X)]
+			self.print('symmetry:','Ez')
+		else:
+			symmetry = []
+		return symmetry
+
+	def isInsidexy(vec, pyramid_width, pyramid_height, sz, sh):
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-pyramid_height):
+
+				#h=pyramid_width/2+vec.z*(pyramid_width/(2*(sz/2-sh)))
+				h=pyramid_width/(2*pyramid_height)*vec.z-(pyramid_width/(2*pyramid_height))*(sz/2-sh-pyramid_height)
+				v=h*math.tan(math.pi/6)	
+				center=mp.Vector3(h,v,0)
+				q2x = math.fabs(vec.x - center.x+h) #transform the test point locally and to quadrant 2m nm
+				q2y = math.fabs(vec.y - center.y+v) # transform the test point locally and to quadrant 2
+				if (q2x > h) or (q2y > v*2):
+					return air
+				if  ((2*v*h - v*q2x - h*q2y) >= 0): #finally the dot product can be reduced to this due to the hexagon symmetry
+					return GaN
+				else:
+					return air 
+			else:
+				return air
 
 	def simulate(self, resolution, simulation_time, source_pos, pyramid_height, pyramid_width, dpml):
 
@@ -71,18 +103,8 @@ class Pyramid():
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
 		if self.use_symmetries:
-
-			if source_direction ==	mp.Ex:
-				symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1)]
-				self.print('symmetry:','Ex')
-			elif source_direction == mp.Ey:
-				symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1)]
-				self.print('symmetry:','Ey')
-			elif source_direction == mp.Ez:
-				symmetry =[mp.Mirror(mp.X)]
-				self.print('symmetry:','Ez')
-			else:
-				symmetry = []
+			symmetry = self.create_symetry()
+		
 
 
 
@@ -94,23 +116,7 @@ class Pyramid():
 		# "is inside a hexagonal area or not. Decreasing/increasing h over the span of z then forms a pyramid. Courtesy to playchilla.com for logic test if a point is inside a hexagon or not."
 		# "loops over the height of the pyramid in z-direction. "
 		def isInsidexy(vec):
-			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-pyramid_height):
-
-				#h=pyramid_width/2+vec.z*(pyramid_width/(2*(sz/2-sh)))
-				h=pyramid_width/(2*pyramid_height)*vec.z-(pyramid_width/(2*pyramid_height))*(sz/2-sh-pyramid_height)
-				v=h*math.tan(math.pi/6)	
-				center=mp.Vector3(h,v,0)
-				q2x = math.fabs(vec.x - center.x+h) #transform the test point locally and to quadrant 2m nm
-				q2y = math.fabs(vec.y - center.y+v) # transform the test point locally and to quadrant 2
-				if (q2x > h) or (q2y > v*2):
-					return air
-				if  ((2*v*h - v*q2x - h*q2y) >= 0): #finally the dot product can be reduced to this due to the hexagon symmetry
-					return GaN
-				else:
-					return air 
-			else:
-				return air
-
+			return self.isInsidexy(vec, pyramid_width, pyramid_height, sz, sh)
 
 		###PML_LAYERS###################################################################
 
