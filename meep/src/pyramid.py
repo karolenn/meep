@@ -22,9 +22,9 @@ class Pyramid():
 		self.source_direction = source_direction
 		self.debug = debug
 
-	def print(self,**kvargs):
+	def print(self,*args):
 		if self.debug:
-			print(**kvargs)
+			print(args)
 	 	
 	def create_symetry(self):
 		if self.source_direction ==	mp.Ex:
