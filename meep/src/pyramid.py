@@ -240,7 +240,7 @@ class Pyramid():
 		###FAR FIELD REGION#############################################################
 
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
-		nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = define_nearfield_regions(sx, sy, sz, sh, padding)
+		nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = self.define_nearfield_regions(sx, sy, sz, sh, padding)
 		nearfield=sim.add_near2far(fcen,df,nfreq,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
 
 		###RUN##########################################################################
