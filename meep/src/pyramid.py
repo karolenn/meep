@@ -105,7 +105,7 @@ class Pyramid():
 			size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 			direction=mp.Z,
 			weight=-1))
-		return tuple(fluxregion)
+		return fluxregion
 
 
 	def simulate(self, resolution, simulation_time, dpml):
