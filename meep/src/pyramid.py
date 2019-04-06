@@ -71,7 +71,7 @@ class Pyramid():
 			else:
 				return air
 
-	def define_flux_regions(sx, sy, sz, padding):
+	def define_flux_regions(self, sx, sy, sz, padding):
 		fluxregion = []
 		fluxregion.append(mp.FluxRegion(					#region x to calculate flux from
 			center=mp.Vector3(sx/2-padding,0,0),
@@ -191,14 +191,14 @@ class Pyramid():
 
 		#"These regions define the borders of the cell with distance 'padding' between the flux region and the dpml region to avoid calculation errors."
 		if self.calculate_flux:
-			flux_regions = define_flux_regions(sx,sy,sz, padding)
-
+			flux_regions = self.define_flux_regions(sx,sy,sz, padding)
+			r1,r2, r3, r4, r5, r6 = flux_regions
 
 		###FIELD CALCULATIONS###########################################################
 
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
 			
-			flux_total=sim.add_flux(fcen,df,nfreq,flux_regions)	#calculate flux for flux regions
+			flux_total=sim.add_flux(fcen, df, nfreq, r1, r2, r3, r4, r5, r6 )	#calculate flux for flux regions
 
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
 
