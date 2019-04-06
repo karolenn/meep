@@ -1,0 +1,16 @@
+{
+    "ppl": [
+        {
+            "name": "kalle",
+            "age": 10
+        },
+        {
+            "name": "Arty",
+            "age": 2
+        },
+        {
+            "name": "harald",
+            "age": 4
+        }
+    ]
+}

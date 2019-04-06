@@ -151,6 +151,9 @@ class Pyramid():
 		sx=self.pyramid_width*(6/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
 		sy=sx
 		sz=self.pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
+		#sh=substrate_height
+		sh=0
+
 		padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		#"Inarguments for the simulation"
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
@@ -172,22 +175,16 @@ class Pyramid():
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
 
-		#sh=substrate_height
-		sh=0
-
-
 		#"Geometry to define the Substrate"
 
 		Substrate=[mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
 					size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
 					material=SubstrateEps)]
 
-
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
 		if self.use_symmetries:
 			symmetry = self.create_symetry()
-		
 
 		# "Function for creating pyramid"
 
@@ -231,9 +228,7 @@ class Pyramid():
 			fr1,fr2, fr3, fr4, fr5, fr6 = flux_regions
 
 		###FIELD CALCULATIONS###########################################################
-
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
-			
 			flux_total=sim.add_flux(fcen, df, nfreq, fr1,fr2, fr3, fr4, fr5, fr6 )	#calculate flux for flux regions
 
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
@@ -251,7 +246,6 @@ class Pyramid():
 		#mp.at_beginning(mp.output_epsilon),
 		#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,abs_source_pos+0.2),1e-2))
 		until=simulation_time)
-
 
 		###OUTPUT CALCULATIONS##########################################################
 
@@ -328,11 +322,11 @@ class Pyramid():
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
 				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_pos:',self.source_pos,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
-				return flux_tot_out, P_tot_ff, flux_tot_ff_ratio, simulation_time, dpml, resolution, self.source_pos, self.pyramid_height, self.pyramid_width, ff_freqs
+				return flux_tot_out, P_tot_ff, flux_tot_ff_ratio, ff_freqs
 
 			else:
 				self. print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_pos:',self.source_pos)
-				return flux_tot_out, None , None, simulation_time, dpml, resolution, r, None , self.source_pos, None
+				return flux_tot_out, None , None, r
 
 
 
