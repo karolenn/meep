@@ -1,6 +1,6 @@
 import meep as mp	
 import numpy as np
-from functions.functions import *
+from utils.functions import *
 import matplotlib.pyplot as plt
 import sys
 from mpl_toolkits.mplot3d import Axes3D
