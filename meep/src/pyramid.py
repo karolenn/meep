@@ -37,7 +37,7 @@ class Pyramid():
 
 	def print(self,*args):
 		if self.debug:
-			print(args.spit())
+			print(args)
 	 	
 	def create_symetry(self):
 		if self.source_direction ==	mp.Ex:
