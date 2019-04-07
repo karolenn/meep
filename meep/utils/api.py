@@ -18,3 +18,23 @@ def write(db, data):
         print(err)
         return False
     return True
+
+def write_result(db, info):
+    data = read(db)
+    if db != None:
+        db.append(info)
+    
+    write(db, data)
+        
+
+def sim_to_json(config,result):
+    flux_tot_out, P_tot_ff, flux_tot_ff_ratio = result
+    result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio }
+    config["result"] = result
+    return config
+
+def opt_to_json(opt):
+    return opt
+
+def json_to_imp(json_spec):
+    return json_spec

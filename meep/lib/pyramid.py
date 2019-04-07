@@ -15,25 +15,17 @@ import time
 
 
 class Pyramid():
-	def __init__(self, \
-				 source_pos, \
-				 pyramid_height, \
-				 pyramid_width, \
-				 use_symmetries = True, \
-				 calculate_flux = True, \
-				 far_field_calculation = True, \
-				 debug=False, \
-				 source_direction=mp.Ey, \
-				 ):
-		self.source_pos = source_pos
-		self.pyramid_height = pyramid_height
-		self.pyramid_width = pyramid_width
-		self.use_symmetries = use_symmetries
-		self.calculate_flux = calculate_flux
-		self.far_field_calculation = far_field_calculation
-		self.source_direction = source_direction
 
-		self.debug = debug
+	def __init__(self, config, debug = False):
+		self.source_position = config["source_position"] 
+	 	self.pyramid_height = config["pyramid_height"] 
+	 	self.pyramid_width = config["pyramid_width"] 
+	 	self.source_direction = config["source_direction"] 
+		self.frequency_center = config["frequency_center"] 
+		self.frequency_width = config["frequency_width"] 
+		self.number_of_freqs = config["number_of_freqs"] 
+		self.cutoff = config["cutoff"]
+	 	self.debug = debug
 
 	def print(self,*args):
 		if self.debug:
@@ -144,7 +136,21 @@ class Pyramid():
 		return nearfieldregions
 
 
-	def simulate(self, resolution, simulation_time, dpml):
+	def simulate(self, config):
+		dpml = config["dpml"]
+		resolution = config["resolution"]
+
+		
+		use_fixed_time = config["use_fixed_time"]
+		simulation_time = config["simulation_time"]
+		padding = config["padding"]
+		ff_pts = config["ff_pts"]
+		use_symmetries = config["use_symmetries"]
+		calculate_flux = config["calculate_flux"]
+		ff_calculations = config["ff_calculations"]
+		ff_angle = math.pi/config["ff_angle"]
+		simulation_ratio = eval(config["simulation_ratio"])
+		substrate_ratio = eval(config["substrate_ratio"])
 
 		substrate_height=self.pyramid_height/20				#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
@@ -160,11 +166,8 @@ class Pyramid():
 		#"Direction for source"
 										#symmetry has normal in x & y-direction, phase-even z-dir 
 		#"Frequency parameters for gaussian source"
-		fcen=2								#center frequency
-		df=0.5	   							#frequency span, ranging from 1.7-2.3 
-		nfreq=1								#number of frequencies sampled
 		#"Calculation and plotting parameters"
-		angle = math.pi/6						#calculate flux at angle measured from top of the pyramid
+								#calculate flux at angle measured from top of the pyramid
 
 										
 
@@ -183,7 +186,7 @@ class Pyramid():
 
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
-		if self.use_symmetries:
+		if use_symmetries:
 			symmetry = self.create_symetry()
 
 		# "Function for creating pyramid"
@@ -204,9 +207,8 @@ class Pyramid():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
 		#"Source position"
-		abs_source_pos=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_pos)
-
-		source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2),	#gaussian current-source
+		sbs_cource_position=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_position)
+		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
 				center=mp.Vector3(0,0,0))]
 
@@ -223,14 +225,13 @@ class Pyramid():
 		###REGIONS######################################################################
 
 		#"These regions define the borders of the cell with distance 'padding' between the flux region and the dpml region to avoid calculation errors."
-		if self.calculate_flux:
+		if calculate_flux:
 			flux_regions = self.define_flux_regions(sx,sy,sz, padding)
 			fr1,fr2, fr3, fr4, fr5, fr6 = flux_regions
 
 		###FIELD CALCULATIONS###########################################################
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
-			flux_total=sim.add_flux(fcen, df, nfreq, fr1,fr2, fr3, fr4, fr5, fr6 )	#calculate flux for flux regions
-
+		flux_total=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr5, fr6 )	#calculate flux for flux regions
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
 
 		###FAR FIELD REGION#############################################################
@@ -238,29 +239,33 @@ class Pyramid():
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
 		nearfieldregions = self.define_nearfield_regions(sx, sy, sz, sh, padding)
 		nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = nearfieldregions
-		nearfield=sim.add_near2far(fcen,df,nfreq,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
-
+		nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
 		###RUN##########################################################################
 		#"The run constructor for meep."
-		sim.run(
-		#mp.at_beginning(mp.output_epsilon),
-		#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,abs_source_pos+0.2),1e-2))
-		until=simulation_time)
+		if use_fixed_time:
+			sim.run(
+			#mp.at_beginning(mp.output_epsilon),
+			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
+			until=simulation_time)
+		else:
+			sim.run(
+			#mp.at_beginning(mp.output_epsilon),
+			until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 
 		###OUTPUT CALCULATIONS##########################################################
 
 		#"Calculate the poynting flux given the far field values of E, H."
 
 									#how to pick ff-points, this uses fibbonaci-sphere distribution
-		r=2*math.pow(self.pyramid_height,2)*fcen*2*10 				# 2 times the Fraunhofer-distance
-		if self.far_field_calculation:
-			P_tot_ff = np.zeros(nfreq)
+		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 2 times the Fraunhofer-distance
+		if ff_calculations:
+			P_tot_ff = np.zeros(self.number_of_freqs)
 									
 			npts=1000							#number of far-field points
 			Px=0
 			Py=0
 			Pz=0
-			theta=math.pi/4
+			theta=ff_angle
 			phi=math.pi*2
 			#"How many points on the ff-sphere"
 			range_npts=int((theta/math.pi)*npts)
@@ -285,7 +290,7 @@ class Pyramid():
 				#"Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and numerically integrate it "
 
 				i=0
-				for k in range(nfreq):
+				for k in range(self.number_of_freqs):
 					#"Calculate the poynting vector in x,y,z direction"
 					Px=(ff[i+1]*np.conjugate(ff[i+5])-ff[i+2]*np.conjugate(ff[i+4]))
 					Px=Px.real
@@ -307,26 +312,26 @@ class Pyramid():
 
 
 			##CALCULATE FLUX OUT FROM BOX###########################################
-		if self.calculate_flux:
+		if calculate_flux:
 			#"Initialize variables to be used, pf stands for 'per frequency'"
-			flux_tot_value = np.zeros(nfreq)						#total flux out from box
-			flux_tot_ff_ratio = np.zeros(nfreq)						
+			flux_tot_value = np.zeros(self.number_of_freqs)						#total flux out from box
+			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
 			flux_tot_out = mp.get_fluxes(flux_total)			#save total flux data
 
-			if self.far_field_calculation:
+			if ff_calculations:
 				#"the for loop sums up the flux for all frequencies and stores it in flux_tot_value and flux_top_value"
 				#"it also calculates the ratio betwewen top and total flux out for all frequencies and stores it in an array 'flux_tot_pf_ratio'"
 				ff_freqs = mp.get_near2far_freqs(nearfield)
 
-				for i in range(nfreq):
+				for i in range(self.number_of_freqs):
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
-				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_pos:',self.source_pos,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
-				return flux_tot_out, P_tot_ff, flux_tot_ff_ratio, ff_freqs
+				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
+				return flux_tot_out, P_tot_ff, flux_tot_ff_ratio 
 
 			else:
-				self. print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_pos:',self.source_pos)
-				return flux_tot_out, None , None, r
+				self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
+				return flux_tot_out, None , None, 
 
 
 
@@ -345,10 +350,10 @@ if __name__ == "__main__":
 	"Structure Geometry"
 	resolution= int(sys.argv[1])					#resolution of the pyramid. Measured as number of pixels / unit distance
 	simulation_time=int(sys.argv[2])				#simulation time for the sim. #Multiply by a and divide by c to get time in fs.
-	source_pos=float(sys.argv[3])					#pos of source measured	measured as fraction of tot. pyramid height from top. 
+	source_position=float(sys.argv[3])					#pos of source measured	measured as fraction of tot. pyramid height from top. 
 	pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
 	pyramid_width=float(sys.argv[5])					#width measured from edge to edge 2.6
 	dpml=float(sys.argv[6])
 	pyramid = Pyramid()
-	pyramid.simulate(resolution, simulation_time, source_pos, pyramid_height, pyramid_width, dpml)
+	pyramid.simulate(resolution, simulation_time, source_position, pyramid_height, pyramid_width, dpml)
 	

@@ -1,4 +1,4 @@
-from src.pyramid import Pyramid
+from lib.pyramid import Pyramid
 import sys
 
 if (len(sys.argv)) != 7:
