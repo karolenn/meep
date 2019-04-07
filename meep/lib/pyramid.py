@@ -208,7 +208,7 @@ class Pyramid():
 
 		#"Source position"
 		sbs_cource_position=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_position)
-		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=frequency_width, cutoff=self.cutoff),	#gaussian current-source
+		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
 				center=mp.Vector3(0,0,0))]
 
