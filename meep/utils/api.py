@@ -21,8 +21,8 @@ def write(db, data):
 
 def write_result(db, info):
     data = read(db)
-    if db != None:
-        db.append(info)
+    if data != None:
+        data.append(info)
     
     write(db, data)
         
