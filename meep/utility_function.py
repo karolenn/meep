@@ -16,7 +16,7 @@ def main(sim_name, times):
             else: 
                 write_result("db/results/{}.json".format(sim_name), db)
 
-        results = db_results(db)
+        results = db_to_array(db)
         print(results)
         # config = utility_function(results)
 
