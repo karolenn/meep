@@ -22,9 +22,9 @@ def write(db, data):
 def write_result(db, info):
     data = read(db)
     if data != None:
-        data = [info]
-    else:
         data.append(info)
+    else:
+        data = [info]
 
     
     write(db, data)
