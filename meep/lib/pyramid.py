@@ -18,14 +18,14 @@ class Pyramid():
 
 	def __init__(self, config, debug = False):
 		self.source_position = config["source_position"] 
-	 	self.pyramid_height = config["pyramid_height"] 
-	 	self.pyramid_width = config["pyramid_width"] 
-	 	self.source_direction = config["source_direction"] 
+		self.pyramid_height = config["pyramid_height"] 
+		self.pyramid_width = config["pyramid_width"] 
+		self.source_direction = config["source_direction"] 
 		self.frequency_center = config["frequency_center"] 
 		self.frequency_width = config["frequency_width"] 
 		self.number_of_freqs = config["number_of_freqs"] 
 		self.cutoff = config["cutoff"]
-	 	self.debug = debug
+		self.debug = debug
 
 	def print(self,*args):
 		if self.debug:
