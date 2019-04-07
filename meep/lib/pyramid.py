@@ -20,13 +20,13 @@ class Pyramid():
 		self.source_position = config["source_position"] 
 		self.pyramid_height = config["pyramid_height"] 
 		self.pyramid_width = config["pyramid_width"] 
-		self.source_direction = config["source_direction"] 
 		self.frequency_center = config["frequency_center"] 
 		self.frequency_width = config["frequency_width"] 
 		self.number_of_freqs = config["number_of_freqs"] 
 		self.cutoff = config["cutoff"]
 		self.debug = debug
-
+		self.source_direction = eval("mp.E"+to_lower((config["source_direction"])))
+		
 	def print(self,*args):
 		if self.debug:
 			print(args)
@@ -207,7 +207,7 @@ class Pyramid():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
 		#"Source position"
-		sbs_cource_position=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_position)
+		abs_cource_position=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_position)
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
 				center=mp.Vector3(0,0,0))]
@@ -250,7 +250,7 @@ class Pyramid():
 		else:
 			sim.run(
 			#mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
+			until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,abs_cource_position+0.2),1e-2))
 
 		###OUTPUT CALCULATIONS##########################################################
 
