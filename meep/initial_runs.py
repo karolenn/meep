@@ -10,7 +10,7 @@ def initial_runs(sim_name):
     
     for config in db:
         pyramid = Pyramid(config["pyramid"])
-        result = pyramid.simlate(config["simulate"])
+        result = pyramid.simulate(config["simulate"])
         data = sim_to_json(config, result)
         write_result("db/initial_result/{}.json".format(sim_name), data)
     
