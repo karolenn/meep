@@ -7,7 +7,7 @@ def read(db):
             data_json = json.load(f)
             return data_json
     except OSError as err:
-        print(err)
+        #print(err)
         return None
 
 def write(db, data):
