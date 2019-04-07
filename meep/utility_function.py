@@ -23,7 +23,7 @@ def main(sim_name, times):
         # pyramid = Pyramid(config["pyramid"])
         # result = pyramid.simlate(config["simulate"])
 
-        data = sim_to_json(db, ["kalle",  False, True])
+        data = sim_to_json(db, ["kalle",  "False", "True"])
         write_result("db/results/{}.json".format(sim_name), data)
 
 
