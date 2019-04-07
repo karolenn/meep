@@ -13,7 +13,6 @@
             "ff_angle": 6,
             "simulation_ratio": "6/5",
             "substrate_ratio": "1/20"
-            
         },
         "pyramid": {
             "source_position": 0.02,
@@ -23,7 +22,8 @@
             "frequency_center": 2,
             "frequency_width": 0.5,
             "number_of_freqs": 1,
-            "cutoff" : 2
-        }
+            "cutoff": 2
+        },
+        "result": {}
     }
 ]

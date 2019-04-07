@@ -36,6 +36,14 @@ def sim_to_json(config,result):
     config["result"] = result
     return config
 
+def db_to_array(db):
+    results = [[] for _ in range(3)]
+    for result in db:
+        results[0].append(result["pyramid"]["source_position"])
+        results[1].append(result["pyramid"]["pyramid_height"])
+        results[2].append(result["pyramid"]["pyramid_width"])
+    return results
+
 def opt_to_json(opt):
     return opt
 
