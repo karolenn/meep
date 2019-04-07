@@ -37,6 +37,7 @@ def sim_to_json(config,result):
     return config
 
 def db_to_array(db):
+    print(db)
     results = [[] for _ in range(3)]
     print(results)
     for result in db:
