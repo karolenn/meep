@@ -19,7 +19,7 @@
             "source_position": 0.02,
             "pyramid_height": 2,
             "pyramid_width": 2,
-            "source_direction": "y",
+            "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 0.5,
             "number_of_freqs": 1,

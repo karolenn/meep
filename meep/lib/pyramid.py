@@ -25,7 +25,7 @@ class Pyramid():
 		self.number_of_freqs = config["number_of_freqs"] 
 		self.cutoff = config["cutoff"]
 		self.debug = debug
-		self.source_direction = eval("mp.E"+(config["source_direction"]))
+		self.source_direction = eval(config["source_direction"])
 
 	def print(self,*args):
 		if self.debug:
