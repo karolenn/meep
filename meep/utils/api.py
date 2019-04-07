@@ -38,6 +38,7 @@ def sim_to_json(config,result):
 
 def db_to_array(db):
     results = [[] for _ in range(3)]
+    print(results)
     for result in db:
         print(result)
         results[0].append(result["pyramid"]["source_position"])
