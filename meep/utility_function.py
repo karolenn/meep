@@ -14,7 +14,7 @@ def main(sim_name, times):
                 print("could not open db/initial_results/{}.json".format(sim_name))
                 exit(0)
             else: 
-                write_result("db/results/{}.json".format(sim_name), db)
+                write("db/results/{}.json".format(sim_name), db)
 
         results = db_to_array(db)
         print(results)
