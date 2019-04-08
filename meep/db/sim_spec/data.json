@@ -1,8 +1,8 @@
 [
     {
         "simulate": {
-            "resolution": 20,
-            "use_fixed_time": true,
+            "resolution": 60,
+            "use_fixed_time": false,
             "simulation_time": 30,
             "dpml": 0.1,
             "padding": 0.1,

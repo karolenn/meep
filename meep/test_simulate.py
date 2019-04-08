@@ -3,8 +3,8 @@ import sys
 
 config = {
         "simulate": {
-            "resolution": 20,
-            "use_fixed_time": True,
+            "resolution": 100,
+            "use_fixed_time": False,
             "simulation_time": 30,
             "dpml": 0.1,
             "padding": 0.1,
@@ -20,7 +20,7 @@ config = {
             "source_position": 0.02,
             "pyramid_height": 2,
             "pyramid_width": 2,
-            "source_direction": "mp.Ey",
+            "source_direction": "mp.Ex",
             "frequency_center": 2,
             "frequency_width": 0.5,
             "number_of_freqs": 1,
@@ -46,4 +46,5 @@ if (len(sys.argv)) != 1:
 #cutoff=int(sys.argv[9])
 #dpml=float(sys.argv[10])
 pyramid = Pyramid(config["pyramid"])
-pyramid.simulate(config["simulate"])
+result = pyramid.simulate(config["simulate"])
+print(result)

@@ -11,7 +11,7 @@ import time
 
 #from mpl_toolkits.mplot3d import Axes3D
 
-
+test = mp.Vector3(0,0,0)
 if (len(sys.argv)) != 7:
     print("Not enough arguments")
     exit(0)

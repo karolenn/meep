@@ -43,23 +43,23 @@ class Pyramid():
 			symmetry = []
 		return symmetry
 
-	def isInsidexy(vec, pyramid_width, pyramid_height, sz, sh):
-			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-pyramid_height):
-
-				#h=pyramid_width/2+vec.z*(pyramid_width/(2*(sz/2-sh)))
-				h=pyramid_width/(2*pyramid_height)*vec.z-(pyramid_width/(2*pyramid_height))*(sz/2-sh-pyramid_height)
-				v=h*math.tan(math.pi/6)	
-				center=mp.Vector3(h,v,0)
-				q2x = math.fabs(vec.x - center.x+h) #transform the test point locally and to quadrant 2m nm
-				q2y = math.fabs(vec.y - center.y+v) # transform the test point locally and to quadrant 2
-				if (q2x > h) or (q2y > v*2):
-					return air
-				if  ((2*v*h - v*q2x - h*q2y) >= 0): #finally the dot product can be reduced to this due to the hexagon symmetry
-					return GaN
-				else:
-					return air 
-			else:
-				return air
+	#def isInsidexy(vec):
+	#		while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
+#
+#				#h=pyramid_width/2+vec.z*(pyramid_width/(2*(sz/2-sh)))
+	#			h=self.pyramid_width/(2*self.pyramid_height)*vec.z-(self.pyramid_width/(2*self.pyramid_height))*(sz/2-sh-self.pyramid_height)
+	#			v=h*math.tan(math.pi/6)	
+	#			center=mp.Vector3(h,v,0)
+	#			q2x = math.fabs(vec.x - center.x+h) #transform the test point locally and to quadrant 2m nm
+	#			q2y = math.fabs(vec.y - center.y+v) # transform the test point locally and to quadrant 2
+	#			if (q2x > h) or (q2y > v*2):
+	#				return air
+	#			if  ((2*v*h - v*q2x - h*q2y) >= 0): #finally the dot product can be reduced to this due to the hexagon symmetry
+	#				return GaN
+	#			else:
+	#				return air 
+	#		else:
+	#			return air
 
 	def define_flux_regions(self, sx, sy, sz, padding):
 		fluxregion = []
@@ -121,10 +121,10 @@ class Pyramid():
 				direction=mp.Y,
 				weight=-1))
 		#under the substrate
-		nearfieldregions.append(mp.Near2FarRegion(
-				center=mp.Vector3(0,0,sz/2-padding),
-				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-				direction=mp.Z))
+		#nearfieldregions.append(mp.Near2FarRegion(
+			#	center=mp.Vector3(0,0,sz/2-padding),
+			#	size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+			#	direction=mp.Z))
 
 		nearfieldregions.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
 				center=mp.Vector3(0,0,-sz/2+padding),
@@ -155,8 +155,7 @@ class Pyramid():
 		sx=self.pyramid_width*(6/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
 		sy=sx
 		sz=self.pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
-		#sh=substrate_height
-		sh=0
+		sh=substrate_height
 
 		padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		#"Inarguments for the simulation"
@@ -194,7 +193,23 @@ class Pyramid():
 		# "is inside a hexagonal area or not. Decreasing/increasing h over the span of z then forms a pyramid. Courtesy to playchilla.com for logic test if a point is inside a hexagon or not."
 		# "loops over the height of the pyramid in z-direction. "
 		def isInsidexy(vec):
-			return self.isInsidexy(vec, self.pyramid_width, self.pyramid_height, sz, sh)
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
+
+				#h=pyramid_width/2+vec.z*(pyramid_width/(2*(sz/2-sh)))
+				h=self.pyramid_width/(2*self.pyramid_height)*vec.z-(self.pyramid_width/(2*self.pyramid_height))*(sz/2-sh-self.pyramid_height)
+				v=h*math.tan(math.pi/6)	
+				center=mp.Vector3(h,v,0)
+				q2x = math.fabs(vec.x - center.x+h) #transform the test point locally and to quadrant 2m nm
+				q2y = math.fabs(vec.y - center.y+v) # transform the test point locally and to quadrant 2
+				if (q2x > h) or (q2y > v*2):
+					return air
+				if  ((2*v*h - v*q2x - h*q2y) >= 0): #finally the dot product can be reduced to this due to the hexagon symmetry
+					return GaN
+				else:
+					return air 
+			else:
+				return air
+
 
 		###PML_LAYERS###################################################################
 
@@ -205,17 +220,17 @@ class Pyramid():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
 		#"Source position"
-		abs_cource_position=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_position)
+		abs_source_position=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_position)
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
-				center=mp.Vector3(0,0,0))]
+				center=mp.Vector3(0,0,abs_source_position))]
 
 		sim=mp.Simulation(cell_size=cell,
-				#geometry=Substrate,
+				geometry=Substrate,
 				symmetries=symmetry,
 				sources=source,
 				dimensions=3,
-				#material_function=isInsidexy,
+				material_function=isInsidexy,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)
@@ -236,8 +251,8 @@ class Pyramid():
 
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
 		nearfieldregions = self.define_nearfield_regions(sx, sy, sz, sh, padding)
-		nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = nearfieldregions
-		nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
+		nfr1, nfr2, nfr3, nfr4, nfr6 = nearfieldregions
+		nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr6)
 		###RUN##########################################################################
 		#"The run constructor for meep."
 		if use_fixed_time:
@@ -248,18 +263,18 @@ class Pyramid():
 		else:
 			sim.run(
 			#mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,abs_cource_position+0.2),1e-2))
+			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-2))
 
 		###OUTPUT CALCULATIONS##########################################################
 
 		#"Calculate the poynting flux given the far field values of E, H."
 
 									#how to pick ff-points, this uses fibbonaci-sphere distribution
-		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 2 times the Fraunhofer-distance
+		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
 		if ff_calculations:
 			P_tot_ff = np.zeros(self.number_of_freqs)
 									
-			npts=1000							#number of far-field points
+			npts=ff_pts							#number of far-field points
 			Px=0
 			Py=0
 			Pz=0
