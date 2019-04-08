@@ -1,8 +1,7 @@
 from lib.pyramid import Pyramid
 import sys
 
-config = [
-    {
+config = {
         "simulate": {
             "resolution": 20,
             "use_fixed_time": True,
@@ -28,8 +27,8 @@ config = [
             "cutoff": 2
         },
         "result": {}
-    }
-]
+    	}
+
 #print(int(config["source_position"]))
 
 if (len(sys.argv)) != 1:
