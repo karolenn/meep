@@ -12,8 +12,6 @@ import time
 #from mpl_toolkits.mplot3d import Axes3D
 
 
-
-
 class Pyramid():
 
 	def __init__(self, config, debug = False):
