@@ -14,7 +14,7 @@ import time
 
 class Pyramid():
 
-	def __init__(self, config, debug = False):
+	def setup(self, config, debug = False):
 		self.source_position = config["source_position"] 
 		self.pyramid_height = config["pyramid_height"] 
 		self.pyramid_width = config["pyramid_width"] 
