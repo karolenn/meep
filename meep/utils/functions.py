@@ -30,6 +30,22 @@ def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):
 
 	return(xPts,yPts,zPts)
 
+def plot_data(sim_name,x,y):
+
+    db = read("db/initial_results/{}.json".format(sim_name))
+    if db == None:
+        print("could not open db/initial_results/{}.json".format(sim_name))
+        exit(0)
+    
+#    for config in db:
+ #       pyramid = Pyramid(config["pyramid"])
+  #      result = pyramid.simulate(config["simulate"])
+   #     data = sim_to_json(config, result)
+    #    write_result("db/initial_results/{}.json".format(sim_name), data)
+    array_data=db_to_array(db)
+
+
+
 	
 	
 
