@@ -1,6 +1,7 @@
 import meep as mp	
 import numpy as np
 from utils.functions import *
+from utils.api import *
 import matplotlib.pyplot as plt
 import sys
 from mpl_toolkits.mplot3d import Axes3D
@@ -167,7 +168,6 @@ class Pyramid():
 								#calculate flux at angle measured from top of the pyramid
 
 										
-
 		###GEOMETRY FOR THE SIMULATION#################################################
 
 		#"Material parameters"
@@ -265,6 +265,7 @@ class Pyramid():
 			#mp.at_beginning(mp.output_epsilon),
 			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-2))
 
+
 		###OUTPUT CALCULATIONS##########################################################
 
 		#"Calculate the poynting flux given the far field values of E, H."
@@ -336,7 +337,7 @@ class Pyramid():
 				#"it also calculates the ratio betwewen top and total flux out for all frequencies and stores it in an array 'flux_tot_pf_ratio'"
 				ff_freqs = mp.get_near2far_freqs(nearfield)
 
-				for i in range(self.number_of_freqs):
+				for i in range(self.number_of_freqs):	
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
 				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
@@ -354,19 +355,36 @@ class Pyramid():
 
 
 if __name__ == "__main__":
-	if (len(sys.argv)) != 7:
+	if (len(sys.argv)) != 2:
 		print("Not enough arguments")
 		exit(0)
 
-	"1 unit distance is meep is thought of as 1 micrometer here."
+	config = read("db/tmp/tmp.json")
+	if config == None:
+		print("could not open tmp/tmp.json for simulation")
+		exit(0)
 
-	"Structure Geometry"
-	resolution= int(sys.argv[1])					#resolution of the pyramid. Measured as number of pixels / unit distance
-	simulation_time=int(sys.argv[2])				#simulation time for the sim. #Multiply by a and divide by c to get time in fs.
-	source_position=float(sys.argv[3])					#pos of source measured	measured as fraction of tot. pyramid height from top. 
-	pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
-	pyramid_width=float(sys.argv[5])					#width measured from edge to edge 2.6
-	dpml=float(sys.argv[6])
 	pyramid = Pyramid()
-	pyramid.simulate(resolution, simulation_time, source_position, pyramid_height, pyramid_width, dpml)
+	pyramid.setup(config["pyramid"])
+	result = pyramid.simulate(config["simulate"])
+	data = sim_to_json(config, result)
+	write_result("db/initial_results/{}.json".format(sys.argv[1]), data)
+	for k,v in data["result"].items():
+		print(k, v)
+	
+	# if (len(sys.argv)) != 7:
+	# 	print("Not enough arguments")
+	# 	exit(0)
+
+	# "1 unit distance is meep is thought of as 1 micrometer here."
+
+	# "Structure Geometry"
+	# resolution= int(sys.argv[1])					#resolution of the pyramid. Measured as number of pixels / unit distance
+	# simulation_time=int(sys.argv[2])				#simulation time for the sim. #Multiply by a and divide by c to get time in fs.
+	# source_position=float(sys.argv[3])					#pos of source measured	measured as fraction of tot. pyramid height from top. 
+	# pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
+	# pyramid_width=float(sys.argv[5])					#width measured from edge to edge 2.6
+	# dpml=float(sys.argv[6])
+	# pyramid = Pyramid()
+	# pyramid.simulate(resolution, simulation_time, source_position, pyramid_height, pyramid_width, dpml)
 	

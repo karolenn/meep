@@ -1,5 +1,5 @@
 from utils.api import *
-from lib.pyramid import Pyramid
+from src.exicute_simulation import exicute_simulation
 
 def initial_runs(sim_name):
 
@@ -7,15 +7,9 @@ def initial_runs(sim_name):
     if db == None:
         print("could not open db/sim_spec/{}.json".format(sim_name))
         exit(0)
-    
-    pyramid = Pyramid()
+
     for config in db:
-        pyramid.setup(config["pyramid"])
-        print(config["pyramid"])
-        result = pyramid.simulate(config["simulate"])
-        data = sim_to_json(config, result)
-        write_result("db/initial_results/{}.json".format(sim_name), data)
-    
+        exicute_simulation(config, sim_name)
 
 
 if __name__ == "__main__":
