@@ -1,5 +1,5 @@
 from utils.api import *
-from src.exicute_simulation import exicute_simulation
+from src.execute_simulation import execute_simulation
 
 def initial_runs(sim_name):
 
@@ -9,7 +9,7 @@ def initial_runs(sim_name):
         exit(0)
 
     for config in db:
-        exicute_simulation(config, sim_name)
+        execute_simulation(config, sim_name)
 
 
 if __name__ == "__main__":
