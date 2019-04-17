@@ -19,7 +19,7 @@ config = {
         },
         "pyramid": {
             "source_position": 0.06,
-            "pyramid_height": 3.1,
+            "pyramid_height": 2,
             "pyramid_width": 2,
             "source_direction": "mp.Ey",
             "frequency_center": 2,

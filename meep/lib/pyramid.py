@@ -264,6 +264,7 @@ class Pyramid():
 				symmetries=symmetry,
 				sources=source,
 				dimensions=3,
+			#	default_material=GaN,
 				material_function=isInsidexy,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
@@ -372,7 +373,7 @@ class Pyramid():
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
 				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
-				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), ff_freqs
+				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio)
 
 			else:
 				self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)

@@ -36,11 +36,11 @@ def sim_to_json(config,result):
     config["result"] = result
     return config
 
+"Usage: dataarray = db_to_array(db,pyramid,yourdata)"
 def db_to_array(db,arg1,arg2):
    # print(db)
     #results = [[] for _ in range(4)]
     results=[]
-    print(results)
     for result in db:
         results.append(result[arg1][str(arg2)])
         #print(result)
@@ -48,7 +48,6 @@ def db_to_array(db,arg1,arg2):
         #results[1].append(result["pyramid"]["pyramid_height"])
         #results[2].append(result["pyramid"]["pyramid_width"])
         #results[3].append(result["result"]["flux_ratio"])
-    print(results)
     return results
 
 def opt_to_json(opt):

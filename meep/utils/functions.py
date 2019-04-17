@@ -1,5 +1,9 @@
 import math as math
 import numpy as np
+from scipy.interpolate import Rbf
+import matplotlib.pyplot as plt
+from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 
 
 ###FUNCTIONS##########################################################
@@ -60,6 +64,22 @@ def myPoyntingFlux(ff,nfreq):
 	Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))
 
 	return(Pr)
+
+def meritfunction(data,results):
+	print(len(data))
+	x=data[0]
+	y=data[1]
+	approx_func=Rbf(data)
+	x,y=np.linspace(2,3)
+	#3dplot
+	fig = plt.figure()
+	ax = plt.axes(projection='3d')
+	#ax.scatter(x,y,z,cmap=cm.jet)
+	ax.plot_surface(x,y,approx_func)
+	plt.show()
+
+
+
 
 
 
