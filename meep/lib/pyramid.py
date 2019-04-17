@@ -94,7 +94,6 @@ class Pyramid():
 		#"Calculation and plotting parameters"
 								#calculate flux at angle measured from top of the pyramid
 
-<<<<<<< HEAD
 		def define_flux_regions(sx, sy, sz, padding):
 			fluxregion = []
 			fluxregion.append(mp.FluxRegion(					#region x to calculate flux from
@@ -203,9 +202,6 @@ class Pyramid():
 
 					
 
-=======
-										
->>>>>>> e8d05d4d50985e25ad31057052f79b3f33c412a4
 		###GEOMETRY FOR THE SIMULATION#################################################
 
 		#"Material parameters"
