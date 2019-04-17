@@ -1,4 +1,5 @@
 import math as math
+import numpy as np
 
 
 ###FUNCTIONS##########################################################
@@ -43,6 +44,23 @@ def plot_data(sim_name,x,y):
    #     data = sim_to_json(config, result)
     #    write_result("db/initial_results/{}.json".format(sim_name), data)
     array_data=db_to_array(db)
+
+"Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and numerically integrate it "
+def myPoyntingFlux(ff,nfreq):
+	i=nfreq
+	P=0 #The poynting flux at point (xPts,yPts,zPts)
+	"Calculate the poynting vector in x,y,z direction"
+	Px=(ff[i+1]*np.conjugate(ff[i+5])-ff[i+2]*np.conjugate(ff[i+4]))
+	Px=Px.real
+	Py=(ff[i+2]*np.conjugate(ff[i+3])-ff[i]*np.conjugate(ff[i+5]))
+	Py=Py.real
+	Pz=(ff[i]*np.conjugate(ff[i+4])-ff[i+1]*np.conjugate(ff[i+3]))
+	Pz=Pz.real
+	"obtain the radial component of the poynting flux by sqrt(px^2+py^2+pz^2)"
+	Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))
+
+	return(Pr)
+
 
 
 

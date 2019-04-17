@@ -61,88 +61,15 @@ class Pyramid():
 	#		else:
 	#			return air
 
-	def define_flux_regions(self, sx, sy, sz, padding):
-		fluxregion = []
-		fluxregion.append(mp.FluxRegion(					#region x to calculate flux from
-			center=mp.Vector3(sx/2-padding,0,0),
-			size=mp.Vector3(0,sy-padding*2,sz-padding*2),
-			direction=mp.X))
-
-		fluxregion.append(mp.FluxRegion(					# region -x to calculate flux from
-			center=mp.Vector3(-sx/2+padding,0,0),
-			size=mp.Vector3(0,sy-padding*2,sz-padding*2),
-			direction=mp.X,
-			weight=-1))
-
-		fluxregion.append(mp.FluxRegion(					#region y to calculate flux from
-			center=mp.Vector3(0,sy/2-padding,0),
-			size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-			direction=mp.Y))
-
-		fluxregion.append(mp.FluxRegion(					#region -y to calculate flux from
-			center=mp.Vector3(0,-sy/2+padding,0),
-			size=mp.Vector3(sx-padding*2,0,sz-padding*2),
-			direction=mp.Y,
-			weight=-1))
-
-		fluxregion.append(mp.FluxRegion(					#z-bottom region to calculate flux from
-			center=mp.Vector3(0,0,sz/2-padding),
-			size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-			direction=mp.Z))
-
-		fluxregion.append(mp.FluxRegion(					#z-top region to calculate flux from
-			center=mp.Vector3(0,0,-sz/2+padding),
-			size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-			direction=mp.Z,
-			weight=-1))
-		return fluxregion
-
-	def define_nearfield_regions(self, sx, sy, sz, sh, padding):
-		nearfieldregions=[]
-		nearfieldregions.append(mp.Near2FarRegion(
-				center=mp.Vector3(sx/2-padding,0,-sh/2),
-				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
-				direction=mp.X))
-
-		nearfieldregions.append(mp.Near2FarRegion(
-				center=mp.Vector3(-sx/2+padding,0,-sh/2),
-				size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
-				direction=mp.X,
-				weight=-1))
-
-		nearfieldregions.append(mp.Near2FarRegion(
-				center=mp.Vector3(0,sy/2-padding,-sh/2),
-				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
-				direction=mp.Y))
-
-		nearfieldregions.append(mp.Near2FarRegion(
-				center=mp.Vector3(0,-sy/2+padding,-sh/2),
-				size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
-				direction=mp.Y,
-				weight=-1))
-		#under the substrate
-		#nearfieldregions.append(mp.Near2FarRegion(
-			#	center=mp.Vector3(0,0,sz/2-padding),
-			#	size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-			#	direction=mp.Z))
-
-		nearfieldregions.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
-				center=mp.Vector3(0,0,-sz/2+padding),
-				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-				direction=mp.Z,
-				weight=-1))
-		return nearfieldregions
-
 
 	def simulate(self, config):
 		dpml = config["dpml"]
 		resolution = config["resolution"]
-
-		
 		use_fixed_time = config["use_fixed_time"]
 		simulation_time = config["simulation_time"]
 		padding = config["padding"]
 		ff_pts = config["ff_pts"]
+		ff_cover = config["ff_cover"]
 		use_symmetries = config["use_symmetries"]
 		calculate_flux = config["calculate_flux"]
 		ff_calculations = config["ff_calculations"]
@@ -157,7 +84,7 @@ class Pyramid():
 		sz=self.pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 		sh=substrate_height
 
-		padding=0.1							##distance from pml_layers to flux regions so PML don't overlap flux regions
+		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		#"Inarguments for the simulation"
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
 		#"Direction for source"
@@ -166,7 +93,113 @@ class Pyramid():
 		#"Calculation and plotting parameters"
 								#calculate flux at angle measured from top of the pyramid
 
-										
+		def define_flux_regions(sx, sy, sz, padding):
+			fluxregion = []
+			fluxregion.append(mp.FluxRegion(					#region x to calculate flux from
+				center=mp.Vector3(sx/2-padding,0,0),
+				size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+				direction=mp.X))
+
+			fluxregion.append(mp.FluxRegion(					# region -x to calculate flux from
+				center=mp.Vector3(-sx/2+padding,0,0),
+				size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+				direction=mp.X,
+				weight=-1))
+
+			fluxregion.append(mp.FluxRegion(					#region y to calculate flux from
+				center=mp.Vector3(0,sy/2-padding,0),
+				size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+				direction=mp.Y))
+
+			fluxregion.append(mp.FluxRegion(					#region -y to calculate flux from
+				center=mp.Vector3(0,-sy/2+padding,0),
+				size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+				direction=mp.Y,
+				weight=-1))
+
+			fluxregion.append(mp.FluxRegion(					#z-bottom region to calculate flux from
+				center=mp.Vector3(0,0,sz/2-padding),
+				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+				direction=mp.Z))
+
+			fluxregion.append(mp.FluxRegion(					#z-top region to calculate flux from
+				center=mp.Vector3(0,0,-sz/2+padding),
+				size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+				direction=mp.Z,
+				weight=-1))
+			return fluxregion
+
+		def define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover):
+			nearfieldregions=[]
+			if ff_cover == False:
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(sx/2-padding,0,-sh/2),
+					size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
+					direction=mp.X))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(-sx/2+padding,0,-sh/2),
+					size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
+					direction=mp.X,
+					weight=-1))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,sy/2-padding,-sh/2),
+					size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
+					direction=mp.Y))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,-sy/2+padding,-sh/2),
+					size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
+					direction=mp.Y,
+					weight=-1))
+		#under the substrate
+		#nearfieldregions.append(mp.Near2FarRegion(
+			#	center=mp.Vector3(0,0,sz/2-padding),
+			#	size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+			#	direction=mp.Z))
+
+				nearfieldregions.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
+					center=mp.Vector3(0,0,-sz/2+padding),
+					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+					direction=mp.Z,
+					weight=-1))
+			else:
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(sx/2-padding,0,0),
+					size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+					direction=mp.X))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(-sx/2+padding,0,0),
+					size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+					direction=mp.X,
+					weight=-1))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,sy/2-padding,0),
+					size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+					direction=mp.Y))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,-sy/2+padding,0),
+					size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+					direction=mp.Y,
+					weight=-1))
+		#under the substrate
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,0,sz/2-padding),
+					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+					direction=mp.Z))
+
+				nearfieldregions.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
+					center=mp.Vector3(0,0,-sz/2+padding),
+					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+					direction=mp.Z,
+					weight=-1))
+			return nearfieldregions
+
+					
 
 		###GEOMETRY FOR THE SIMULATION#################################################
 
@@ -239,7 +272,7 @@ class Pyramid():
 
 		#"These regions define the borders of the cell with distance 'padding' between the flux region and the dpml region to avoid calculation errors."
 		if calculate_flux:
-			flux_regions = self.define_flux_regions(sx,sy,sz, padding)
+			flux_regions = define_flux_regions(sx,sy,sz,padding)
 			fr1,fr2, fr3, fr4, fr5, fr6 = flux_regions
 
 		###FIELD CALCULATIONS###########################################################
@@ -250,9 +283,14 @@ class Pyramid():
 		###FAR FIELD REGION#############################################################
 
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
-		nearfieldregions = self.define_nearfield_regions(sx, sy, sz, sh, padding)
-		nfr1, nfr2, nfr3, nfr4, nfr6 = nearfieldregions
-		nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr6)
+		nearfieldregions = define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover)
+		if ff_cover == False:
+			nfr1, nfr2, nfr3, nfr4, nfr6 = nearfieldregions
+			nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr6)
+
+		else:
+			nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = nearfieldregions				
+			nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
 		###RUN##########################################################################
 		#"The run constructor for meep."
 		if use_fixed_time:
@@ -263,13 +301,13 @@ class Pyramid():
 		else:
 			sim.run(
 			#mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-2))
+			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3))
 
 		###OUTPUT CALCULATIONS##########################################################
 
 		#"Calculate the poynting flux given the far field values of E, H."
-
-									#how to pick ff-points, this uses fibbonaci-sphere distribution
+		myIntegration = True
+		nfreq=self.number_of_freqs
 		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
 		if ff_calculations:
 			P_tot_ff = np.zeros(self.number_of_freqs)
@@ -290,35 +328,27 @@ class Pyramid():
 
 			global zPts
 			zPts=[]
-			#"fibspherepts defined in functions/functions.py"
-			fibspherepts(r,theta,npts,xPts,yPts,zPts)
-			#print(xPts)
 
-			for n in range(range_npts):
+			if myIntegration == True:
+				#how to pick ff-points, this uses fibbonaci-sphere distribution
+				fibspherepts(r,theta,npts,xPts,yPts,zPts)
+				npts=range_npts
+
+				for n in range(npts):
+
+					ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
+					i=0
+					for k in range(nfreq):
+						"Calculate the poynting vector in x,y,z direction"
+						Pr = myPoyntingFlux(ff,i)	
+						"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
+						"divided by npts and we get evenly sized area chunks" 					
+						surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
+						P_tot_ff[k] += surface_Element*(1)*(Pr)
+						i = i + 6 #to keep track of the correct entries in the ff array
+						#use meeps integration
 
 
-				ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
-				#"P_tot_ff calculated as (1/2)Re(E x H*)scalar-product(sin(angleM)cos(angleN),sin(angleM)sin(angleN),-cos(angleM)) where H* is the complex conjugate and this corresponds to the average power density in radial direction from the simulation cell at a distance of r micrometers."
-
-				#"Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and numerically integrate it "
-
-				i=0
-				for k in range(self.number_of_freqs):
-					#"Calculate the poynting vector in x,y,z direction"
-					Px=(ff[i+1]*np.conjugate(ff[i+5])-ff[i+2]*np.conjugate(ff[i+4]))
-					Px=Px.real
-					Py=(ff[i+2]*np.conjugate(ff[i+3])-ff[i]*np.conjugate(ff[i+5]))
-					Py=Py.real
-					Pz=(ff[i]*np.conjugate(ff[i+4])-ff[i+1]*np.conjugate(ff[i+3]))
-					Pz=Pz.real
-					#"obtain the radial component of the poynting flux by sqrt(px^2+py^2+pz^2)"
-					Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))
-					#"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
-					#"divided by npts and we get evenly sized area chunks" 					
-					surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
-					P_tot_ff[k] += surface_Element*(1)*np.real(Pr)
-
-					i=i+6
 
 
 					#"P_tot_ff[k] is calculated for each freq. Now the loop should make the spacing between two points larger the further down the sphere we goes and surface_elements might overlap here. Check in the future the errors."
@@ -340,7 +370,7 @@ class Pyramid():
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
 				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
-				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio)
+				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), ff_freqs
 
 			else:
 				self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)

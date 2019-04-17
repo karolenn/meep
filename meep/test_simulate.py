@@ -3,12 +3,13 @@ import sys
 
 config = {
         "simulate": {
-            "resolution": 100,
+            "resolution": 60,
             "use_fixed_time": False,
-            "simulation_time": 30,
+            "simulation_time": 40,
             "dpml": 0.1,
             "padding": 0.1,
             "ff_pts": 1600,
+            "ff_cover": False,
             "use_symmetries": True,
             "calculate_flux": True,
             "ff_calculations": True,
@@ -17,10 +18,10 @@ config = {
             "substrate_ratio": "1/20"
         },
         "pyramid": {
-            "source_position": 0.02,
-            "pyramid_height": 2,
+            "source_position": 0.06,
+            "pyramid_height": 3.1,
             "pyramid_width": 2,
-            "source_direction": "mp.Ex",
+            "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 0.5,
             "number_of_freqs": 1,
@@ -44,7 +45,8 @@ if (len(sys.argv)) != 1:
 #frequency_width=float(sys.argv[7])
 #number_of_freqs=int(sys.argv[8])
 #cutoff=int(sys.argv[9])
-#dpml=float(sys.argv[10])
-pyramid = Pyramid(config["pyramid"])
+#dpml=float(sys.argv[10])'
+pyramid = Pyramid()
+pyramid.setup(config["pyramid"])
 result = pyramid.simulate(config["simulate"])
 print(result)
