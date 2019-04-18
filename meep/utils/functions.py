@@ -65,18 +65,78 @@ def myPoyntingFlux(ff,nfreq):
 
 	return(Pr)
 
+def Unpacker(data):
+	num_dim=len(data)
+	if num_dim == 0:
+		print('Error: 0 dims to RBF')
+	elif num_dim == 1:
+		return(Rbf(data[0],sum(results,[])))
+	elif num_dim == 2:
+		return(Rbf(data[0],data[1],sum(results,[])))
+	elif num_dim == 3:
+		return(Rbf(data[0],data[1],data[2],sum(results,[])))
+	elif num_dim == 4:
+		return(Rbf(data[0],data[1],data[2],data[3],sum(results,[])))
+	else:
+		print('Error: merit function to many inparameters')
+
 def meritfunction(data,results):
-	print(len(data))
-	x=data[0]
-	y=data[1]
-	approx_func=Rbf(data)
-	x,y=np.linspace(2,3)
-	#3dplot
-	fig = plt.figure()
-	ax = plt.axes(projection='3d')
-	#ax.scatter(x,y,z,cmap=cm.jet)
-	ax.plot_surface(x,y,approx_func)
-	plt.show()
+	#first we need to 'unpack' data and results into arrays
+	num_dim=len(data)
+	if num_dim == 0:
+		print('Error: 0 dims to RBF')
+	elif num_dim == 1:
+		print('x:',data[0])
+		print('f:',sum(results,[]))
+		RBF_Func=Rbf(data[0],sum(results,[]))
+		minx=min(data[0])
+		maxx=max(data[0])
+		minf=min(results)
+		maxf=max(results)
+		x = np.linspace(minx,maxx)
+		z = np.linspace(minf[0],maxf[0])
+		print('rbf:',RBF_Func(z))
+		#3d plot
+		plt.scatter(data[0],sum(results,[]))
+		plt.plot(x,RBF_Func(x))
+		plt.show()
+	elif num_dim == 2:
+		print(sum(results,[]))
+		RBF_func=Rbf(data[0],data[1],sum(results,[]))
+		minx=min(data[0])
+		maxx=max(data[0])
+		miny=min(data[1])
+		maxy=max(data[1])
+		minz=min(results)
+		maxz=max(results)
+		x = np.linspace(minx,maxx)
+		y = np.linspace(miny,maxy)
+		z = np.linspace(minz,maxz)
+		#3d plot
+		fig = plt.figure()
+		ax = plt.axes(projection='3d')
+		ax.scatter(data[0],data[1],sum(results,[]))
+		plt.show()
+
+	elif num_dim == 3:
+		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]))
+	elif num_dim == 4:
+		RBF_Func=Rbf(data[0],data[1],data[2],data[3],sum(results,[]))
+	else:
+		print('Error: merit function to many inparameters')
+#	approx_func=Rbf((Unpacker(data,n) for n in range(num_dim)),(Unpacker(results,m) for m in range(num_dim)))
+	#approx_func=Rbf((data[n] for n in range(len(data))), (results[m] for m in range(len(results))))
+
+	# x=data[0]
+	# y=data[1]
+	# approx_func=Rbf(data)
+	# x,y=np.linspace(2,3)
+	# #3dplot
+	# fig = plt.figure()
+	# ax = plt.axes(projection='3d')
+	# #ax.scatter(x,y,z,cmap=cm.jet)
+	# ax.plot_surface(x,y,approx_func)
+	# plt.show()
 
 
 
