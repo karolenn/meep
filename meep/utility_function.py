@@ -9,15 +9,16 @@ def merit_function(sim_name, **args):
     "withdraw the (**args) source_pos, pyramid size etc from initial results and store them in array"
     values = []
     for n in args: #n is index in db
-        print(n)
-        print(db_to_array(db,"pyramid",n))
         values.append(db_to_array(db,"pyramid",n))
     "withdraw the flux_ratio results from initial_runs simulations"
     sim_results=db_to_array(db,"result","flux_ratio")
     #values and sim results are now arrays in arrays. Inner array is data from single simulation
  #   print(sim_results)
  #   print(values) #What remains to do is to send this badboy to an actual merit function that computes the next sim
-    meritfunction(values,sim_results)
+    meritfunction(values,sim_results,args)
+    ph=[5,7,9]
+    x=distfunction(6,ph)
+    print(x)
     
 
 

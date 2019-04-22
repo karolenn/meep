@@ -1,9 +1,12 @@
 import math as math
 import numpy as np
 from scipy.interpolate import Rbf
+from scipy.optimize import Bounds
+from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
+import sys
 
 
 ###FUNCTIONS##########################################################
@@ -80,43 +83,94 @@ def Unpacker(data):
 	else:
 		print('Error: merit function to many inparameters')
 
-def meritfunction(data,results):
+def mindistfunction(args):
+	bounds = [min(args),max(args)]
+	max_dist_pt=0
+
+	return max_dist_pt
+
+def distfunction(x,args):
+	num_variables = len(args)
+	#if x outside bounds
+	#return 0
+	func_value = []
+	for n in range(num_variables):
+		func_value.append(abs(x-args[n]))
+	return min(func_value)
+
+
+
+
+def meritfunction(data,results,args):
 	#first we need to 'unpack' data and results into arrays
 	num_dim=len(data)
 	if num_dim == 0:
 		print('Error: 0 dims to RBF')
 	elif num_dim == 1:
-		print('x:',data[0])
-		print('f:',sum(results,[]))
-		RBF_Func=Rbf(data[0],sum(results,[]))
-		minx=min(data[0])
-		maxx=max(data[0])
+		#remove duplicates
+		data = np.unique(data).tolist()
+		results = sum(results,[])
+		results = np.unique(results).tolist()
+		print('x:',data,len(data))
+		print('f:',results,len(results))
+		RBF_Func=Rbf(data,results)
+		minx=min(data)
+		maxx=max(data)
 		minf=min(results)
 		maxf=max(results)
-		x = np.linspace(minx,maxx)
-		z = np.linspace(minf[0],maxf[0])
-		print('rbf:',RBF_Func(z))
-		#3d plot
-		plt.scatter(data[0],sum(results,[]))
+		x = np.linspace(minx,maxx,num=30)
+		f = np.linspace(minf,maxf,num=30)
+		#optimizer
+		def RBF_min(var):
+			x = var[0]
+			return (-1*RBF_func(x))
+		init_guess = np.array([(maxx-minx)/2])
+		bounds_RBF = Bounds([minx, maxx])
+		rbf_max = minimize(RBF_min,x0=init_guess, method='COBYLA', options={'verbose': 1}, bounds=bounds_RBF)
+
+		#2d plot
+		fig = plt.figure()
+		plt.plot(data[0],results)
 		plt.plot(x,RBF_Func(x))
 		plt.show()
 	elif num_dim == 2:
-		print(sum(results,[]))
-		RBF_func=Rbf(data[0],data[1],sum(results,[]))
+		print(data)
+		print(results)
+		RBF_func=Rbf(data[0],data[1],sum(results,[]),function='thin_plate')
 		minx=min(data[0])
 		maxx=max(data[0])
 		miny=min(data[1])
 		maxy=max(data[1])
-		minz=min(results)
-		maxz=max(results)
-		x = np.linspace(minx,maxx)
-		y = np.linspace(miny,maxy)
-		z = np.linspace(minz,maxz)
+		minf=min(results)
+		maxf=max(results)
+		print(minx,maxx,miny,maxy,minf,maxf)
+		x = np.linspace(minx,maxx,num=30)
+		y = np.linspace(miny,maxy,num=30)
+		f = np.linspace(minf,maxf,num=30)
+		#optimizer
+		def RBF_min(var):
+			x=var[0]
+			y=var[1]
+			return (-1*RBF_func(x,y))
+		init_guess = np.array([(maxx-minx)/2,(maxy-miny)/2])
+		rbf_max = minimize(RBF_min,x0=init_guess, method='L-BFGS-B', options={'verbose': 1},bounds=[[minx,maxx],[miny,maxy]])
+		print(rbf_max.x)
+		print(-1*rbf_max.fun)
 		#3d plot
 		fig = plt.figure()
 		ax = plt.axes(projection='3d')
-		ax.scatter(data[0],data[1],sum(results,[]))
+		X,Y=np.meshgrid(x,y)
+		z = RBF_func(X,Y)
+		print(RBF_func(1,2.37))
+	#	print(X)
+	#	print(Y)
+		ax.scatter(rbf_max.x[0],rbf_max.x[1],-1*rbf_max.fun,s=50,c='r',marker='D')
+		ax.scatter(data[0],data[1],sum(results,[]),alpha=1)
+		ax.plot_surface(X,Y,z,cmap=cm.jet)
+		ax.set_xlabel(sys.argv[2])
+		ax.set_ylabel(sys.argv[3])
 		plt.show()
+
 
 	elif num_dim == 3:
 		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]))

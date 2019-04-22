@@ -311,7 +311,8 @@ class Pyramid():
 		#"Calculate the poynting flux given the far field values of E, H."
 		myIntegration = True
 		nfreq=self.number_of_freqs
-		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
+		#r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
+		r=100
 		if ff_calculations:
 			P_tot_ff = np.zeros(self.number_of_freqs)
 									
@@ -322,7 +323,6 @@ class Pyramid():
 			theta=ff_angle
 			phi=math.pi*2
 			#"How many points on the ff-sphere"
-			range_npts=int((theta/math.pi)*npts)
 			global xPts
 			xPts=[]
 
@@ -332,10 +332,14 @@ class Pyramid():
 			global zPts
 			zPts=[]
 
+			Pr_Array=[]
+
 			if myIntegration == True:
 				#how to pick ff-points, this uses fibbonaci-sphere distribution
 				fibspherepts(r,theta,npts,xPts,yPts,zPts)
+				range_npts=int((theta/math.pi)*npts)
 				npts=range_npts
+
 
 				for n in range(npts):
 
@@ -344,6 +348,7 @@ class Pyramid():
 					for k in range(nfreq):
 						"Calculate the poynting vector in x,y,z direction"
 						Pr = myPoyntingFlux(ff,i)	
+						Pr_Array.append(Pr)
 						"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
 						"divided by npts and we get evenly sized area chunks" 					
 						surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
@@ -368,7 +373,33 @@ class Pyramid():
 				#"the for loop sums up the flux for all frequencies and stores it in flux_tot_value and flux_top_value"
 				#"it also calculates the ratio betwewen top and total flux out for all frequencies and stores it in an array 'flux_tot_pf_ratio'"
 				ff_freqs = mp.get_near2far_freqs(nearfield)
-
+				# fig = plt.figure()
+				# ax = fig.gca(projection='3d')
+				# Pr_Max=max(Pr_Array)
+				# R = [n/Pr_Max  for n in Pr_Array]
+				# print(R)
+				# #R=1
+				# pts = len(Pr_Array)
+				# theta,phi = np.linspace(0,np.pi,pts), np.linspace(0,2*np.pi,pts)
+				# THETA,PHI = np.meshgrid(theta,phi)
+				# print(xPts)
+				# print(yPts)
+				# print(zPts)
+				# #X=np.zeros(pts**2)
+				# #Y=np.zeros(pts**2)
+				# #Z=np.zeros(pts**2)
+				# for n in range(pts):
+				# 	xPts[n] = R[n]*xPts[n]
+				# 	yPts[n] = R[n]*yPts[n]
+				# 	zPts[n] = R[n]*zPts[n]
+				# #print(X)
+				# #print(Y)
+				# #print(Z)
+				# ax.set_zlim(-100,100)
+				# ax.set_ylim(-100,100)
+				# ax.set_xlim(-100,100)
+				# ax.scatter(xPts,yPts,zPts)
+				# plt.show()
 				for i in range(self.number_of_freqs):	
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
