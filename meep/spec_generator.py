@@ -127,7 +127,13 @@ def testRand():
     x = []
     y = []
     z = []
+    tests = []
     for a,b,c in result:
+        tmp = copy.deepcopy(template)
+        tmp["pyramid"][z["pyramid_height"]] = a
+        tmp["pyramid"][x["pyramid_width"]] = b
+        tmp["pyramid"][y["source_position"]] = c
+        tests.append(tmp)
         x.append(a)
         y.append(b)
         z.append(c)
@@ -137,7 +143,7 @@ def testRand():
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/out.json", result)
+    write("db/sim_spec/out.json", tests)
     #print(result)
 
 
