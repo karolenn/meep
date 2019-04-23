@@ -130,9 +130,9 @@ def testRand():
     tests = []
     for a,b,c in result:
         tmp = copy.deepcopy(template)
-        tmp["pyramid"][z["pyramid_height"]] = a
-        tmp["pyramid"][x["pyramid_width"]] = b
-        tmp["pyramid"][y["source_position"]] = c
+        tmp["pyramid"]["pyramid_height"] = a
+        tmp["pyramid"]["pyramid_width"] = b
+        tmp["pyramid"]["source_position"] = c
         tests.append(tmp)
         x.append(a)
         y.append(b)
