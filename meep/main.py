@@ -2,15 +2,18 @@ from utils.api import *
 #from lib.pyramid import Pyramid
 from src.optimizer import Optimizer
 from initial_runs import initial_runs
+from utility_function import merit_function
 
-def main(sim_name):
+def main(sim_name,number_of_runs,*args):
 
     #Perform the initial runs and write the results to the database
     initial_runs(sim_name)
     "place below in a for loop"
     #Take the initial run results, calculate the next input parameters for the simulation
-    next_run = merit_function(sim_name)
-    execute_simulation(next_run,sim_name)
+    for n in range(int(number_of_runs)):
+        next_run = merit_function(sim_name,*args)
+        #execute_sim needs db entry for next run
+        execute_simulation(next_run,sim_name)
     
     "run next run"
 
@@ -55,11 +58,10 @@ class Pyramid():
 
 
 
-
 if __name__ == "__main__":
     import sys
-    if (len(sys.argv)) == 2:
-        main(sys.argv[1])
+    if (len(sys.argv)) == 5:
+        main(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
     elif (len(sys.argv)) == 3:
         main(sys.argv[1], int(sys.argv[2]))
     else:

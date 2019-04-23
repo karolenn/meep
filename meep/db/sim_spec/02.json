@@ -1,0 +1,86 @@
+[
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": false,
+            "simulation_time": 30,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.06,
+            "pyramid_height": 1.2,
+            "pyramid_width": 1.2,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {}
+    },
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": false,
+            "simulation_time": 30,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.06,
+            "pyramid_height": 3,
+            "pyramid_width": 1,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {}
+    },
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": false,
+            "simulation_time": 30,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.06,
+            "pyramid_height": 3.5,
+            "pyramid_width": 1.8,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {}
+    }
+]

@@ -311,8 +311,8 @@ class Pyramid():
 		#"Calculate the poynting flux given the far field values of E, H."
 		myIntegration = True
 		nfreq=self.number_of_freqs
-		#r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
-		r=100
+		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
+		#r=100
 		if ff_calculations:
 			P_tot_ff = np.zeros(self.number_of_freqs)
 									

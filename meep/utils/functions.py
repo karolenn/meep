@@ -101,7 +101,7 @@ def distfunction(x,args):
 
 
 
-def meritfunction(data,results,args):
+def meritfunction(data,results):
 	#first we need to 'unpack' data and results into arrays
 	num_dim=len(data)
 	if num_dim == 0:
@@ -143,6 +143,7 @@ def meritfunction(data,results,args):
 		maxy=max(data[1])
 		minf=min(results)
 		maxf=max(results)
+		index_max = np.argmax(results)
 		print(minx,maxx,miny,maxy,minf,maxf)
 		x = np.linspace(minx,maxx,num=30)
 		y = np.linspace(miny,maxy,num=30)
@@ -153,23 +154,23 @@ def meritfunction(data,results,args):
 			y=var[1]
 			return (-1*RBF_func(x,y))
 		init_guess = np.array([(maxx-minx)/2,(maxy-miny)/2])
+		init_guess=np.array([data[0][index_max],data[1][index_max]])
 		rbf_max = minimize(RBF_min,x0=init_guess, method='L-BFGS-B', options={'verbose': 1},bounds=[[minx,maxx],[miny,maxy]])
-		print(rbf_max.x)
-		print(-1*rbf_max.fun)
 		#3d plot
 		fig = plt.figure()
 		ax = plt.axes(projection='3d')
 		X,Y=np.meshgrid(x,y)
 		z = RBF_func(X,Y)
-		print(RBF_func(1,2.37))
+		next_sim = rbf_max.x
 	#	print(X)
 	#	print(Y)
 		ax.scatter(rbf_max.x[0],rbf_max.x[1],-1*rbf_max.fun,s=50,c='r',marker='D')
-		ax.scatter(data[0],data[1],sum(results,[]),alpha=1)
+		ax.scatter(data[0],data[1],sum(results,[]),alpha=1,c='k')
 		ax.plot_surface(X,Y,z,cmap=cm.jet)
 		ax.set_xlabel(sys.argv[2])
 		ax.set_ylabel(sys.argv[3])
 		plt.show()
+		return rbf_max.x
 
 
 	elif num_dim == 3:

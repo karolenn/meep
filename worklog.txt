@@ -60,3 +60,11 @@ Fix fibsphere pts, they seem to place on the x-axis on the simulation cell now. 
 
 Fibsphere seems to place points correctly now. Hard to compare ff-calcs with something. Fredriks SIM could be solution but doesn't work on my comp.
 
+
+---
+Importance:
+1a. Check ff-calcs with Fredrik!! 
+1b. Implement initial runs with the stochastic radial choosing process.
+1c. Do some runs for different parameters to get a feel for the smoothness of the function.
+
+

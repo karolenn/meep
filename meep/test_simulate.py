@@ -3,12 +3,12 @@ import sys
 
 config = {
         "simulate": {
-            "resolution": 20,
+            "resolution": 60,
             "use_fixed_time": False,
-            "simulation_time": 5,
+            "simulation_time": 6,
             "dpml": 0.1,
             "padding": 0.1,
-            "ff_pts": 500,
+            "ff_pts": 1600,
             "ff_cover": False,
             "use_symmetries": True,
             "calculate_flux": True,
@@ -19,8 +19,8 @@ config = {
         },
         "pyramid": {
             "source_position": 0.06,
-            "pyramid_height": 1,
-            "pyramid_width": 1,
+            "pyramid_height": 3,
+            "pyramid_width": 2,
             "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 0.5,
