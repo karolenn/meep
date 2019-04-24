@@ -219,6 +219,8 @@ class Pyramid():
 		#"Symmetry logic."
 		if use_symmetries:
 			symmetry = self.create_symetry()
+		else:
+			symmetry = []
 
 		# "Function for creating pyramid"
 
