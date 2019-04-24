@@ -64,9 +64,13 @@ def test(template):
     z = {"from": 0.01, "to": 0.5 ,"steps": 4}
     result = generate_eq_dist(x, y, z)
     tests = points_to_json(result, template)
-
+    
+    x,y,z = zip(*result)
+    ax = plt.axes(projection='3d')
+    ax.scatter(x,y,z)
+    plt.show()
     #write("db/sim_spec/out.json", result)
-    print(tests)
+    #print(tests)
 
 def testRand(template):
     
@@ -114,4 +118,4 @@ if __name__ == "__main__":
         },
         "result": {}
     }  
-    test(template)
+    testRand(template)
