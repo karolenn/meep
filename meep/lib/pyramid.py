@@ -78,11 +78,11 @@ class Pyramid():
 		simulation_ratio = eval(config["simulation_ratio"])
 		substrate_ratio = eval(config["substrate_ratio"])
 
-		substrate_height=self.pyramid_height/20				#height of the substrate, measured as fraction of pyramid height
+		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
-		sx=self.pyramid_width*(6/5)						#size of the cell in xy-plane is measured as a fraction of pyramid width
+		sx=self.pyramid_width*simulation_ratio						#size of the cell in xy-plane is measured as a fraction of pyramid width
 		sy=sx
-		sz=self.pyramid_height*(6/5)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
+		sz=self.pyramid_height*simulation_ratio						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 		sh=substrate_height
 
 		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
