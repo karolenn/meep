@@ -4,7 +4,7 @@ from lib.pyramid import Pyramid
 from src.optimizer import Optimizer
 import numpy as np
 
-def merit_function(sim_name, **args):
+def merit_function(sim_name, args):
     db = read("db/initial_results/{}.json".format(sim_name))
     "withdraw the (**args) source_pos, pyramid size etc from initial results and store them in array"
     values = []
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     import sys
     if(len(sys.argv)) < 12:
         merit_function(sys.argv[1],
-        **dict(arg.split('=') for arg in sys.argv[2:]))
+        [arg.strip() for arg in sys.argv[2:]])
     else:
         print("Not enough arguments")
         exit(0)
