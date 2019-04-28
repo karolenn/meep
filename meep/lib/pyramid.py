@@ -262,12 +262,12 @@ class Pyramid():
 				center=mp.Vector3(0,0,abs_source_position))]
 
 		sim=mp.Simulation(cell_size=cell,
-				geometry=Substrate,
+			#	geometry=Substrate,
 				symmetries=symmetry,
 				sources=source,
 				dimensions=3,
 			#	default_material=GaN,
-				material_function=isInsidexy,
+			#	material_function=isInsidexy,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)
@@ -305,7 +305,8 @@ class Pyramid():
 		else:
 			sim.run(
 			#mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3))
+			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3),
+			until=60)
 
 
 		###OUTPUT CALCULATIONS##########################################################
@@ -317,8 +318,8 @@ class Pyramid():
 		#r=100
 		if ff_calculations:
 			P_tot_ff = np.zeros(self.number_of_freqs)
-									
-			npts=ff_pts							#number of far-field points
+			npts=1600							
+		#	npts=ff_pts							#number of far-field points
 			Px=0
 			Py=0
 			Pz=0
