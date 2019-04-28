@@ -67,4 +67,6 @@ Importance:
 1b. Implement initial runs with the stochastic radial choosing process.
 1c. Do some runs for different parameters to get a feel for the smoothness of the function.
 
-
+1a. Slight errors seem to exist when compared to analytical solutions. Around 4% that doesn't really seem to go away with increased resolution or sample points. Mismatch between fib-sphere pts and continuum or something else? 
+1b. Done for 3D.
+1c. Runs to be done over Valborg. 
