@@ -8,7 +8,7 @@ def main(sim_name,number_of_runs,*args):
 
     #Perform the initial runs and write the results to the database
     initial_runs(sim_name)
-    "place below in a for loop"
+    #"place below in a for loop"
     #Take the initial run results, calculate the next input parameters for the simulation
     for n in range(int(number_of_runs)):
         next_run = merit_function(sim_name,*args)

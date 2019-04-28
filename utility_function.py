@@ -15,8 +15,12 @@ def merit_function(sim_name, args):
     #values and sim results are now arrays in arrays. Inner array is data from single simulation
  #   print(sim_results)
  #   print(values) #What remains to do is to send this badboy to an actual merit function that computes the next sim
-    
-    meritfunction(values,sim_results)
+    result = meritfunction(values,sim_results)
+    template = read("db/tmp/tmp.json")
+    for i, name in enumerate(args):
+        template["pyramid"][name] = result[i]
+    return template
+
     #next_run = meritfunction(values,sim_results)
     #return next_run
 
