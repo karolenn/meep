@@ -37,9 +37,18 @@ Results differ a lot when changing polarization to Ey. Need to redo a lot of run
 TODO:
 
 
+	if myIntegration == True:
+
+		for n in range(npts):
+
+			ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
+			for k in range(nfreq):
+				"Calculate the poynting vector in x,y,z direction"
+				P_tot_ff[k] += myPoyntingFlux(ff,nfreq)	
+				nfreq = nreq + 6 #to keep track of the correct entries in the ff array
 
 Importance 1: Check how to implement utility function and automate the process
-Importance 2: Compare my ff calcs with meep, compare array get metadata integal with my own check how varying sim cell sizes affect output
+Importance 2: Compare my ff calcs with meep, compare array get metadata integal with my own check how varying sim cell sizes affect output. Can't do. Meep want ff-fields from planar regions.
 Importance 3:Time differs from fixed sim time to energy convergence. Done. Go with probe.
 
 --- April
@@ -49,5 +58,13 @@ Importance 2: Implement utility function. Look how to optimize outdata, automate
 1: closed flux now works. The next, and I guess final test is to compare to some analytical solution for some radiator pattern antenna or something. Tricky to couple the gaussian source to something, but should be solvable.
 Fix fibsphere pts, they seem to place on the x-axis on the simulation cell now. LOL!!
 
-Fibsphere seems to place points correctly now.
+Fibsphere seems to place points correctly now. Hard to compare ff-calcs with something. Fredriks SIM could be solution but doesn't work on my comp.
+
+
+---
+Importance:
+1a. Check ff-calcs with Fredrik!! 
+1b. Implement initial runs with the stochastic radial choosing process.
+1c. Do some runs for different parameters to get a feel for the smoothness of the function.
+
 

@@ -11,7 +11,6 @@ import time
 
 #from mpl_toolkits.mplot3d import Axes3D
 
-
 if (len(sys.argv)) != 7:
     print("Not enough arguments")
     exit(0)
@@ -137,11 +136,11 @@ source=[mp.Source(mp.GaussianSource(frequency=fcen,fwidth=df,cutoff=2),	#gaussia
 		center=mp.Vector3(0,0,0))]
 
 sim=mp.Simulation(cell_size=cell,
-		#geometry=Substrate,
+		geometry=Substrate,
 		symmetries=symmetry,
 		sources=source,
 		dimensions=3,
-		#material_function=isInsidexy,
+		material_function=isInsidexy,
 		boundary_layers=pml_layer,
 		split_chunks_evenly=False,
 		resolution=resolution)
@@ -253,7 +252,7 @@ if far_field_calculation == 'true':
 	P_tot_ff = np.zeros(nfreq)
 							
 	fibsphere='true'	
-	npts=16000							#number of far-field points
+	npts=1600							#number of far-field points
 	Px=0
 	Py=0
 	Pz=0
@@ -282,17 +281,15 @@ if far_field_calculation == 'true':
 		npts=int(math.pow(npts,2))
 	#print(xPts)
 
-	print('radius:',r)
-
+	Pr_Array=[]
 	for n in range(npts):
-		Act_Theta=math.acos(zPts[n]/r)	#theta for current pt, pass to surface element
+
 
 		ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
 		"P_tot_ff calculated as (1/2)Re(E x H*)scalar-product(sin(angleM)cos(angleN),sin(angleM)sin(angleN),-cos(angleM)) where H* is the complex conjugate and this corresponds to the average power density in radial direction from the simulation cell at a distance of r micrometers."
 
 		"Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and numerically integrate it "
-		print('Act_Theta:',Act_Theta)
-		#print('zPtn[n]:',zPts[n])
+
 
 		i=0
 		for k in range(nfreq):
@@ -305,6 +302,7 @@ if far_field_calculation == 'true':
 			Pz=Pz.real
 			"obtain the radial component of the poynting flux by sqrt(px^2+py^2+pz^2)"
 			Pr=math.sqrt(math.pow(Px,2)+math.pow(Py,2)+math.pow(Pz,2))
+			Pr_Array.append(Pr)
 			"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
 			"divided by npts and we get evenly sized area chunks" 					
 			#surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
@@ -354,5 +352,6 @@ if calculate_flux == 'true':
 ###OUTPUT DATA##################################################################
 
 
-
+ax.scatter(xPts,yPts,zPts,Pr_Array)
+plt.show()
 
