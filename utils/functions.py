@@ -11,8 +11,8 @@ import sys
 
 ###FUNCTIONS##########################################################
 def fibspherepts(r,theta,npts,xPts,yPts,zPts):
-	offset=1.12/npts #this is hardcoded for angle = pi/4
-	#offset=0.75/npts #this is hardcoded for angle = pi/6
+	#offset=1.12/npts #this is hardcoded for angle = pi/4
+	offset=0.75/npts #this is hardcoded for angle = pi/6
 	range_npts=int((theta/math.pi)*npts)
 	increment = math.pi*(3 - math.sqrt(5))
 
@@ -167,8 +167,8 @@ def meritfunction(data,results):
 		ax.scatter(rbf_max.x[0],rbf_max.x[1],-1*rbf_max.fun,s=50,c='r',marker='D')
 		ax.scatter(data[0],data[1],sum(results,[]),alpha=1,c='k')
 		ax.plot_surface(X,Y,z,cmap=cm.jet)
-		ax.set_xlabel(sys.argv[2])
-		ax.set_ylabel(sys.argv[3])
+		ax.set_xlabel(sys.argv[3])
+		ax.set_ylabel(sys.argv[4])
 		plt.show()
 		return rbf_max.x
 

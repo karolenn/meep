@@ -8,6 +8,7 @@ def merit_function(sim_name, args):
     db = read("db/initial_results/{}.json".format(sim_name))
     "withdraw the (**args) source_pos, pyramid size etc from initial results and store them in array"
     values = []
+    print(args)
     for n in args: #n is index in db
         values.append(db_to_array(db,"pyramid",n))
     "withdraw the flux_ratio results from initial_runs simulations"

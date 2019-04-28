@@ -3,15 +3,16 @@ from utils.api import *
 from src.optimizer import Optimizer
 from initial_runs import initial_runs
 from utility_function import merit_function
+from src.execute_simulation import execute_simulation
 
-def main(sim_name,number_of_runs,*args):
+def main(sim_name,number_of_runs,args):
 
     #Perform the initial runs and write the results to the database
     initial_runs(sim_name)
     #"place below in a for loop"
     #Take the initial run results, calculate the next input parameters for the simulation
     for n in range(int(number_of_runs)):
-        next_run = merit_function(sim_name,*args)
+        next_run = merit_function(sim_name,args)
         #execute_sim needs db entry for next run
         execute_simulation(next_run,sim_name)
     
@@ -60,10 +61,9 @@ class Pyramid():
 
 if __name__ == "__main__":
     import sys
-    if (len(sys.argv)) == 5:
-        main(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
-    elif (len(sys.argv)) == 3:
-        main(sys.argv[1], int(sys.argv[2]))
+    if (len(sys.argv)) > 3:
+       main(sys.argv[1], sys.argv[2],
+        [arg.strip() for arg in sys.argv[3:]])
     else:
         print("Not enough arguments")
         exit(0)

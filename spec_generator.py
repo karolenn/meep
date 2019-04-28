@@ -41,11 +41,13 @@ def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 
     for _ , x in limit_x.items():
         for _ , y in limit_y.items():
             for _ , z in limit_z.items():
-                selected.append((x,y,z))
+                if (x,y,z) not in selected:
+                    selected.append((x,y,z))
     #print(selected)
     t = time.time()
     while time.time() - t < max_time:
-        if len(selected) > satisfied:
+        if len(selected) >= satisfied:
+            print(selected)
             break
         x, y, z = get_next(limit_x, limit_y, limit_z)
         if valid(x,y,z, selected, radius):
@@ -74,15 +76,15 @@ def test(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    #write("db/sim_spec/out.json", result)
+    write("db/sim_spec/test.json", tests)
     #print(tests)
 
 def testRand(template):
     
-    x = {"from": 1, "to":5 }
-    y = {"from": 1, "to":5 }
-    z = {"from": 1, "to": 5 }
-    result = generate_rand_dist(x, y, z, 0.1, 50)
+    x = {"from": 1, "to":3 }
+    y = {"from": 1, "to":3 }
+    z = {"from": 0.06, "to": 0.06 }
+    result = generate_rand_dist(x, y, z, 0.5, 9)
     x,y,z = zip(*result)
 
     tests = points_to_json(result, template)
@@ -90,7 +92,7 @@ def testRand(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/out.json", tests)
+    write("db/sim_spec/test.json", tests)
     #print(tests)
 
 
@@ -123,4 +125,4 @@ if __name__ == "__main__":
         },
         "result": {}
     }  
-    testRand(template)
+    test(template)
