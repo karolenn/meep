@@ -37,7 +37,12 @@ def get_next(limit_x, limit_y, limit_z):
 
 
 def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 3):
-    selected = [(limit_x["from"], limit_y["from"], limit_z["from"])]
+    selected = []
+    for _ , x in limit_x.items():
+        for _ , y in limit_y.items():
+            for _ , z in limit_z.items():
+                selected.append((x,y,z))
+    #print(selected)
     t = time.time()
     while time.time() - t < max_time:
         if len(selected) > satisfied:
@@ -76,7 +81,7 @@ def testRand(template):
     
     x = {"from": 1, "to":5 }
     y = {"from": 1, "to":5 }
-    z = {"from": 0.01, "to": 0.5 }
+    z = {"from": 1, "to": 5 }
     result = generate_rand_dist(x, y, z, 0.1, 50)
     x,y,z = zip(*result)
 
