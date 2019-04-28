@@ -318,7 +318,7 @@ class Pyramid():
 		#r=100
 		if ff_calculations:
 			P_tot_ff = np.zeros(self.number_of_freqs)
-			npts=1600							
+			npts=3200							
 		#	npts=ff_pts							#number of far-field points
 			Px=0
 			Py=0

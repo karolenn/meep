@@ -26,7 +26,7 @@ ypts=[]
 zpts=[]
 def fibspherepts(r,theta,npts,xpts,ypts,zpts):
 
-	offset=0.75/npts
+	offset=1.12/npts
 	range_npts=int((theta/math.pi)*npts)
 	increment = math.pi*(3 - math.sqrt(5))
 
@@ -42,9 +42,9 @@ def fibspherepts(r,theta,npts,xpts,ypts,zpts):
 r=100
 theta=math.pi/4
 phi=math.pi*2
-nPts=16
+nPts=32
 npts=40**2
-npts=1600
+npts=3200
 xPts=[]
 yPts=[]
 zPts=[]

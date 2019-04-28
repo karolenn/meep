@@ -13,7 +13,7 @@ config = {
             "use_symmetries": True,
             "calculate_flux": True,
             "ff_calculations": True,
-            "ff_angle": 6,
+            "ff_angle": 4,
             "simulation_ratio": "6/5",
             "substrate_ratio": "1/20"
         },
