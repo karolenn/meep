@@ -2,7 +2,7 @@
 *.vtk
 *.png
 *.gif
-
+*.pyc
 
 
 
