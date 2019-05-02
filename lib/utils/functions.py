@@ -3,9 +3,8 @@ import numpy as np
 
 
 ###FUNCTIONS##########################################################
-def fibspherepts(r,theta,npts,xPts,yPts,zPts):
+def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):
 
-	offset=2/npts
 	range_npts=int((theta/math.pi)*npts)
 	increment = math.pi*(3 - math.sqrt(5))
 
@@ -16,7 +15,7 @@ def fibspherepts(r,theta,npts,xPts,yPts,zPts):
 		xPts.append(R*math.cos(phi))
 		yPts.append(R*math.sin(phi))
 
-	return(xPts,yPts,zPts)
+	return(xPts,yPts,zPts,npts)
 	
 
 def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):

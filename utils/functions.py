@@ -10,9 +10,7 @@ import sys
 
 
 ###FUNCTIONS##########################################################
-def fibspherepts(r,theta,npts,xPts,yPts,zPts):
-	#offset=1.12/npts #this is hardcoded for angle = pi/4
-	offset=0.75/npts #this is hardcoded for angle = pi/6
+def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):
 	range_npts=int((theta/math.pi)*npts)
 	increment = math.pi*(3 - math.sqrt(5))
 
@@ -23,7 +21,7 @@ def fibspherepts(r,theta,npts,xPts,yPts,zPts):
 		xPts.append(R*math.cos(phi))
 		yPts.append(R*math.sin(phi))
 
-	return(xPts,yPts,zPts)
+	return(xPts,yPts,zPts,npts)
 	
 
 def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):

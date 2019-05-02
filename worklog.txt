@@ -66,7 +66,14 @@ Importance:
 1a. Check ff-calcs with Fredrik!! 
 1b. Implement initial runs with the stochastic radial choosing process.
 1c. Do some runs for different parameters to get a feel for the smoothness of the function.
-
+--
 1a. Slight errors seem to exist when compared to analytical solutions. Around 4% that doesn't really seem to go away with increased resolution or sample points. Mismatch between fib-sphere pts and continuum or something else? 
 1b. Done for 3D.
 1c. Runs to be done over Valborg. 
+--TODO after Valborg
+1a. Do some tests and compare to analytical solutions. Analytical solutions now working for pi/1, /2, ...,/7,pi/8
+1b. Find out the divering run. (3,1 mp.Ey for example) not perfect symmetry most likely.
+2a. Start write on the rapport.
+2b. Find somewhere to run all the simulations.
+
+

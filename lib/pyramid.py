@@ -38,7 +38,7 @@ class Pyramid():
 			symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1)]
 			self.print('symmetry:','Ey')
 		elif self.source_direction == mp.Ez:
-			symmetry =[mp.Mirror(mp.X)]
+			symmetry =[mp.Mirror(mp.X),mp.Mirror(mp.Y)]
 			self.print('symmetry:','Ez')
 		else:
 			symmetry = []
@@ -171,6 +171,7 @@ class Pyramid():
 					size=mp.Vector3(0,sy-padding*2,sz-padding*2),
 					direction=mp.X))
 
+
 				nearfieldregions.append(mp.Near2FarRegion(
 					center=mp.Vector3(-sx/2+padding,0,0),
 					size=mp.Vector3(0,sy-padding*2,sz-padding*2),
@@ -246,6 +247,17 @@ class Pyramid():
 			else:
 				return air
 
+		def isInsidexy2(vec):
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
+				h=self.pyramid_width/(2*self.pyramid_height)*vec.z-(self.pyramid_width/(2*self.pyramid_height))*(sz/2-sh-self.pyramid_height)
+				v=h*math.tan(math.pi/6)	
+				if math.fabs(vec.x)>=h or math.fabs(vec.y)>=v or vec.y >= -1*vec.x/(2*math.cos(math.pi/6))+v:
+					return GaN
+				else:
+					return air
+			else:
+				return air
+
 
 		###PML_LAYERS###################################################################
 
@@ -262,12 +274,13 @@ class Pyramid():
 				center=mp.Vector3(0,0,abs_source_position))]
 
 		sim=mp.Simulation(cell_size=cell,
-			#	geometry=Substrate,
+				geometry=Substrate,
 				symmetries=symmetry,
 				sources=source,
+				eps_averaging=True,
 				dimensions=3,
 			#	default_material=GaN,
-			#	material_function=isInsidexy,
+				material_function=isInsidexy2,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)
@@ -287,26 +300,26 @@ class Pyramid():
 		###FAR FIELD REGION#############################################################
 
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
-		nearfieldregions = define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover)
-		if ff_cover == False:
-			nfr1, nfr2, nfr3, nfr4, nfr6 = nearfieldregions
-			nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr6)
+		if ff_calculations == True:
+			nearfieldregions = define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover)
+			if ff_cover == False:
+				nfr1, nfr2, nfr3, nfr4, nfr6 = nearfieldregions
+				nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr6)
 
-		else:
-			nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = nearfieldregions				
-			nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
+			else:
+				nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = nearfieldregions				
+				nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
 		###RUN##########################################################################
 		#"The run constructor for meep."
 		if use_fixed_time:
 			sim.run(
-			#mp.at_beginning(mp.output_epsilon),
+			mp.at_beginning(mp.output_epsilon),
 			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 			until=simulation_time)
 		else:
 			sim.run(
 			#mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3),
-			until=60)
+			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3))
 
 
 		###OUTPUT CALCULATIONS##########################################################
@@ -318,8 +331,8 @@ class Pyramid():
 		#r=100
 		if ff_calculations:
 			P_tot_ff = np.zeros(self.number_of_freqs)
-			npts=3200							
-		#	npts=ff_pts							#number of far-field points
+		#	npts=3200							
+			npts=ff_pts							#number of far-field points
 			Px=0
 			Py=0
 			Pz=0
@@ -339,12 +352,30 @@ class Pyramid():
 
 			if myIntegration == True:
 				#how to pick ff-points, this uses fibbonaci-sphere distribution
-				fibspherepts(r,theta,npts,xPts,yPts,zPts)
+				if theta==math.pi/3:
+					offset=1.5/npts
+				elif theta==math.pi/4:
+					npts=npts*2
+					offset=1.15/npts
+				elif theta==math.pi/5:
+					npts=npts*2.5
+					offset=0.95/npts
+				elif theta==math.pi/6:
+					npts=npts*3
+					offset=0.8/npts
+				elif theta==math.pi/7:
+					npts=npts*3
+					offset=0.7/npts
+				elif theta==math.pi/8:
+					npts=npts*3
+					offset=0.6/npts
+				else:
+					offset=2/npts
+				fibspherepts(r,theta,npts,xPts,yPts,zPts,offset)
 				range_npts=int((theta/math.pi)*npts)
-				npts=range_npts
+				#npts=range_npts
 
-
-				for n in range(npts):
+				for n in range(range_npts):
 
 					ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
 					i=0
