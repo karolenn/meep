@@ -75,5 +75,9 @@ Importance:
 1b. Find out the divering run. (3,1 mp.Ey for example) not perfect symmetry most likely.
 2a. Start write on the rapport.
 2b. Find somewhere to run all the simulations.
+--Friday 03/05
+1. New function to paint pyramid. Check source pos etc. Should be working. Check substrate actually is there, dont know if isInsidexy2 overwrites it? differs quite a lot between results. Very interesting (and dangerous) !
+
+
 
 

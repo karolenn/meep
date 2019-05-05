@@ -246,18 +246,29 @@ class Pyramid():
 					return air 
 			else:
 				return air
-
+		#paints out a hexagon with the help of 4 straight lines in the big if statement
 		def isInsidexy2(vec):
 			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
-				h=self.pyramid_width/(2*self.pyramid_height)*vec.z-(self.pyramid_width/(2*self.pyramid_height))*(sz/2-sh-self.pyramid_height)
-				v=h*math.tan(math.pi/6)	
-				if math.fabs(vec.x)>=h or math.fabs(vec.y)>=v or vec.y >= -1*vec.x/(2*math.cos(math.pi/6))+v:
+				v=(self.pyramid_width/(2*self.pyramid_height))*vec.z+(self.pyramid_width/(2*self.pyramid_height))*(sh+self.pyramid_height-sz/2)
+				h=math.cos(math.pi/6)*v
+				k=1/(2*math.cos(math.pi/6))
+				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
 					return GaN
 				else:
 					return air
 			else:
 				return air
-
+		#paints out on forth of a hexagon
+		def isInsidexy3(vec):
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
+				v=(self.pyramid_width/self.pyramid_height)*vec.z+(self.pyramid_width/self.pyramid_height)*(sh+self.pyramid_height-sz/2)
+				h=math.cos(pi/6)*v
+				if (vec.x>=0 and vex.x<=h and y<=-1/(2*math.cos(math.pi6))*vec.x+v):
+					return GaN
+				else:
+					return air
+			else:
+				return air
 
 		###PML_LAYERS###################################################################
 
@@ -280,7 +291,7 @@ class Pyramid():
 				eps_averaging=True,
 				dimensions=3,
 			#	default_material=GaN,
-				material_function=isInsidexy2,
+				material_function=isInsidexy,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)

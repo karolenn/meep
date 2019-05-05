@@ -13,6 +13,7 @@ def plotter(db,x,y):
     plt.title("plotting:"+' '+'xaxis:'+str(x)+' '+'yaxis:'+str(y))
     plt.plot(datax,datay)
     plt.show()
+    print(datay)
 
 
 
