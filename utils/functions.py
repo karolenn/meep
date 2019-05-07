@@ -6,7 +6,9 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
+from collections import defaultdict
 import sys
+#from skimage import measure
 
 
 ###FUNCTIONS##########################################################
@@ -142,7 +144,7 @@ def meritfunction(data,results):
 		minf=min(results)
 		maxf=max(results)
 		index_max = np.argmax(results)
-		print(minx,maxx,miny,maxy,minf,maxf)
+		#print(minx,maxx,miny,maxy,minf,maxf)
 		x = np.linspace(minx,maxx,num=30)
 		y = np.linspace(miny,maxy,num=30)
 		f = np.linspace(minf,maxf,num=30)
@@ -165,14 +167,62 @@ def meritfunction(data,results):
 		ax.scatter(rbf_max.x[0],rbf_max.x[1],-1*rbf_max.fun,s=50,c='r',marker='D')
 		ax.scatter(data[0],data[1],sum(results,[]),alpha=1,c='k')
 		ax.plot_surface(X,Y,z,cmap=cm.jet)
-		ax.set_xlabel(sys.argv[3])
-		ax.set_ylabel(sys.argv[4])
+		ax.set_xlabel(sys.argv[2])
+		ax.set_ylabel(sys.argv[3])
 		plt.show()
 		return rbf_max.x
 
-
 	elif num_dim == 3:
-		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]))
+		print(data[0])
+		print(data[1])
+		print(data[2])
+		print(sum(results,[]))
+		data.append(sum(results,[]))
+		bar = defaultdict(list)
+		for x,y,z,r in zip(*data):
+			bar[z].append((x,y,r))
+		bar = sorted(bar.items())
+
+		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]),smooth=0,function='thin_plate')
+
+		minx=min(data[0])
+		maxx=max(data[0])
+		miny=min(data[1])
+		maxy=max(data[1])
+		minz=min(data[2])
+		maxz=max(data[2])
+		#print(len(data[0]))
+		x = np.linspace(minx,maxx,num=30)
+		y = np.linspace(miny,maxy,num=30)
+		z = np.linspace(minz,maxz,num=30)
+		print('lin',z)
+		#print(x,y,z)	
+		print(data[0])
+		X,Y,Z=np.meshgrid(x,y,z)
+		print('X',X)
+		f = RBF_Func(X,Y,Z)
+		print('f',f[:][:][0])
+		print('rbf func',RBF_Func(X,Y,Z))
+		#print(f)
+		X,Y=np.meshgrid(x,y)
+		print('z',Z)
+		print('func value:',RBF_Func(1,1,0.038333))
+		print('next',RBF_Func(5,5,0.18))
+		#print(X)
+		#print(Y)
+		#print(f[0][:][:])
+		#print(f[:][:][0])
+		n=0
+		for _source , _slice in bar:
+			print('source',_source)
+			#print()
+			print(f[n][:][:])
+			x,y,r = zip(*_slice)
+			ax = plt.axes(projection='3d')
+			ax.plot_surface(X,Y,f[n][:][:],cmap=cm.jet)
+			n+=1
+			ax.scatter(x,y,r)
+			plt.show()
 	elif num_dim == 4:
 		RBF_Func=Rbf(data[0],data[1],data[2],data[3],sum(results,[]))
 	else:

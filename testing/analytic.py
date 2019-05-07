@@ -41,8 +41,9 @@ def fibspherepts(r,theta,npts,xpts,ypts,zpts):
 		npts=npts*2.5
 		offset=0.95/npts
 	elif theta==math.pi/6:
-		npts=npts*3
-		offset=0.8/npts
+		#npts=npts*3
+		#offset=0.8/npts
+		offset=2/npts
 	elif theta==math.pi/7:
 		npts=npts*3
 		offset=0.7/npts
@@ -66,7 +67,7 @@ def fibspherepts(r,theta,npts,xpts,ypts,zpts):
 	return(xpts,ypts,zpts)
 
 r=1000
-theta=math.pi/2
+theta=math.pi/6
 phi=math.pi*2
 nPts=32
 npts=40**2
