@@ -206,9 +206,12 @@ class Pyramid():
 		###GEOMETRY FOR THE SIMULATION#################################################
 
 		#"Material parameters"
+		TiO2=mp.Medium(epsilon=3.26**2)
 		GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
+		GaN=TiO2
+		SubstrateEps=air
 
 		#"Geometry to define the Substrate"
 
@@ -291,7 +294,7 @@ class Pyramid():
 				eps_averaging=True,
 				dimensions=3,
 			#	default_material=GaN,
-				material_function=isInsidexy,
+				material_function=isInsidexy2,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)
@@ -329,7 +332,7 @@ class Pyramid():
 			until=simulation_time)
 		else:
 			sim.run(
-			#mp.at_beginning(mp.output_epsilon),
+		#	mp.at_beginning(mp.output_epsilon),
 			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3))
 
 
@@ -380,6 +383,9 @@ class Pyramid():
 				elif theta==math.pi/8:
 					npts=npts*3
 					offset=0.6/npts
+				elif theta==math.pi/12:
+					npts=npts*3
+					offset=0.4/npts
 				else:
 					offset=2/npts
 				fibspherepts(r,theta,npts,xPts,yPts,zPts,offset)
@@ -453,7 +459,7 @@ class Pyramid():
 
 			else:
 				self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
-				return flux_tot_out, None , None, 
+				return flux_tot_out, None , None
 
 
 

@@ -183,7 +183,7 @@ def meritfunction(data,results):
 			bar[z].append((x,y,r))
 		bar = sorted(bar.items())
 
-		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]),smooth=0,function='thin_plate')
+		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]),smooth=0)
 
 		minx=min(data[0])
 		maxx=max(data[0])
@@ -219,7 +219,7 @@ def meritfunction(data,results):
 			print(f[n][:][:])
 			x,y,r = zip(*_slice)
 			ax = plt.axes(projection='3d')
-			ax.plot_surface(X,Y,f[n][:][:],cmap=cm.jet)
+			#ax.plot_surface(X,Y,f[n][:][:],cmap=cm.jet)
 			n+=1
 			ax.scatter(x,y,r)
 			plt.show()

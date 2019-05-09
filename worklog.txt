@@ -78,6 +78,12 @@ Importance:
 --Friday 03/05
 1. New function to paint pyramid. Check source pos etc. Should be working. Check substrate actually is there, dont know if isInsidexy2 overwrites it? differs quite a lot between results. Very interesting (and dangerous) !
 
+---
+Utility function - flera lösare som ska returna max som ev. nästa simuleringspunkter. vi vill även ha en exploration fas, och denna val av punkt så kan vi använda radial choosing.
+GÖra simuleringar. plocka ut g(x)=maxf(y,z), projicera ner funktionen. undersöka om vi behöver vidga sökområde. 
+Undersöka konvergens i upplösningar. Kan vi köra res 40?
+
+
 
 
 
