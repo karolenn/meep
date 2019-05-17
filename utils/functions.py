@@ -182,9 +182,9 @@ def meritfuncshort(data,results):
 #Choose if we're going for exploration or explotation phase
 def Phase_Selector(data,results,rbf_optima):
 	if Compare_max_res_and_rbf(data,results,rbf_optima) == True:
-		return ('explore')
-	else:
 		return ('exploit')
+	else:
+		return ('explore')
 
 #compares difference between rbf_maximum and simulated maximum, returns True if we're exploting. False if we're exploring.
 def Compare_max_res_and_rbf(data,results,rbf_optima):
@@ -198,7 +198,7 @@ def Compare_max_res_and_rbf(data,results,rbf_optima):
 	maxrbf = max(rbf_func_max)
 	print('max rbf value',maxrbf)
 	print('difference:',maxrbf-maxf)
-	if maxrbf-maxf > 0.005:
+	if maxrbf-maxf > 0.05:
 		return True
 	else:
 		return False
@@ -257,13 +257,14 @@ def RBF_max_point_selector(rbf_optima):
 	rbf_func_pt = []
 	#withdraw all the function variables from the rbf for the corresponding f value optima
 	for n in range(len(rbf_optima)):
-		rbf_func_pt.append(rbf_optima[n].x)
+		print(list(rbf_optima[n].x))
+		rbf_func_pt.append(list(rbf_optima[n].x))
 	#return the pt/variables corresponding to the highest rbf func value optima
 	print('rbf func max',rbf_func_max)
 	print('rbf funct pt',rbf_func_pt)
 	print('index',rbf_func_max_index)
 	testguy=rbf_func_pt[1]
-	print('hereeee',rbf_func_pt[0],type(testguy),print(testguy.tolist),print(list(testguy)))
+	print('hereeee',rbf_func_pt[0],type(testguy))
 	return rbf_func_pt[rbf_func_max_index]
 
 
@@ -315,10 +316,6 @@ def meritfunction(data,results):
 		y = np.linspace(miny,maxy,num=30)
 		f = np.linspace(minf,maxf,num=30)
 		#optimizer
-		def RBF_min(var):
-			x=var[0]
-			y=var[1]
-			return (-1*RBF_Func(x,y))
 		init_guess = np.array([(maxx-minx)/2,(maxy-miny)/2])
 		init_guess=np.array([data[0][index_max],data[1][index_max]])
 		rbf_optima=[]
@@ -336,11 +333,11 @@ def meritfunction(data,results):
 		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
 		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
 		#if true, exploit, if false, explore
-		if Phase_Selector(data,results,rbf_optima)=='explore':
+		if Phase_Selector(data,results,rbf_optima)=='exploit':
 			next_sim = RBF_max_point_selector(rbf_optima)
 			print('next_sim',next_sim)
 			print('EXPLOATATIONS','point',next_sim)
-			next_sim = [next_sim[0][0]]+[next_sim[0][1]]
+		#	next_sim = [next_sim[0][0]]+[next_sim[0][1]]
 			plot_color = 'r'
 		else:
 			next_sim = Exploration_point_selector(data,num_dim)
@@ -354,7 +351,8 @@ def meritfunction(data,results):
 		X,Y=np.meshgrid(x,y)
 		z = RBF_Func(X,Y)
 		print('hehe',next_sim)
-		ax.scatter(next_sim[0],next_sim[1],-1*RBF_min(next_sim),s=50,c=plot_color,marker='D')
+		ax.text(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),'POINT',fontsize=12)
+		ax.scatter(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),s=50,c=plot_color,marker='D')
 		ax.scatter(data[0],data[1],sum(results,[]),alpha=1,c='k')
 		ax.plot_surface(X,Y,z,cmap=cm.jet)
 		ax.set_xlabel(sys.argv[2])
