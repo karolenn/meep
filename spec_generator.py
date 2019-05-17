@@ -5,6 +5,9 @@ import time
 from random import uniform 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from utils.functions import generate_rand_dist
+from utils.functions import get_next
+from utils.functions import valid
 
 def singleLoop(db,conf,array):
     for n in range(len(array)):
@@ -19,40 +22,14 @@ def generate_eq_dist(x, y, z):
     return tests
 
 
-def valid(x,y,z, selected, radius):
-    dis = lambda f,s: (f-s)**2
-    #print(selected)
-    for ptx, pty,ptz in selected:
-        if (dis(ptx,x)+ dis(pty,y)+dis(ptz,z))**(1/2) < radius:
-            return False
-    return True
-
-
-def get_next(limit_x, limit_y, limit_z):
-    x = uniform(limit_x["from"], limit_x["to"])
-    y = uniform(limit_y["from"], limit_y["to"])
-    z = uniform(limit_z["from"], limit_z["to"])
-    return x, y, z
 
 
 
-def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 3):
-    selected = []
-    for _ , x in limit_x.items():
-        for _ , y in limit_y.items():
-            for _ , z in limit_z.items():
-                if (x,y,z) not in selected:
-                    selected.append((x,y,z))
-    #print(selected)
-    t = time.time()
-    while time.time() - t < max_time:
-        if len(selected) >= satisfied:
-            print(selected)
-            break
-        x, y, z = get_next(limit_x, limit_y, limit_z)
-        if valid(x,y,z, selected, radius):
-            selected.append((x, y, z))
-    return selected
+
+
+
+
+
 
 def points_to_json(points, template):
     tests = []
@@ -81,9 +58,9 @@ def test(template):
 
 def testRand(template):
     
-    x = {"from": 1, "to":3 }
-    y = {"from": 1, "to":3 }
-    z = {"from": 0.06, "to": 0.06 }
+    x = {"from": 0.8, "to":2 }
+    y = {"from": 0.8, "to":2 }
+    z = {"from": 0.2, "to": 0.2 }
     result = generate_rand_dist(x, y, z, 0.5, 9)
     x,y,z = zip(*result)
 
@@ -92,7 +69,7 @@ def testRand(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/test.json", tests)
+    write("db/sim_spec/lowtest.json", tests)
     #print(tests)
 
 
@@ -100,7 +77,7 @@ if __name__ == "__main__":
     template={
         "simulate": {
             "resolution": 20,
-            "use_fixed_time": True,
+            "use_fixed_time": False,
             "simulation_time": 1,
             "dpml": 0.1,
             "padding": 0.1,
@@ -125,4 +102,4 @@ if __name__ == "__main__":
         },
         "result": {}
     }  
-    test(template)
+    testRand(template)

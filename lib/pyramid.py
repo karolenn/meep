@@ -210,8 +210,8 @@ class Pyramid():
 		GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
-		GaN=TiO2
-		SubstrateEps=air
+	#	GaN=TiO2
+	#	SubstrateEps=TiO2
 
 		#"Geometry to define the Substrate"
 
@@ -327,7 +327,7 @@ class Pyramid():
 		#"The run constructor for meep."
 		if use_fixed_time:
 			sim.run(
-			mp.at_beginning(mp.output_epsilon),
+	#		mp.at_beginning(mp.output_epsilon),
 			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 			until=simulation_time)
 		else:

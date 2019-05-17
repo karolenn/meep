@@ -82,7 +82,7 @@ Importance:
 Utility function - flera lösare som ska returna max som ev. nästa simuleringspunkter. vi vill även ha en exploration fas, och denna val av punkt så kan vi använda radial choosing.
 GÖra simuleringar. plocka ut g(x)=maxf(y,z), projicera ner funktionen. undersöka om vi behöver vidga sökområde. 
 Undersöka konvergens i upplösningar. Kan vi köra res 40?
-
+Rapporten ska vara läsbar för klasskompisar etc. Rapporten ska ge en idé om hur metoden fungerar men behöver inte vara underlag nog för att man ska kunna implementera den. 
 
 
 

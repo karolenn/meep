@@ -3,32 +3,32 @@ import sys
 
 config = {
         "simulate": {
-            "resolution": 120,
+            "resolution": 60,
             "use_fixed_time": False,
-            "simulation_time": 6,
+            "simulation_time": 30,
             "dpml": 0.1,
             "padding": 0.1,
-            "ff_pts": 1600,
-            "ff_cover": True,
+            "ff_pts": 3200,
+            "ff_cover": False,
             "use_symmetries": True,
             "calculate_flux": True,
             "ff_calculations": True,
-            "ff_angle": 4,
-            "simulation_ratio": "6/5",
-            "substrate_ratio": "1/20"
+            "ff_angle": 6,
+            "simulation_ratio": "15/5",
+            "substrate_ratio": "1/2"
         },
         "pyramid": {
-            "source_position": 0.06,
-            "pyramid_height": 0.8,
-            "pyramid_width": 0.8,
-            "source_direction": "mp.Ez",
+            "source_position": 0.1,
+            "pyramid_height": 0.2,
+            "pyramid_width": 0.92376,
+            "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 0.5,
             "number_of_freqs": 1,
             "cutoff": 2
         },
         "result": {}
-    	}
+    }
 
 #print(int(config["source_position"]))
 
@@ -46,6 +46,8 @@ if (len(sys.argv)) != 1:
 #number_of_freqs=int(sys.argv[8])
 #cutoff=int(sys.argv[9])
 #dpml=float(sys.argv[10])'
+
+    
 pyramid = Pyramid()
 pyramid.setup(config["pyramid"])
 result = pyramid.simulate(config["simulate"])
