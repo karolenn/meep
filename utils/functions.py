@@ -105,25 +105,7 @@ def valid(x,y,z, selected, radius):
   #  limit_x = {"from": 1, "to":3 }
   #  limit_y = {"from": 1, "to":3 }
   # limit_z  z = {"from": 0.06, "to": 0.06 }
-def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 3):
-	#check if we already have some data points from simulations
-	selected=[]
-	for _ , x in limit_x.items():
-		for _ , y in limit_y.items():
-			for _ , z in limit_z.items():
-				if (x,y,z) not in selected:
-					selected.append((x,y,z))
 
-	t = time.time()
-
-	while time.time() - t < max_time:
-		if len(selected) >= satisfied:
-		#	print('selected',selected)
-			break
-		x, y, z = get_next(limit_x, limit_y, limit_z)
-		if valid(x,y,z, selected, radius):
-			selected.append((x, y, z))
-	return selected
 
 def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, already_selected):
 	#check if we already have some data points from simulations
