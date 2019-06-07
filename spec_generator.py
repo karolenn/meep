@@ -5,7 +5,6 @@ import time
 from random import uniform 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from utils.functions import generate_rand_dist
 from utils.functions import get_next
 from utils.functions import valid
 
@@ -21,14 +20,25 @@ def generate_eq_dist(x, y, z):
                 tests.append((itx,ity,itz))
     return tests
 
+def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 3):
+	#check if we already have some data points from simulations
+	selected=[]
+	for _ , x in limit_x.items():
+		for _ , y in limit_y.items():
+			for _ , z in limit_z.items():
+				if (x,y,z) not in selected:
+					selected.append((x,y,z))
 
+	t = time.time()
 
-
-
-
-
-
-
+	while time.time() - t < max_time:
+		if len(selected) >= satisfied:
+		#	print('selected',selected)
+			break
+		x, y, z = get_next(limit_x, limit_y, limit_z)
+		if valid(x,y,z, selected, radius):
+			selected.append((x, y, z))
+	return selected
 
 
 def points_to_json(points, template):
