@@ -71,7 +71,7 @@ def testRand(template):
     x = {"from": 0.8, "to":3 }
     y = {"from": 0.8, "to":3 }
     z = {"from": 0.2, "to": 0.4 }
-    result = generate_rand_dist(x, y, z, 0.5, 15)
+    result = generate_rand_dist(x, y, z, 0.5, 4)
     x,y,z = zip(*result)
 
     tests = points_to_json(result, template)
@@ -79,7 +79,7 @@ def testRand(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/fieldsnew.json", tests)
+    write("db/sim_spec/time.json", tests)
     #print(tests)
 
 
@@ -87,11 +87,12 @@ if __name__ == "__main__":
     template={
         "simulate": {
             "resolution": 40,
-            "use_fixed_time": False,
-            "simulation_time": 1,
+            "use_fixed_time": True,
+            "simulation_time": 10,
             "dpml": 0.1,
             "padding": 0.1,
             "ff_pts": 1600,
+            "ff_below": False,
             "ff_cover": False,
             "use_symmetries": True,
             "calculate_flux": True,
@@ -104,7 +105,8 @@ if __name__ == "__main__":
             "source_position": 0.06,
             "pyramid_height": 3.1,
             "pyramid_width": 2,
-            "source_direction": "mp.Ez",
+            "truncation": 0,
+            "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 0.5,
             "number_of_freqs": 1,

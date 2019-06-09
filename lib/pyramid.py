@@ -25,7 +25,7 @@ class Pyramid():
 		self.cutoff = config["cutoff"]
 		self.debug = debug
 		self.source_direction = eval(config["source_direction"])
-	#	self.truncation = config["truncation"]
+		self.truncation = config["truncation"]
 
 	def print(self,*args):
 		if self.debug:
@@ -73,6 +73,7 @@ class Pyramid():
 		padding = config["padding"]
 		ff_pts = config["ff_pts"]
 		ff_cover = config["ff_cover"]
+		ff_below = config["ff_below"]
 		use_symmetries = config["use_symmetries"]
 		calculate_flux = config["calculate_flux"]
 		ff_calculations = config["ff_calculations"]
@@ -134,7 +135,34 @@ class Pyramid():
 
 		def define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover):
 			nearfieldregions=[]
-			if ff_cover == False:
+			if ff_below == True:
+				print('ff below true')
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(sx/2-padding,0,sz/2-sh/2),
+					size=mp.Vector3(0,sy-padding*2,sh-padding*2),
+					direction=mp.X))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(-sx/2+padding,0,sz/2-sh/2),
+					size=mp.Vector3(0,sy-padding*2,sh-padding*2),
+					direction=mp.X,
+					weight=-1))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,sy/2-padding,sz/2-sh/2),
+					size=mp.Vector3(sx-padding*2,0,sh-padding*2),
+					direction=mp.Y))
+
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,-sy/2+padding,sz/2-sh/2),
+					size=mp.Vector3(sx-padding*2,0,sh-padding*2),
+					direction=mp.Y,
+					weight=-1))				
+				nearfieldregions.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,0,sz/2-padding),
+					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+					direction=mp.Z))
+			elif ff_cover == False:
 				nearfieldregions.append(mp.Near2FarRegion(
 					center=mp.Vector3(sx/2-padding,0,-sh/2),
 					size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
@@ -167,6 +195,7 @@ class Pyramid():
 					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 					direction=mp.Z,
 					weight=-1))
+
 			else:
 				nearfieldregions.append(mp.Near2FarRegion(
 					center=mp.Vector3(sx/2-padding,0,0),
@@ -212,14 +241,20 @@ class Pyramid():
 		GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
-	#	GaN=TiO2
-	#	SubstrateEps=TiO2
+#		GaN = TiO2
+#		SubstrateEps = TiO2
 
-		#"Geometry to define the Substrate"
-
-		Substrate=[mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
+		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
+		geometry=[]
+		#Substrate
+		geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
 					size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
-					material=SubstrateEps)]
+					material=SubstrateEps))
+		
+		#Truncation block of air to truncate the pyramid
+		geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh-self.pyramid_height),
+					size=mp.Vector3(self.pyramid_width,self.pyramid_width,self.truncation*self.pyramid_height*2),
+					material=air))
 
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
@@ -284,13 +319,14 @@ class Pyramid():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
 		#"Source position"
-		abs_source_position=sz/2-sh-self.pyramid_height+self.pyramid_height*(self.source_position)
+		
+		abs_source_position=sz/2-sh-self.pyramid_height*(1-self.truncation)+self.pyramid_height*(self.source_position)*(1-self.truncation)		
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
 				center=mp.Vector3(0,0,abs_source_position))]
 
 		sim=mp.Simulation(cell_size=cell,
-				geometry=Substrate,
+				geometry=geometry,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
@@ -329,7 +365,7 @@ class Pyramid():
 		#"The run constructor for meep."
 		if use_fixed_time:
 			sim.run(
-	#		mp.at_beginning(mp.output_epsilon),
+		#	mp.at_beginning(mp.output_epsilon),
 			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 			until=simulation_time)
 		else:
@@ -395,7 +431,8 @@ class Pyramid():
 				#npts=range_npts
 
 				for n in range(range_npts):
-
+					if ff_below == True:
+						zPts[n]=(-1)*zPts[n]
 					ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
 					i=0
 					for k in range(nfreq):
@@ -407,7 +444,6 @@ class Pyramid():
 						surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
 						P_tot_ff[k] += surface_Element*(1)*(Pr)
 						i = i + 6 #to keep track of the correct entries in the ff array
-						#use meeps integration
 
 
 

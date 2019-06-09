@@ -5,22 +5,24 @@ config = {
         "simulate": {
             "resolution": 60,
             "use_fixed_time": False,
-            "simulation_time": 30,
+            "simulation_time": 10,
             "dpml": 0.1,
             "padding": 0.1,
-            "ff_pts": 3200,
+            "ff_pts": 1600,
+            "ff_below": True,
             "ff_cover": False,
             "use_symmetries": True,
             "calculate_flux": True,
             "ff_calculations": True,
-            "ff_angle": 6,
-            "simulation_ratio": "15/5",
-            "substrate_ratio": "1/2"
+            "ff_angle": 2,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
         },
         "pyramid": {
-            "source_position": 0.1,
-            "pyramid_height": 0.2,
-            "pyramid_width": 0.92376,
+            "source_position": 0.06,
+            "pyramid_height": 0.8,
+            "pyramid_width": 0.8,
+            "truncation": 0,
             "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 0.5,
@@ -28,8 +30,7 @@ config = {
             "cutoff": 2
         },
         "result": {}
-    }
-
+    }  
 #print(int(config["source_position"]))
 
 if (len(sys.argv)) != 1:
