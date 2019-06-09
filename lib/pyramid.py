@@ -25,6 +25,7 @@ class Pyramid():
 		self.cutoff = config["cutoff"]
 		self.debug = debug
 		self.source_direction = eval(config["source_direction"])
+	#	self.truncation = config["truncation"]
 
 	def print(self,*args):
 		if self.debug:
@@ -64,6 +65,7 @@ class Pyramid():
 
 
 	def simulate(self, config):
+		start = time.time()
 		dpml = config["dpml"]
 		resolution = config["resolution"]
 		use_fixed_time = config["use_fixed_time"]
@@ -455,7 +457,8 @@ class Pyramid():
 
 					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
 				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
-				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio)
+				elapsed_time = time.time()-start
+				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
 
 			else:
 				self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
