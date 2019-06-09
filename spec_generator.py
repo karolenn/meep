@@ -53,9 +53,9 @@ def points_to_json(points, template):
 
 
 def test(template):
-    x = {"from": 1, "to":2 ,"steps": 5}
-    y = {"from": 2, "to":4 ,"steps": 4}
-    z = {"from": 0.01, "to": 0.5 ,"steps": 4}
+    x = {"from": 1, "to":10 ,"steps": 5}
+    y = {"from": 1, "to":10 ,"steps": 5}
+    z = {"from": 0.1, "to": 0.7 ,"steps": 5}
     result = generate_eq_dist(x, y, z)
     tests = points_to_json(result, template)
     
@@ -68,8 +68,8 @@ def test(template):
 
 def testRand(template):
     
-    x = {"from": 0.8, "to":6 }
-    y = {"from": 0.8, "to":6 }
+    x = {"from": 0.8, "to":10 }
+    y = {"from": 0.8, "to":1 }
     z = {"from": 0.1, "to": 0.6 }
     result = generate_rand_dist(x, y, z, 0.5, 20)
     x,y,z = zip(*result)
@@ -79,7 +79,7 @@ def testRand(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/fields6below.json", tests)
+    write("db/sim_spec/dummy.json", tests)
     #print(tests)
 
 
@@ -114,4 +114,4 @@ if __name__ == "__main__":
         },
         "result": {}
     }  
-    testRand(template)
+    test(template)

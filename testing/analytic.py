@@ -61,7 +61,7 @@ def fibspherepts(r,theta,npts,xpts,ypts,zpts):
 	increment = math.pi*(3 - math.sqrt(5))
 
 	for n in range(range_npts):
-		zpts.append(r*((n*offset-1)+(offset/2)))
+		zpts.append(-1*(r*((n*offset-1)+(offset/2))))
 		R = r*math.sqrt(1-pow(zpts[n]/r,2))
 		phi = (n % npts)*increment
 		xpts.append(R*math.cos(phi))
@@ -70,7 +70,7 @@ def fibspherepts(r,theta,npts,xpts,ypts,zpts):
 	return(xpts,ypts,zpts)
 
 r=1000
-theta=math.pi/12
+theta=math.pi/2
 phi=math.pi*2
 nPts=32
 npts=40**2
@@ -88,7 +88,7 @@ def sphericalpts(r,theta,phi,nPts,xPts,yPts,zPts):
 			anglePhi=(m/nPts)*phi
 			xPts.append(r*math.sin(angleTheta)*math.cos(anglePhi))
 			yPts.append(r*math.sin(angleTheta)*math.sin(anglePhi))
-			zPts.append(-r*math.cos(angleTheta))
+			zPts.append(r*math.cos(angleTheta))
 
 	return(xPts,yPts,zPts)
 fibspherepts(r,theta,npts,xpts,ypts,zpts)
