@@ -32,7 +32,7 @@ def write_result(db, info):
 
 def sim_to_json(config,result):
     flux_tot_out, P_tot_ff, flux_tot_ff_ratio, elapsed_time = result
-    result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (s)":elapsed_time }
+    result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (min)":elapsed_time }
     config["result"] = result
     return config
 
