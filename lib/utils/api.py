@@ -5,9 +5,10 @@ def read(db):
     try:
         with open (db, encoding='utf-8') as f:
             data_json = json.load(f)
+            print('but i return anyhow')
             return data_json
     except OSError as err:
-        print("unable to open")
+        print("unable to open here")
         #print(err)
         return None
 
@@ -21,8 +22,11 @@ def write(db, data):
     return True
 
 def write_result(db, info):
+    print('this is the db I read',db)
+    print('this is the info',info)
     data = read(db)
     if data != None:
+        print('fucked data',data)
         data.append(info)
     else:
         data = [info]
@@ -30,7 +34,7 @@ def write_result(db, info):
         
 def sim_to_json(config,result):
     flux_tot_out, P_tot_ff, flux_tot_ff_ratio, elapsed_time = result
-    result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (s)":elapsed_time }
+    result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time":elapsed_time }
     config["result"] = result
     return config
 

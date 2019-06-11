@@ -37,7 +37,7 @@ def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 
 			break
 		x, y, z = get_next(limit_x, limit_y, limit_z)
 		if valid(x,y,z, selected, radius):
-			selected.append((x, y, z))
+			selected.append((round(x,2), round(y,2), round(z,2)))
 	return selected
 
 
@@ -53,9 +53,9 @@ def points_to_json(points, template):
 
 
 def test(template):
-    x = {"from": 1, "to":10 ,"steps": 5}
-    y = {"from": 1, "to":10 ,"steps": 5}
-    z = {"from": 0.1, "to": 0.7 ,"steps": 5}
+    x = {"from": 1, "to":2 ,"steps": 3}
+    y = {"from": 1, "to":2 ,"steps": 3}
+    z = {"from": 0.1, "to": 0.7 ,"steps": 3}
     result = generate_eq_dist(x, y, z)
     tests = points_to_json(result, template)
     
@@ -63,15 +63,15 @@ def test(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/test.json", tests)
+    write("db/sim_spec/dummy2.json", tests)
     #print(tests)
 
 def testRand(template):
     
-    x = {"from": 0.8, "to":10 }
-    y = {"from": 0.8, "to":1 }
+    x = {"from": 0.8, "to":2 }
+    y = {"from": 0.8, "to":2 }
     z = {"from": 0.1, "to": 0.6 }
-    result = generate_rand_dist(x, y, z, 0.5, 20)
+    result = generate_rand_dist(x, y, z, 0.5, 16)
     x,y,z = zip(*result)
 
     tests = points_to_json(result, template)
@@ -79,20 +79,20 @@ def testRand(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/dummy.json", tests)
+    write("db/sim_spec/test3.json", tests)
     #print(tests)
 
 
 if __name__ == "__main__":
     template={
         "simulate": {
-            "resolution": 60,
+            "resolution": 20,
             "use_fixed_time": False,
             "simulation_time": 10,
             "dpml": 0.1,
             "padding": 0.1,
             "ff_pts": 1600,
-            "ff_below": True,
+            "ff_below": False,
             "ff_cover": False,
             "use_symmetries": True,
             "calculate_flux": True,

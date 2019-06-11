@@ -456,7 +456,10 @@ class Pyramid():
 			#"Initialize variables to be used, pf stands for 'per frequency'"
 			flux_tot_value = np.zeros(self.number_of_freqs)						#total flux out from box
 			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
-			flux_tot_out = mp.get_fluxes(flux_total)			#save total flux data
+			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
+			for n in range(len(flux_tot_out)):
+				flux_tot_out[n]=round(flux_tot_out[n],4)
+				P_tot_ff[n]=round(P_tot_ff[n],4)
 
 			if ff_calculations:
 				#"the for loop sums up the flux for all frequencies and stores it in flux_tot_value and flux_top_value"
@@ -491,9 +494,9 @@ class Pyramid():
 				# plt.show()
 				for i in range(self.number_of_freqs):	
 
-					flux_tot_ff_ratio[i] =P_tot_ff[i]/flux_tot_out[i]			#sums up the total flux out
+					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],4)			#sums up the total flux out
 				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
-				elapsed_time = time.time()-start
+				elapsed_time = round((time.time()-start)/60,1)
 				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
 
 			else:
@@ -511,8 +514,9 @@ if __name__ == "__main__":
 	if (len(sys.argv)) != 2:
 		print("Not enough arguments")
 		exit(0)
-
+	print('wrapper*')
 	config = read("db/tmp/tmp.json")
+	print('wrapper^')
 	if config == None:
 		print("could not open tmp/tmp.json for simulation")
 		exit(0)
@@ -521,6 +525,7 @@ if __name__ == "__main__":
 	pyramid.setup(config["pyramid"])
 	result = pyramid.simulate(config["simulate"])
 	data = sim_to_json(config, result)
+	print('pyramid data:',data)
 	write_result("db/initial_results/{}.json".format(sys.argv[1]), data)
 	for k,v in data["result"].items():
 		print(k, v)
