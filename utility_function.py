@@ -1,7 +1,7 @@
 from utils.api import *
 from utils.functions import *
 from lib.pyramid import Pyramid
-from src.optimizer import Optimizer
+#from src.optimizer import Optimizer
 import numpy as np
 
 def merit_function(sim_name, args):
