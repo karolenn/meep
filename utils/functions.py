@@ -257,6 +257,7 @@ def meritfunction(data,results):
 		print('Error: 0 dims to RBF')
 	elif num_dim == 1:
 		#remove duplicates
+		print('unsorted results',results)
 		data = np.unique(data).tolist()
 		results = sum(results,[])
 		results = np.unique(results).tolist()

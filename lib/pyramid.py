@@ -73,7 +73,7 @@ class Pyramid():
 		padding = config["padding"]
 		ff_pts = config["ff_pts"]
 		ff_cover = config["ff_cover"]
-		ff_below = config["ff_below"]
+		ff_calc = config["ff_calc"]
 		use_symmetries = config["use_symmetries"]
 		calculate_flux = config["calculate_flux"]
 		ff_calculations = config["ff_calculations"]
@@ -135,51 +135,28 @@ class Pyramid():
 
 		def define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover):
 			nearfieldregions=[]
-			if ff_below == True:
-				print('ff below true')
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(sx/2-padding,0,sz/2-sh/2),
-					size=mp.Vector3(0,sy-padding*2,sh-padding*2),
-					direction=mp.X))
-
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(-sx/2+padding,0,sz/2-sh/2),
-					size=mp.Vector3(0,sy-padding*2,sh-padding*2),
-					direction=mp.X,
-					weight=-1))
-
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(0,sy/2-padding,sz/2-sh/2),
-					size=mp.Vector3(sx-padding*2,0,sh-padding*2),
-					direction=mp.Y))
-
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(0,-sy/2+padding,sz/2-sh/2),
-					size=mp.Vector3(sx-padding*2,0,sh-padding*2),
-					direction=mp.Y,
-					weight=-1))				
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(0,0,sz/2-padding),
-					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-					direction=mp.Z))
-			elif ff_cover == False:
-				nearfieldregions.append(mp.Near2FarRegion(
+			nfrAbove=[]
+			nfrBelow=[]
+			#if ff_calc == True:
+			#If we wish to calculate the far-field above and below the pyramid
+		#	if ff_calc == "Both":
+			nfrAbove.append(mp.Near2FarRegion(
 					center=mp.Vector3(sx/2-padding,0,-sh/2),
 					size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
 					direction=mp.X))
 
-				nearfieldregions.append(mp.Near2FarRegion(
+			nfrAbove.append(mp.Near2FarRegion(
 					center=mp.Vector3(-sx/2+padding,0,-sh/2),
 					size=mp.Vector3(0,sy-padding*2,sz-sh-padding*2),
 					direction=mp.X,
 					weight=-1))
 
-				nearfieldregions.append(mp.Near2FarRegion(
+			nfrAbove.append(mp.Near2FarRegion(
 					center=mp.Vector3(0,sy/2-padding,-sh/2),
 					size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
 					direction=mp.Y))
 
-				nearfieldregions.append(mp.Near2FarRegion(
+			nfrAbove.append(mp.Near2FarRegion(
 					center=mp.Vector3(0,-sy/2+padding,-sh/2),
 					size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
 					direction=mp.Y,
@@ -190,46 +167,51 @@ class Pyramid():
 			#	size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 			#	direction=mp.Z))
 
-				nearfieldregions.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
+			nfrAbove.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
 					center=mp.Vector3(0,0,-sz/2+padding),
 					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 					direction=mp.Z,
 					weight=-1))
 
-			else:
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(sx/2-padding,0,0),
-					size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+			#Far-field to calculate below transmissions
+			nfrBelow.append(mp.Near2FarRegion(
+					center=mp.Vector3(sx/2-padding,0,sz/2-sh/2),
+					size=mp.Vector3(0,sy-padding*2,sh-padding*2),
 					direction=mp.X))
 
-
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(-sx/2+padding,0,0),
-					size=mp.Vector3(0,sy-padding*2,sz-padding*2),
+			nfrBelow.append(mp.Near2FarRegion(
+					center=mp.Vector3(-sx/2+padding,0,sz/2-sh/2),
+					size=mp.Vector3(0,sy-padding*2,sh-padding*2),
 					direction=mp.X,
 					weight=-1))
 
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(0,sy/2-padding,0),
-					size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+			nfrBelow.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,sy/2-padding,sz/2-sh/2),
+					size=mp.Vector3(sx-padding*2,0,sh-padding*2),
 					direction=mp.Y))
 
-				nearfieldregions.append(mp.Near2FarRegion(
-					center=mp.Vector3(0,-sy/2+padding,0),
-					size=mp.Vector3(sx-padding*2,0,sz-padding*2),
+			nfrBelow.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,-sy/2+padding,sz/2-sh/2),
+					size=mp.Vector3(sx-padding*2,0,sh-padding*2),
 					direction=mp.Y,
-					weight=-1))
-		#under the substrate
-				nearfieldregions.append(mp.Near2FarRegion(
+					weight=-1))				
+			nfrBelow.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,0,sz/2-padding),
+					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
+					direction=mp.Z))
+			if ff_cover == True:
+				nfrAbove.append(mp.Near2FarRegion(
 					center=mp.Vector3(0,0,sz/2-padding),
 					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 					direction=mp.Z))
 
-				nearfieldregions.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
-					center=mp.Vector3(0,0,-sz/2+padding),
+				nfrBelow.append(mp.Near2FarRegion(
+					center=mp.Vector3(0,0,-sz/2-padding),
 					size=mp.Vector3(sx-padding*2,sy-padding*2,0),
 					direction=mp.Z,
 					weight=-1))
+			nearfieldregions.append(nfrAbove)
+			nearfieldregions.append(nfrBelow)
 			return nearfieldregions
 
 					
@@ -354,13 +336,27 @@ class Pyramid():
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
 		if ff_calculations == True:
 			nearfieldregions = define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover)
-			if ff_cover == False:
-				nfr1, nfr2, nfr3, nfr4, nfr6 = nearfieldregions
-				nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr6)
-
+			if ff_cover == True:
+				nfrA1, nfrA2, nfrA3, nfrA4, nfrA5, nfrA6 = nearfieldregions[0]
+				nfrB1, nfrB2, nfrB3, nfrB4, nfrB5, nfrB6 = nearfieldregions[1]
+			else:	
+				nfrA1, nfrA2, nfrA3, nfrA4, nfrA6 = nearfieldregions[0]
+				nfrB1, nfrB2, nfrB3, nfrB4, nfrB6 = nearfieldregions[1]
+			if ff_calc == "Both" and ff_cover == True:
+				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA, nfrA3, nfrA4, nfrA5, nfrA6)
+				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB5, nfrB6)
+			elif ff_calc == "Above" and ff_cover == True:
+				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA, nfrA3, nfrA4, nfrA5, nfrA6)
+			elif ff_calc == "Above" and ff_cover == False:
+				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA2, nfrA3, nfrA4, nfrA6)
+			elif ff_calc == "Below" and ff_cover == True:
+				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB5, nfrB6)			
+			elif ff_calc == "Below" and ff_cover == False:
+				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB6)
+			#Assumed ff_calc == Both and ff_cover == False	
 			else:
-				nfr1, nfr2, nfr3, nfr4, nfr5, nfr6 = nearfieldregions				
-				nearfield=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfr1 ,nfr2, nfr3, nfr4, nfr5, nfr6)
+				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA2, nfrA3, nfrA4, nfrA6)
+				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB6)
 		###RUN##########################################################################
 		#"The run constructor for meep."
 		if use_fixed_time:
@@ -372,6 +368,8 @@ class Pyramid():
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
 			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3))
+		#	sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
+		#	plt.show()
 
 
 		###OUTPUT CALCULATIONS##########################################################
@@ -430,20 +428,53 @@ class Pyramid():
 				range_npts=int((theta/math.pi)*npts)
 				#npts=range_npts
 
-				for n in range(range_npts):
-					if ff_below == True:
-						zPts[n]=(-1)*zPts[n]
-					ff=sim.get_farfield(nearfield, mp.Vector3(xPts[n],yPts[n],zPts[n]))
-					i=0
-					for k in range(nfreq):
-						"Calculate the poynting vector in x,y,z direction"
-						Pr = myPoyntingFlux(ff,i)	
-						Pr_Array.append(Pr)
-						"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
-						"divided by npts and we get evenly sized area chunks" 					
-						surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
-						P_tot_ff[k] += surface_Element*(1)*(Pr)
-						i = i + 6 #to keep track of the correct entries in the ff array
+				if ff_calc == "Both":
+					Pr_ArrayA=[]
+					Pr_ArrayB=[]
+					P_tot_ffA = [0]*(self.number_of_freqs)
+					P_tot_ffB = [0]*(self.number_of_freqs)
+					for n in range(range_npts):
+						ffA=sim.get_farfield(nearfieldAbove, mp.Vector3(xPts[n],yPts[n],zPts[n]))
+						ffB=sim.get_farfield(nearfieldBelow, mp.Vector3(xPts[n],yPts[n],-1*zPts[n]))
+						i=0
+						for k in range(nfreq):
+							"Calculate the poynting vector in x,y,z direction"
+							PrA = myPoyntingFlux(ffA,i)	
+							PrB = myPoyntingFlux(ffB,i)
+							Pr_ArrayA.append(PrA)
+							Pr_ArrayB.append(PrB)
+							"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
+							"divided by npts and we get evenly sized area chunks" 					
+							surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
+							P_tot_ffA[k] += surface_Element*(1)*(PrA)
+							P_tot_ffB[k] += surface_Element*(1)*(PrB)
+							i = i + 6 #to keep track of the correct entries in the ff array
+				if ff_calc == "Below":
+					for n in range(range_npts):
+						ff=sim.get_farfield(nearfieldBelow, mp.Vector3(xPts[n],yPts[n],-1*zPts[n]))
+						i=0
+						for k in range(nfreq):
+							"Calculate the poynting vector in x,y,z direction"
+							Pr = myPoyntingFlux(ff,i)	
+							Pr_Array.append(Pr)
+							"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
+							"divided by npts and we get evenly sized area chunks" 					
+							surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
+							P_tot_ff[k] += surface_Element*(1)*(Pr)
+							i = i + 6 #to keep track of the correct entries in the ff array
+				if ff_calc == "Above":
+					for n in range(range_npts):
+						ff=sim.get_farfield(nearfieldAbove, mp.Vector3(xPts[n],yPts[n],zPts[n]))
+						i=0
+						for k in range(nfreq):
+							"Calculate the poynting vector in x,y,z direction"
+							Pr = myPoyntingFlux(ff,i)	
+							Pr_Array.append(Pr)
+							"the spherical cap has area 2*pi*r^2*(1-cos(theta))"
+							"divided by npts and we get evenly sized area chunks" 					
+							surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
+							P_tot_ff[k] += surface_Element*(1)*(Pr)
+							i = i + 6 #to keep track of the correct entries in the ff array
 
 
 
@@ -464,7 +495,7 @@ class Pyramid():
 			if ff_calculations:
 				#"the for loop sums up the flux for all frequencies and stores it in flux_tot_value and flux_top_value"
 				#"it also calculates the ratio betwewen top and total flux out for all frequencies and stores it in an array 'flux_tot_pf_ratio'"
-				ff_freqs = mp.get_near2far_freqs(nearfield)
+				#ff_freqs = mp.get_near2far_freqs(nearfieldAbove)
 				# fig = plt.figure()
 				# ax = fig.gca(projection='3d')
 				# Pr_Max=max(Pr_Array)
@@ -494,8 +525,20 @@ class Pyramid():
 				# plt.show()
 				for i in range(self.number_of_freqs):	
 
-					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],6)			#sums up the total flux out
-				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width,'freqs:', ff_freqs)
+					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],6)		
+				if ff_calc == "Both":
+					P_tot_ff = []
+					P_tot_ff.append(P_tot_ffA)
+					P_tot_ff.append(P_tot_ffB)
+					flux_tot_ff_ratio = []
+					flux_tot_ff_ratioA = [0]*(self.number_of_freqs)	
+					flux_tot_ff_ratioB = [0]*(self.number_of_freqs)	
+					for i in range(self.number_of_freqs):	
+						flux_tot_ff_ratioA[i] =round(P_tot_ffA[i]/flux_tot_out[i],6)		
+						flux_tot_ff_ratioB[i] =round(P_tot_ffB[i]/flux_tot_out[i],6)
+					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
+					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)				
+				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width)
 				elapsed_time = round((time.time()-start)/60,1)
 				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
 

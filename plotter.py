@@ -10,10 +10,12 @@ def plotter(db,x,y):
         exit(0)
     datax = db_to_array(db,"pyramid",x)
     datay = db_to_array(db,"result",y)
+    print('datay',datay)
     plt.title("plotting:"+' '+'xaxis:'+str(x)+' '+'yaxis:'+str(y))
     plt.plot(datax,datay)
     plt.show()
-    print(datay)
+    print('x',datax)
+    print('y',datay)
 
 
 
