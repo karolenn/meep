@@ -130,60 +130,13 @@ def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, alr
 			choice.append((x, y, z))
 	return choice
 
-#används ej?
-def mindistfunction(args):
-	bounds = [min(args),max(args)]
-	max_dist_pt=0
-
-	return max_dist_pt
-
-#används ej?
-def distfunction(x,args):
-	num_variables = len(args)
-	#if x outside bounds
-	#return 0
-	func_value = []
-	for n in range(num_variables):
-		func_value.append(abs(x-args[n]))
-	return min(func_value)
-
-
-def meritfuncshort(data,results):
-	num_dim = len(data)
-	if num_dim == 0:
-		print('Error: 0 dims to RBF')
-	elif num_dim == 1:
-		print('1')
-	elif num_dim == 2:
-		print('2')
-	elif num_dim == 3:
-		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]),function='thin_plate',smooth=0)
-	else:
-		print('too many args in merit function')
-
 #Choose if we're going for exploration or explotation phase
-def Phase_Selector(data,results,rbf_optima):
-	if Compare_max_res_and_rbf(data,results,rbf_optima) == True:
+def Phase_Selector(data,results,nfreq,rbf_func_max):
+	result_single_list = sum(sum(results,[]),[])	
+	if rbf_func_max - max(result_single_list) > 0.05:
 		return ('exploit')
 	else:
 		return ('explore')
-
-#compares difference between rbf_maximum and simulated maximum, returns True if we're exploting. False if we're exploring.
-def Compare_max_res_and_rbf(data,results,rbf_optima):
-	#plocka ut högsta simulerade målfunktionsvärdet
-	maxf=max(results)
-	print('max func value',maxf)
-	#plocka ut max-funktionsvärdet från varje lösare
-	rbf_func_max = []
-	for n in range(len(rbf_optima)):
-		rbf_func_max.append(-1*rbf_optima[n].fun)
-	maxrbf = max(rbf_func_max)
-	print('max rbf value',maxrbf)
-	print('difference:',maxrbf-maxf)
-	if maxrbf-maxf > 0.05:
-		return True
-	else:
-		return False
 
 #If exploration is chosen, how to select point?
 def Exploration_point_selector(data,num_dim):
@@ -201,6 +154,7 @@ def Radial_random_chooser(data,num_dim):
 		maxy=max(data[1])
 		minz=min(data[2])
 		maxz=max(data[2])
+		template = read("db/tmp/tmp.json")
 		limit_x = {"from": minx, "to":maxx }
 		limit_y = {"from": miny, "to":maxy }
 		limit_z = {"from": minz, "to": maxz }
@@ -208,6 +162,7 @@ def Radial_random_chooser(data,num_dim):
 		#if fail to find point, shrink radius to half
 		while exploration_pt == []:
 			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius*0.5, 1, max_time, data)
+		return exploration_pt
 	if num_dim == 2:
 		minx=min(data[0])
 		maxx=max(data[0])
@@ -229,132 +184,42 @@ def Radial_random_chooser(data,num_dim):
 		print('radius',radius)
 	return exploration_pt
 
-def RBF_max_point_selector(rbf_optima):
-	rbf_func_max = []
-	#withdraw all function value optimas from the rbf
-	for n in range(len(rbf_optima)):
-		rbf_func_max.append(-1*rbf_optima[n].fun)
-	#Select the largest function value from the rbf and save its index
-	rbf_func_max_index = max(range(len(rbf_func_max)), key=rbf_func_max.__getitem__)
-	rbf_func_pt = []
-	#withdraw all the function variables from the rbf for the corresponding f value optima
-	for n in range(len(rbf_optima)):
-		print(list(rbf_optima[n].x))
-		rbf_func_pt.append(list(rbf_optima[n].x))
-	#return the pt/variables corresponding to the highest rbf func value optima
-	print('rbf func max',rbf_func_max)
-	print('rbf funct pt',rbf_func_pt)
-	print('index',rbf_func_max_index)
-	testguy=rbf_func_pt[1]
-	print('hereeee',rbf_func_pt[0],type(testguy))
-	return rbf_func_pt[rbf_func_max_index]
 
-
-def meritfunction(data,results):
+def meritfunction(data,results,ff_calc):
 	#first we need to 'unpack' data and results into arrays
 	num_dim=len(data)
-	if num_dim == 0:
-		print('Error: 0 dims to RBF')
-	elif num_dim == 1:
-		#remove duplicates
-		print('unsorted results',results)
-		data = np.unique(data).tolist()
-		results = sum(results,[])
-		results = np.unique(results).tolist()
-		print('x:',data,len(data))
-		print('f:',results,len(results))
-		RBF_Func=Rbf(data,results)
-		minx=min(data)
-		maxx=max(data)
-		minf=min(results)
-		maxf=max(results)
-		x = np.linspace(minx,maxx,num=30)
-		f = np.linspace(minf,maxf,num=30)
-		#optimizer
-		def RBF_min(var):
-			x = var[0]
-			return (-1*RBF_func(x))
-		init_guess = np.array([(maxx-minx)/2])
-		bounds_RBF = Bounds([minx, maxx])
-		rbf_max = minimize(RBF_min,x0=init_guess, method='COBYLA', options={'verbose': 1}, bounds=bounds_RBF)
-
-		#2d plot
-		fig = plt.figure()
-		plt.plot(data[0],results)
-		plt.plot(x,RBF_Func(x))
-		plt.show()
-	elif num_dim == 2:
-		print(data)
-		print(results)
-		RBF_Func=Rbf(data[0],data[1],sum(results,[]),function='thin_plate')
-		minx=min(data[0])
-		maxx=max(data[0])
-		miny=min(data[1])
-		maxy=max(data[1])
-		minf=min(results)
-		maxf=max(results)
-		index_max = np.argmax(results)
-		#print(minx,maxx,miny,maxy,minf,maxf)
-		x = np.linspace(minx,maxx,num=30)
-		y = np.linspace(miny,maxy,num=30)
-		f = np.linspace(minf,maxf,num=30)
-		#optimizer
-		init_guess = np.array([(maxx-minx)/2,(maxy-miny)/2])
-		init_guess=np.array([data[0][index_max],data[1][index_max]])
-		rbf_optima=[]
-				
-		#global minimizers
-		def RBF_TO_OPT(x):
-			return (-1*RBF_Func(x[0],x[1]))
-		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
-		#if true, exploit, if false, explore
-		if Phase_Selector(data,results,rbf_optima)=='exploit':
-			next_sim = RBF_max_point_selector(rbf_optima)
-			print('next_sim',next_sim)
-			print('EXPLOATATIONS','point',next_sim)
-		#	next_sim = [next_sim[0][0]]+[next_sim[0][1]]
-			plot_color = 'r'
-		else:
-			next_sim = Exploration_point_selector(data,num_dim)
-			print('next_sim',next_sim)
-			print('EXPLORATION','point',next_sim)
-			next_sim = [next_sim[0][0]]+[next_sim[0][1]]
-			plot_color = 'g'
-		#3d plot
-		fig = plt.figure()
-		ax = plt.axes(projection='3d')
-		X,Y=np.meshgrid(x,y)
-		z = RBF_Func(X,Y)
-		print('hehe',next_sim)
-		ax.text(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),'POINT',fontsize=12)
-		ax.scatter(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),s=50,c=plot_color,marker='D')
-		ax.scatter(data[0],data[1],sum(results,[]),alpha=1,c='k')
-		ax.plot_surface(X,Y,z,cmap=cm.jet)
-		ax.set_xlabel(sys.argv[2])
-		ax.set_ylabel(sys.argv[3])
-		plt.show()
-		return next_sim
-
+	if num_dim != 3:
+		raise ValueError (' utility function for D!=3 not completed')
 	elif num_dim == 3:
-		print(data[0])
-		print(data[1])
-		print(data[2])
-	#	print(sum(results,[]))
-		data.append(sum(results,[]))
-		bar = defaultdict(list)
-		for x,y,z,r in zip(*data):
-			bar[z].append((x,y,r))
-		bar = sorted(bar.items())
-
-		RBF_Func=Rbf(data[0],data[1],data[2],sum(results,[]),function='thin_plate',smooth=0)
+		nfreq=len(results[0][0])
+		rbf_optima = {'DE':[[]]*nfreq,
+		'DA':[[]]*nfreq,
+		'SHGO':[[]]*nfreq
+		}
+		temp = []
+		if ff_calc == "Above":
+			for n in range(len(results)):
+				temp.append(results[n][0])
+		elif ff_calc == "Below":
+			for n in range(len(results)):
+				temp.append(results[n][1])
+		else:
+			raise ValueError ('ff_calc incorrect. Do you wish to optimize far field above or below?')
+		results_new = temp
+		print('results',results)
+		print('results_new',results_new)
+		#Sort the results from the simulations 
+		results_pf=[]
+		for n in range(nfreq):
+			temp=[]
+			print(results_pf)
+			for k in range(len(results_new)):
+				temp.append(results_new[k][n])
+			results_pf.append(temp)
+		#Create a list with each element containing a RBF(data,freq). Lowest frequency first in the list.
+		RBF_List=[]
+		for n in range(nfreq):
+			RBF_List.append(Rbf(data[0],data[1],data[2],results_pf[n],function='thin_plate',smooth=0))
 		def RBF_min(var):
 			x=var[0]
 			y=var[1]
@@ -372,74 +237,69 @@ def meritfunction(data,results):
 		z = np.linspace(minz,maxz,num=30)
 		#local minimizers
 		init_guess=np.array([3,3,0.13])
-		rbf_optima = []
-		rbf_optima.append(minimize(RBF_min,x0=init_guess, method='L-BFGS-B',bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(minimize(RBF_min,x0=init_guess, method='TNC',bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(minimize(RBF_min,x0=init_guess, method='SLSQP',bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		#print('bfgs',rbf_optima[0])
-		#print('tnc',rbf_optima[1])
-		#print('slsqp',rbf_optima[2])
-		#global minimizers
-		def RBF_TO_OPT(x):
-			return (-1*RBF_Func(x[0],x[1],x[2]))
-		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		print('evo1',rbf_optima[3])
-		print('evo2',rbf_optima[4])
-		print('evo3',rbf_optima[5])
-		print('shgo1',rbf_optima[6])
-		print('shgo2',rbf_optima[7])
-		print('shgo3',rbf_optima[8])
-		print('dual anneal1',rbf_optima[9])
-		print('dual anneal2',rbf_optima[10])
-		print('dual anneal3',rbf_optima[11])
-
-
-		X,Y,Z=np.meshgrid(x,y,z)
-	#	print('X',X)
-		f = RBF_Func(X,Y,Z)
-
-		X,Y=np.meshgrid(x,y)
-
-		n=0
-		for _source , _slice in bar:
-		#	print('source',_source)
-			#print()
-		#	print(f[n][:][:])
-			x,y,r = zip(*_slice)
-			ax = plt.axes(projection='3d')
-			ax.plot_surface(X,Y,f[:,:,n],cmap=cm.jet)
-			n+=1
-			#print('x',x)
-			#print('y',y)
-			#print('r',r)
-			ax.scatter(x,y,r)
-			plt.show()
-	elif num_dim == 4:
-		RBF_Func=Rbf(data[0],data[1],data[2],data[3],sum(results,[]))
-	else:
-		print('Error: merit function to many inparameters')
-#	approx_func=Rbf((Unpacker(data,n) for n in range(num_dim)),(Unpacker(results,m) for m in range(num_dim)))
-	#approx_func=Rbf((data[n] for n in range(len(data))), (results[m] for m in range(len(results))))
-
-	# x=data[0]
-	# y=data[1]
-	# approx_func=Rbf(data)
-	# x,y=np.linspace(2,3)
-	# #3dplot
-	# fig = plt.figure()
-	# ax = plt.axes(projection='3d')
-	# #ax.scatter(x,y,z,cmap=cm.jet)
-	# ax.plot_surface(x,y,approx_func)
-	# plt.show()
-
+	#	rbf_optima = [[]]*3 #One list for every optimizer. Every sublist will then contain optima for RBF(freq1),RBF(freq2),..,RBF(freqN)
+		print(rbf_optima)
+		print('len',len(rbf_optima))
+		print(RBF_List)
+		#def RBF_TO_OPT(x):
+		#	return (-1*RBF_Func(x[0],x[1],x[2]))
+		for n in range(nfreq):
+			RBF_Func = RBF_List[n]
+			#The optimizers are minimizers, we then "flip" the RBF Func
+			def RBF_TO_OPT(x):
+				return (-1*RBF_Func(x[0],x[1],x[2]))
+			rbf_optima['DE'][n]=(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+			#rbf_optima['DE'][n].append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#	rbf_optima['DE'][n].append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+			rbf_optima['DA'][n]=(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#	rbf_optima['DA'][n].append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#	rbf_optima['DA'][n].append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+			rbf_optima['SHGO'][n]=(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#	rbf_optima['SHGO'][n].append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#	rbf_optima['SHGO'][n].append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#print('evo1',rbf_optima['DE'])
+		#print('DA',rbf_optima['DA'])
+		#print('SHGO',rbf_optima['SHGO'])
+		#Withdraw the best optima from all functions
+		rbf_func_max = []
+	#	print('DE',rbf_optima['DE'])
+		#print('SHGO',rbf_optima['SHGO'])
+		print(rbf_optima)
+		current_best = {'OPT': 'empty','Function value': -100000, 'sim point':[0,0,0], 'frequency index': 2}
+		for opt in rbf_optima:
+			for k in range(nfreq):
+				print('curr best func',current_best['Function value'])
+				if (-1*rbf_optima[opt][k].fun > current_best['Function value']):
+					current_best['OPT']=opt
+					current_best['Function value']=-1*rbf_optima[opt][k].fun
+					current_best['sim point']=rbf_optima[opt][k].x
+					current_best['frequency index']=k
+		rbf_func_max=current_best['Function value']
+		if Phase_Selector(data,results,nfreq,rbf_func_max)=='exploit':
+			next_sim = current_best['sim point']
+			print('next_sim',next_sim)
+			print('EXPLOATATIONS','point',next_sim)
+		#	next_sim = [next_sim[0][0]]+[next_sim[0][1]]
+			plot_color = 'r'
+		else:
+			next_sim = Exploration_point_selector(data,num_dim)
+			print('next_sim',next_sim)
+			print('EXPLORATION','point',next_sim)
+			next_sim = [next_sim[0][0]]+[next_sim[0][1]]+[next_sim[0][2]]
+			plot_color = 'g'
+		print(current_best['sim point'][1])
+		print(current_best)
+		fig = plt.figure()
+		ax = Axes3D(fig)
+		ax.set_xlabel('pyramid height')
+		ax.set_ylabel('pyramid width')
+		ax.set_zlabel('source position')
+		ax.set_xlim(minx,maxx)
+		ax.set_ylim(miny,maxy)
+		ax.set_zlim(minz,maxz)
+		ax.scatter(current_best['sim point'][0],current_best['sim point'][1],current_best['sim point'][2],color='r')
+		plt.show()
+		return next_sim
 
 
 
