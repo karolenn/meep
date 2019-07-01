@@ -84,12 +84,12 @@ GÖra simuleringar. plocka ut g(x)=maxf(y,z), projicera ner funktionen. undersö
 Undersöka konvergens i upplösningar. Kan vi köra res 40?
 Rapporten ska vara läsbar för klasskompisar etc. Rapporten ska ge en idé om hur metoden fungerar men behöver inte vara underlag nog för att man ska kunna implementera den. 
 ---28/06
-Contents -inte ha med subsubsection i table of contents
--ändra cite till cite{asd,afa}
--när jag refar till equationer ska jag använda \eqref 
+Contents -inte ha med subsubsection i table of contents - klar ?
+-ändra cite till cite{asd,afa} - klar ?
+-när jag refar till equationer ska jag använda \eqref  - klar ?
 -Börja inte stycken med So
 -Långa ekvationer kan köra \ldots istället för skriva ..
--aligna maxwells ekvationer
+-aligna maxwells ekvationer - klar ?
 30/06
 Runs on laptop (2,2,0.1) pyramid. freq center: 2 freq width: 0.5
 nfreqs: 10 runtime: 13.7 min
