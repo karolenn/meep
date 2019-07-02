@@ -83,7 +83,32 @@ Utility function - flera lösare som ska returna max som ev. nästa simuleringsp
 GÖra simuleringar. plocka ut g(x)=maxf(y,z), projicera ner funktionen. undersöka om vi behöver vidga sökområde. 
 Undersöka konvergens i upplösningar. Kan vi köra res 40?
 Rapporten ska vara läsbar för klasskompisar etc. Rapporten ska ge en idé om hur metoden fungerar men behöver inte vara underlag nog för att man ska kunna implementera den. 
+---28/06
+Contents -inte ha med subsubsection i table of contents - klar ?
+-ändra cite till cite{asd,afa} - klar ?
+-när jag refar till equationer ska jag använda \eqref  - klar ?
+-Börja inte stycken med So
+-Långa ekvationer kan köra \ldots istället för skriva ..
+-aligna maxwells ekvationer - klar ?
+30/06
+Runs on laptop (2,2,0.1) pyramid. freq center: 2 freq width: 0.5
+nfreqs: 10 runtime: 13.7 min
+nfreqs: 3 runtime: 6.4 min
+nfreqs: 1 runtime: 4.7 min
+---
+Freqs for DPML run freqs [1.0, 1.2222222222222223, 1.4444444444444444, 1.6666666666666667, 1.8888888888888888, 2.111111111111111, 2.3333333333333335, 2.5555555555555554, 2.7777777777777777, 3.0]
+Pyramid (4.5555,1,0.2) f=(1.88,2.11,2.33) enorm skillnad i resultat beroende på om t=15, t=30, t=60. Liten skillnad mellan t=30,t=60, t=120
+Inser nu -> conv runs mellan olika tider PRIO. Varierar massivt! Alt. Padding+Substrate Ratio är den stora skurken här!
 
-
+cutoff=4
+1e: 8,8,8,8,8
+3e: 10,8,10,8,8
+5e:10,10,11,12,16
+7e: 20,26,32,40,38
+---
+cutoff=2
+1e:8,10,12,14,18
+3e: 40,50,62,66,82
+5e: 172,198,279,251,327
 
 
