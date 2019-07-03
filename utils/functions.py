@@ -132,7 +132,9 @@ def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, alr
 
 #Choose if we're going for exploration or explotation phase
 def Phase_Selector(data,results,nfreq,rbf_func_max):
-	result_single_list = sum(sum(results,[]),[])	
+	result_single_list = sum(results,[])
+	print('simulated result',result_single_list)	
+	print('max sim res',max(result_single_list))
 	if rbf_func_max - max(result_single_list) > 0.05:
 		return ('exploit')
 	else:
@@ -188,8 +190,69 @@ def Radial_random_chooser(data,num_dim):
 def meritfunction(data,results,ff_calc):
 	#first we need to 'unpack' data and results into arrays
 	num_dim=len(data)
-	if num_dim != 3:
-		raise ValueError (' utility function for D!=3 not completed')
+	if not (2 <= num_dim <= 3):
+		raise ValueError (' utility function for D!=3 OR 2 not completed')
+	elif num_dim == 2:
+		print(data)
+		print(results)
+		#need to pick out above/under & certain frequency for result
+		RBF_Func=Rbf(data[0],data[1],sum(results,[]),function='thin_plate')
+		minx=min(data[0])
+		maxx=max(data[0])
+		miny=min(data[1])
+		maxy=max(data[1])
+		minf=min(results)
+		maxf=max(results)
+		index_max = np.argmax(results)
+		#print(minx,maxx,miny,maxy,minf,maxf)
+		x = np.linspace(minx,maxx,num=30)
+		y = np.linspace(miny,maxy,num=30)
+		f = np.linspace(minf,maxf,num=30)
+		#optimizer
+		init_guess = np.array([(maxx-minx)/2,(maxy-miny)/2])
+		init_guess=np.array([data[0][index_max],data[1][index_max]])
+		rbf_optima=[]
+									
+		#global minimizers
+		def RBF_TO_OPT(x):
+			return (-1*RBF_Func(x[0],x[1]))
+		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+	#	rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#if true, exploit, if false, explore
+		if Phase_Selector(data,results,rbf_optima)=='exploit':
+			next_sim = RBF_max_point_selector(rbf_optima)
+			print('next_sim',next_sim)
+			print('EXPLOATATIONS','point',next_sim)
+			#       next_sim = [next_sim[0][0]]+[next_sim[0][1]]
+			plot_color = 'r'
+		else:
+			next_sim = Exploration_point_selector(data,num_dim)
+			print('next_sim',next_sim)
+			print('EXPLORATION','point',next_sim)
+			next_sim = [next_sim[0][0]]+[next_sim[0][1]]
+			plot_color = 'g'
+			#3d plot
+			fig = plt.figure()
+			ax = plt.axes(projection='3d')
+			X,Y=np.meshgrid(x,y)
+			z = RBF_Func(X,Y)
+			print('hehe',next_sim)
+			ax.text(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),'POINT',fontsize=12)
+			ax.scatter(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),s=50,c=plot_color,marker='D')
+			ax.scatter(data[0],data[1],sum(results,[]),alpha=1,c='k')
+			ax.plot_surface(X,Y,z,cmap=cm.jet)
+			ax.set_xlabel(sys.argv[2])
+			ax.set_ylabel(sys.argv[3])
+			plt.show()
+			return next_sim
+
 	elif num_dim == 3:
 		nfreq=len(results[0][0])
 		rbf_optima = {'DE':[[]]*nfreq,
@@ -275,7 +338,7 @@ def meritfunction(data,results,ff_calc):
 					current_best['sim point']=rbf_optima[opt][k].x
 					current_best['frequency index']=k
 		rbf_func_max=current_best['Function value']
-		if Phase_Selector(data,results,nfreq,rbf_func_max)=='exploit':
+		if Phase_Selector(data,results_new,nfreq,rbf_func_max)=='exploit':
 			next_sim = current_best['sim point']
 			print('next_sim',next_sim)
 			print('EXPLOATATIONS','point',next_sim)
@@ -287,7 +350,6 @@ def meritfunction(data,results,ff_calc):
 			print('EXPLORATION','point',next_sim)
 			next_sim = [next_sim[0][0]]+[next_sim[0][1]]+[next_sim[0][2]]
 			plot_color = 'g'
-		print(current_best['sim point'][1])
 		print(current_best)
 		fig = plt.figure()
 		ax = Axes3D(fig)

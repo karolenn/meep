@@ -110,5 +110,12 @@ cutoff=2
 1e:8,10,12,14,18
 3e: 40,50,62,66,82
 5e: 172,198,279,251,327
+------
+Ändra namn på rapport?
+-Avgränsingar i rapport:
+Någorlunda konvergerande parametrar. Något avgränsat. Men ok det som jag har nu.
+Kör simuleringar för 2d 3d stora variabelområden.
+Kör simuleringar för main, hur snabbt konvergerar main?
+Klart. Diskussion.
 
 
