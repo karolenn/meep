@@ -9,9 +9,8 @@ from utils.functions import get_next
 from utils.functions import valid
 from math import tan, pi
 
-def singleLoop(db,conf,array):
-    for n in range(len(array)):
-        db[str(array)].append(array[n])
+###spec_generator creates a .json file in db/sim_spec that is a template for initial_runs & main.py to run.
+#We now have 3 ways to create different pyramids to be simulated. 'eq dist', 'eq dist with fixed angle between base and top' and 'rand' way
 
 def generate_eq_dist(x, y, z):
     tests = []
