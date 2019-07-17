@@ -3,8 +3,8 @@ import copy
 from numpy import linspace
 import time
 from random import uniform 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+#import matplotlib.pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
 from utils.functions import get_next
 from utils.functions import valid
 from math import tan, pi
@@ -73,27 +73,27 @@ def test(template):
     tests = points_to_json(result, template)
     
     x,y,z = zip(*result)
-    ax = plt.axes(projection='3d')
-    ax.scatter(x,y,z)
-    plt.show()
+ #   ax = plt.axes(projection='3d')
+  #  ax.scatter(x,y,z)
+   # plt.show()
     write("db/sim_spec/analytic2.json", tests)
     #print(tests)
 
 def fixedangle(template):
-    y = {"from": 1, "to":5, "steps": 10} #pyramid width
-    z = {"from": 0.01, "to": 0.4, "steps": 5} #source position
+    y = {"from": 1, "to":8, "steps": 10} #pyramid width
+    z = {"from": 0.01, "to": 0.9, "steps": 10} #source position
    # pyr_height = tan((pi*62)/180)/2
    # x = {"from": y["from"]*pyr_height,"to": y["to"]*pyr_height, "steps": y["steps"]}
     result =  generate_eq_dist_fixed_angle(y,z) 
     tests = points_to_json(result, template)
     
     x,y,z = zip(*result)
-    ax = plt.axes(projection='3d')
-    ax.set_xlabel("pyramid height")
-    ax.set_ylabel("pyramid width")
-    ax.scatter(x,y,z)
-    plt.show()
-    write("db/sim_spec/testn2.json", tests)
+    #ax = plt.axes(projection='3d')
+    #ax.set_xlabel("pyramid height")
+    #ax.set_ylabel("pyramid width")
+    #ax.scatter(x,y,z)
+    #plt.show()
+    write("db/sim_spec/f1.json", tests)
 
 def testRand(template):
     
@@ -105,9 +105,9 @@ def testRand(template):
 
     tests = points_to_json(result, template)
 
-    ax = plt.axes(projection='3d')
-    ax.scatter(x,y,z)
-    plt.show()
+    #ax = plt.axes(projection='3d')
+    #ax.scatter(x,y,z)
+    #plt.show()
     write("db/sim_spec/laptop.json", tests)
     #print(tests)
 
@@ -115,7 +115,7 @@ def testRand(template):
 if __name__ == "__main__":
     template={
         "simulate": {
-            "resolution": 40,
+            "resolution": 60,
             "use_fixed_time": False,
             "simulation_time": 10,
             "dpml": 0.1,
@@ -135,10 +135,10 @@ if __name__ == "__main__":
             "pyramid_height": 0.5,
             "pyramid_width": 0.5,
             "truncation": 0,
-            "source_direction": "mp.Ez",
+            "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 1.2,
-            "number_of_freqs": 3,
+            "number_of_freqs": 6,
             "cutoff": 4
         },
         "result": {}
