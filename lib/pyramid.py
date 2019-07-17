@@ -328,7 +328,7 @@ class Pyramid():
 
 		###FIELD CALCULATIONS###########################################################
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
-		flux_total=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr5, fr6 )	#calculate flux for flux regions
+			flux_total=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr5, fr6 )	#calculate flux for flux regions
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
 
 		###FAR FIELD REGION#############################################################
@@ -343,10 +343,10 @@ class Pyramid():
 				nfrA1, nfrA2, nfrA3, nfrA4, nfrA6 = nearfieldregions[0]
 				nfrB1, nfrB2, nfrB3, nfrB4, nfrB6 = nearfieldregions[1]
 			if ff_calc == "Both" and ff_cover == True:
-				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA, nfrA3, nfrA4, nfrA5, nfrA6)
+				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA2, nfrA3, nfrA4, nfrA5, nfrA6)
 				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB5, nfrB6)
 			elif ff_calc == "Above" and ff_cover == True:
-				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA, nfrA3, nfrA4, nfrA5, nfrA6)
+				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA2, nfrA3, nfrA4, nfrA5, nfrA6)
 			elif ff_calc == "Above" and ff_cover == False:
 				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA2, nfrA3, nfrA4, nfrA6)
 			elif ff_calc == "Below" and ff_cover == True:
@@ -488,9 +488,10 @@ class Pyramid():
 			flux_tot_value = np.zeros(self.number_of_freqs)						#total flux out from box
 			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
 			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
+			print('freqs',mp.get_flux_freqs(flux_total))
 			for n in range(len(flux_tot_out)):
-				flux_tot_out[n]=round(flux_tot_out[n],6)
-				P_tot_ff[n]=round(P_tot_ff[n],6)
+				flux_tot_out[n]=round(flux_tot_out[n],9)
+				P_tot_ff[n]=round(P_tot_ff[n],9)
 
 			if ff_calculations:
 				#"the for loop sums up the flux for all frequencies and stores it in flux_tot_value and flux_top_value"
@@ -525,7 +526,7 @@ class Pyramid():
 				# plt.show()
 				for i in range(self.number_of_freqs):	
 
-					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],6)		
+					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],9)		
 				if ff_calc == "Both":
 					P_tot_ff = []
 					P_tot_ff.append(P_tot_ffA)
@@ -534,8 +535,8 @@ class Pyramid():
 					flux_tot_ff_ratioA = [0]*(self.number_of_freqs)	
 					flux_tot_ff_ratioB = [0]*(self.number_of_freqs)	
 					for i in range(self.number_of_freqs):	
-						flux_tot_ff_ratioA[i] =round(P_tot_ffA[i]/flux_tot_out[i],6)		
-						flux_tot_ff_ratioB[i] =round(P_tot_ffB[i]/flux_tot_out[i],6)
+						flux_tot_ff_ratioA[i] =round(P_tot_ffA[i]/flux_tot_out[i],9)		
+						flux_tot_ff_ratioB[i] =round(P_tot_ffB[i]/flux_tot_out[i],9)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)				
 				self.print('Total_Flux:',flux_tot_out,'Flux_ff:',P_tot_ff,'ratio:',flux_tot_ff_ratio,'sim_time:',simulation_time,'dpml:',dpml,'res:',resolution,'source_position:',self.source_position,'p_height:',self.pyramid_height,'p_width:',self.pyramid_width)

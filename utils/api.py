@@ -35,6 +35,29 @@ def sim_to_json(config,result):
     result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (min)":elapsed_time }
     config["result"] = result
     return config
+#"Takes in flux ratio results, withdraws flux ratio above OR below for center frequency"
+#"Function have two cases, flux ratio contains both above and below or only one of the cases. Controlled in the if case."
+def process_results(sim_results,ff_calc):
+    #Withdraw ff_ratio above or under from results.
+
+    if float(sim_results[0][0]): #Flux ratio only contains result above / under 
+        nfreqs=len(sim_results[0])
+        if ff_calc == "Below":
+            for n in range(len(sim_results)):
+                sim_results[n]=sim_results[n][int(nfreqs/2)]
+        else:
+            for n in range(len(sim_results)):
+                sim_results[n]=sim_results[n][int(nfreqs/2)]
+        return sim_results
+    else: #flux ratio contains both above and under ratios
+        nfreqs=len(sim_results[0][0])
+        if ff_calc == "Below":
+            for n in range(len(sim_results)):
+                sim_results[n]=sim_results[n][1][int(nfreqs/2)]
+        else:
+            for n in range(len(sim_results)):
+                sim_results[n]=sim_results[n][0][int(nfreqs/2)]
+        return sim_results
 
 "Usage: dataarray = db_to_array(db,pyramid,yourdata)"
 def db_to_array(db,arg1,arg2):
