@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from utils.functions import get_next
 from utils.functions import valid
+from math import tan, pi
 
 def singleLoop(db,conf,array):
     for n in range(len(array)):
@@ -18,6 +19,16 @@ def generate_eq_dist(x, y, z):
         for ity in linspace(y["from"], y["to"], y["steps"]):
             for itz in linspace(z["from"], z["to"], z["steps"]):
                 tests.append((itx,ity,itz))
+    return tests
+
+def generate_eq_dist_fixed_angle(y, z):
+    tests = []
+    pyr_height = tan((pi*62)/180)/2
+  #  for itx in linspace(x["from"], x["to"], x["steps"]):
+    for ity in linspace(y["from"], y["to"], y["steps"]):
+        itx = ity*pyr_height
+        for itz in linspace(z["from"], z["to"], z["steps"]):
+            tests.append((itx,ity,itz))
     return tests
 
 def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 3):
@@ -52,10 +63,12 @@ def points_to_json(points, template):
     return tests
 
 
+#x corresponds to pyramid height, y to pyramid width, z to source position for all three functions below
+#
 def test(template):
     x = {"from": 1, "to":1 ,"steps": 1}
     y = {"from": 1, "to":1 ,"steps": 1}
-    z = {"from": 0.01, "to": 0.4 ,"steps": 10}
+    z = {"from": 0.01, "to": 0.4 ,"steps": 1}
     result = generate_eq_dist(x, y, z)
     tests = points_to_json(result, template)
     
@@ -63,13 +76,29 @@ def test(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/conv60above.json", tests)
+    write("db/sim_spec/analytic2.json", tests)
     #print(tests)
+
+def fixedangle(template):
+    y = {"from": 1, "to":5, "steps": 10} #pyramid width
+    z = {"from": 0.01, "to": 0.4, "steps": 5} #source position
+   # pyr_height = tan((pi*62)/180)/2
+   # x = {"from": y["from"]*pyr_height,"to": y["to"]*pyr_height, "steps": y["steps"]}
+    result =  generate_eq_dist_fixed_angle(y,z) 
+    tests = points_to_json(result, template)
+    
+    x,y,z = zip(*result)
+    ax = plt.axes(projection='3d')
+    ax.set_xlabel("pyramid height")
+    ax.set_ylabel("pyramid width")
+    ax.scatter(x,y,z)
+    plt.show()
+    write("db/sim_spec/testn2.json", tests)
 
 def testRand(template):
     
-    x = {"from": 0.8, "to":2 }
-    y = {"from": 0.8, "to":2 }
+    x = {"from": 0.8, "to":0.8 }
+    y = {"from": 0.6, "to":1.2 }
     z = {"from": 0.1, "to": 0.6 }
     result = generate_rand_dist(x, y, z, 0.5, 4)
     x,y,z = zip(*result)
@@ -79,18 +108,18 @@ def testRand(template):
     ax = plt.axes(projection='3d')
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/testing.json", tests)
+    write("db/sim_spec/laptop.json", tests)
     #print(tests)
 
 
 if __name__ == "__main__":
     template={
         "simulate": {
-            "resolution": 60,
+            "resolution": 40,
             "use_fixed_time": False,
             "simulation_time": 10,
             "dpml": 0.1,
-            "padding": 0.1,
+            "padding": 0.025,
             "ff_pts": 1600,
             "ff_calc": "Both",
             "ff_cover": False,
@@ -99,19 +128,19 @@ if __name__ == "__main__":
             "ff_calculations": True,
             "ff_angle": 6,
             "simulation_ratio": "6/5",
-            "substrate_ratio": "1/20"
+            "substrate_ratio": "1/10"
         },
         "pyramid": {
-            "source_position": 0.06,
-            "pyramid_height": 3.1,
-            "pyramid_width": 2,
+            "source_position": 0.2,
+            "pyramid_height": 0.5,
+            "pyramid_width": 0.5,
             "truncation": 0,
-            "source_direction": "mp.Ey",
+            "source_direction": "mp.Ez",
             "frequency_center": 2,
-            "frequency_width": 0.5,
+            "frequency_width": 1.2,
             "number_of_freqs": 3,
-            "cutoff": 2
+            "cutoff": 4
         },
         "result": {}
     }  
-    testRand(template)
+    fixedangle(template)

@@ -117,5 +117,14 @@ Någorlunda konvergerande parametrar. Något avgränsat. Men ok det som jag har 
 Kör simuleringar för 2d 3d stora variabelområden.
 Kör simuleringar för main, hur snabbt konvergerar main?
 Klart. Diskussion.
+----
+TODO:
+Vi ska köra main på 2D. ->
+Ändra så height är en funktion av width med vinkel. Skriv klart util function för 2d. -KLAR
+Återstår att spara undan..? vad?
+
+ Testa. Undersök fyra fallen Pz, Py: Above, Under.
+UTIL Function för 2d fungerar? Dock så kan exploit punkt hamna på simulerad punkt? Koll behövs? Nej diff max ska ta hand om detta.
+Plotta konvergens på en axel. Så på x axeln är det par av (ph,pw,sp).
 
 

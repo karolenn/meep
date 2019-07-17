@@ -13,10 +13,16 @@ def merit_function(sim_name, ff_calc, args):
         values.append(db_to_array(db,"pyramid",n))
     "withdraw the flux_ratio results from initial_runs simulations"
     sim_results=db_to_array(db,"result","flux_ratio")
+    #Withdraw ff_ratio above or under from results. 
+    print('sim results passed to process',sim_results)
+    if len(sim_results[0]) != 1:
+        sim_results=process_results(sim_results,ff_calc)
     #values and sim results are now arrays in arrays. Inner array is data from single simulation
   #  meritfunction(values,sim_results)
     result = meritfunction(values,sim_results, ff_calc)
     template = read("db/tmp/tmp.json")
+    print('args',args)
+    print('result from merit func',result)
     for i, name in enumerate(args):
         template["pyramid"][name] = result[i]
     return template

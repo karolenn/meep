@@ -130,12 +130,21 @@ def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, alr
 			choice.append((x, y, z))
 	return choice
 
+def RBF_max_point_selector(rbf_optima):
+	current_best = {'OPT': 'empty','Function value': -100000, 'sim point':[0,0,0]}
+	print(rbf_optima[2])
+	for opt in range(len(rbf_optima)):
+		print('curr best func',current_best['Function value'])
+		print(rbf_optima[opt])
+		if (-1*rbf_optima[opt].fun > current_best['Function value']):
+				current_best['OPT']=opt
+				current_best['Function value']=-1*rbf_optima[opt].fun
+				current_best['sim point']=rbf_optima[opt].x
+	return current_best
+
 #Choose if we're going for exploration or explotation phase
-def Phase_Selector(data,results,nfreq,rbf_func_max):
-	result_single_list = sum(results,[])
-	print('simulated result',result_single_list)	
-	print('max sim res',max(result_single_list))
-	if rbf_func_max - max(result_single_list) > 0.05:
+def Phase_Selector(data,results,rbf_func_max):
+	if rbf_func_max - max(results) > 0.02:
 		return ('exploit')
 	else:
 		return ('explore')
@@ -184,19 +193,23 @@ def Radial_random_chooser(data,num_dim):
 			print('im looking for a new point')
 			print('radius here',radius)
 		print('radius',radius)
-	return exploration_pt
+		#exploration point is a tuple within a list [(1,2)] so it is converted to a list
+	return list(exploration_pt[0])
 
 
 def meritfunction(data,results,ff_calc):
 	#first we need to 'unpack' data and results into arrays
 	num_dim=len(data)
+	print(num_dim)
 	if not (2 <= num_dim <= 3):
 		raise ValueError (' utility function for D!=3 OR 2 not completed')
 	elif num_dim == 2:
-		print(data)
-		print(results)
+		print('data',data)
+		print('results',results)
 		#need to pick out above/under & certain frequency for result
-		RBF_Func=Rbf(data[0],data[1],sum(results,[]),function='thin_plate')
+		##Check above/under for results. Pick the center frequency
+
+		RBF_Func=Rbf(data[0],data[1],results,function='thin_plate')
 		minx=min(data[0])
 		maxx=max(data[0])
 		miny=min(data[1])
@@ -226,32 +239,32 @@ def meritfunction(data,results,ff_calc):
 	#	rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
 		#rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
 		#if true, exploit, if false, explore
-		if Phase_Selector(data,results,rbf_optima)=='exploit':
-			next_sim = RBF_max_point_selector(rbf_optima)
+		current_best_rbf = RBF_max_point_selector(rbf_optima)
+		exploit_pt = current_best_rbf['sim point']
+		explore_pt = Exploration_point_selector(data,num_dim)
+		print('exploit',exploit_pt,'explore',explore_pt[0])
+		fig = plt.figure()
+		ax = plt.axes(projection='3d')
+		X,Y=np.meshgrid(x,y)
+		z = RBF_Func(X,Y)
+		ax.text(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),'EXPLORE POINT',fontsize=12)
+		ax.text(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),'EXPLOIT POINT',fontsize=12)
+		ax.scatter(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),s=50,c='r',marker='D')
+		ax.scatter(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),s=50,c='g',marker='D')
+		ax.scatter(data[0],data[1],results,alpha=1,c='k')
+		ax.plot_surface(X,Y,z,cmap=cm.jet)
+		ax.set_xlabel(sys.argv[3])
+		ax.set_ylabel(sys.argv[4])
+		plt.show()
+		if Phase_Selector(data,results,current_best_rbf['Function value'])=='exploit':
+			next_sim = exploit_pt
 			print('next_sim',next_sim)
 			print('EXPLOATATIONS','point',next_sim)
-			#       next_sim = [next_sim[0][0]]+[next_sim[0][1]]
-			plot_color = 'r'
-		else:
-			next_sim = Exploration_point_selector(data,num_dim)
+		else: 
+			next_sim = explore_pt
 			print('next_sim',next_sim)
 			print('EXPLORATION','point',next_sim)
-			next_sim = [next_sim[0][0]]+[next_sim[0][1]]
-			plot_color = 'g'
-			#3d plot
-			fig = plt.figure()
-			ax = plt.axes(projection='3d')
-			X,Y=np.meshgrid(x,y)
-			z = RBF_Func(X,Y)
-			print('hehe',next_sim)
-			ax.text(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),'POINT',fontsize=12)
-			ax.scatter(next_sim[0],next_sim[1],-1*RBF_TO_OPT(next_sim),s=50,c=plot_color,marker='D')
-			ax.scatter(data[0],data[1],sum(results,[]),alpha=1,c='k')
-			ax.plot_surface(X,Y,z,cmap=cm.jet)
-			ax.set_xlabel(sys.argv[2])
-			ax.set_ylabel(sys.argv[3])
-			plt.show()
-			return next_sim
+		return next_sim
 
 	elif num_dim == 3:
 		nfreq=len(results[0][0])
