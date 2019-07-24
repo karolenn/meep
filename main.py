@@ -16,45 +16,8 @@ def main(sim_name,number_of_runs,args):
         #execute_sim needs db entry for next run
         execute_simulation(next_run,sim_name)
     
-    "run next run"
-
-
-""" def main(sim_name):
-    
-    db = read("db/sim_spec/{}.json".format(sim_name))
-    if db == None:
-        print("could not open db/sim_spec/{}.json".format(sim_name))
-        exit(0)
-    
-    sim_results = []
-    for sim_spec in db:
-        imp = json_to_imp(sim_spec)
-        pyramid = Pyramid(imp)
-        result = pyramid.simlate()
-        opt = Optimizer(result)
-        data = sim_to_json(result, opt)
-        write_result("db/result/{}.json".format(sim_name), data)
-
-
-    
-
-    opt_results = []
-    for result in sim_results:
-    
-    new_imput = util()
-    write_utils("db/utils/{}.json".format(sim_name), data)
-
-    sim_id += 1
-    data = opt_to_json(opt_results)
-
-
-class Pyramid():
-    def __init__(self, imp):
-        self.imp = imp
-
-    def simlate(self):
-        return self.imp
- """
+#What is missing is that we need to save for each iteration if we performed exploit or explore run. Optionally how the optimizers
+#worked for the exploit result for each iteration in main. 
 
 
 

@@ -8,13 +8,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import math as math
 import time
 
-###PARAMETERS FOR THE SIMULATION##############################################
-
-#from mpl_toolkits.mplot3d import Axes3D
+###PARAMETERS FOR THE SIMULATION and PYRAMID##############################################
 
 
 class Pyramid():
-
+#Parameters for the pyramid
 	def setup(self, config, debug = False):
 		self.source_position = config["source_position"] 
 		self.pyramid_height = config["pyramid_height"] 
@@ -30,7 +28,7 @@ class Pyramid():
 	def print(self,*args):
 		if self.debug:
 			print(args)
-	 	
+#Symmetries for the simulation	
 	def create_symetry(self):
 		if self.source_direction ==	mp.Ex:
 			symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1)]
@@ -45,25 +43,7 @@ class Pyramid():
 			symmetry = []
 		return symmetry
 
-	#def isInsidexy(vec):
-	#		while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
-#
-#				#h=pyramid_width/2+vec.z*(pyramid_width/(2*(sz/2-sh)))
-	#			h=self.pyramid_width/(2*self.pyramid_height)*vec.z-(self.pyramid_width/(2*self.pyramid_height))*(sz/2-sh-self.pyramid_height)
-	#			v=h*math.tan(math.pi/6)	
-	#			center=mp.Vector3(h,v,0)
-	#			q2x = math.fabs(vec.x - center.x+h) #transform the test point locally and to quadrant 2m nm
-	#			q2y = math.fabs(vec.y - center.y+v) # transform the test point locally and to quadrant 2
-	#			if (q2x > h) or (q2y > v*2):
-	#				return air
-	#			if  ((2*v*h - v*q2x - h*q2y) >= 0): #finally the dot product can be reduced to this due to the hexagon symmetry
-	#				return GaN
-	#			else:
-	#				return air 
-	#		else:
-	#			return air
-
-
+#Simulation parameters
 	def simulate(self, config):
 		start = time.time()
 		dpml = config["dpml"]
@@ -89,14 +69,9 @@ class Pyramid():
 		sh=substrate_height
 
 		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
-		#"Inarguments for the simulation"
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
-		#"Direction for source"
-										#symmetry has normal in x & y-direction, phase-even z-dir 
-		#"Frequency parameters for gaussian source"
-		#"Calculation and plotting parameters"
-								#calculate flux at angle measured from top of the pyramid
 
+#Flux regions to calculate the total flux emitted from the simulation
 		def define_flux_regions(sx, sy, sz, padding):
 			fluxregion = []
 			fluxregion.append(mp.FluxRegion(					#region x to calculate flux from
@@ -133,6 +108,7 @@ class Pyramid():
 				weight=-1))
 			return fluxregion
 
+#Flux regions to calculate the far field flux
 		def define_nearfield_regions(sx, sy, sz, sh, padding, ff_cover):
 			nearfieldregions=[]
 			nfrAbove=[]
@@ -161,11 +137,7 @@ class Pyramid():
 					size=mp.Vector3(sx-padding*2,0,sz-sh-padding*2),
 					direction=mp.Y,
 					weight=-1))
-		#under the substrate
-		#nearfieldregions.append(mp.Near2FarRegion(
-			#	center=mp.Vector3(0,0,sz/2-padding),
-			#	size=mp.Vector3(sx-padding*2,sy-padding*2,0),
-			#	direction=mp.Z))
+
 
 			nfrAbove.append(mp.Near2FarRegion(					#nearfield -z. above pyramid.		
 					center=mp.Vector3(0,0,-sz/2+padding),
@@ -233,7 +205,7 @@ class Pyramid():
 					size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
 		
-		#Truncation block of air to truncate the pyramid
+		#Truncation block of air to truncate the pyramid. NEEDS TO BE REWRITTEN
 		geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh-self.pyramid_height),
 					size=mp.Vector3(self.pyramid_width,self.pyramid_width,self.truncation*self.pyramid_height*2),
 					material=air))
@@ -306,7 +278,7 @@ class Pyramid():
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
 				center=mp.Vector3(0,0,abs_source_position))]
-
+		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				geometry=geometry,
 				symmetries=symmetry,
@@ -358,7 +330,7 @@ class Pyramid():
 				nearfieldAbove=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrA1 ,nfrA2, nfrA3, nfrA4, nfrA6)
 				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB6)
 		###RUN##########################################################################
-		#"The run constructor for meep."
+		#"Run the simulation"
 		if use_fixed_time:
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
@@ -378,10 +350,8 @@ class Pyramid():
 		myIntegration = True
 		nfreq=self.number_of_freqs
 		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
-		#r=100
 		if ff_calculations:
-			P_tot_ff = np.zeros(self.number_of_freqs)
-		#	npts=3200							
+			P_tot_ff = np.zeros(self.number_of_freqs)						
 			npts=ff_pts							#number of far-field points
 			Px=0
 			Py=0
@@ -476,12 +446,6 @@ class Pyramid():
 							P_tot_ff[k] += surface_Element*(1)*(Pr)
 							i = i + 6 #to keep track of the correct entries in the ff array
 
-
-
-
-					#"P_tot_ff[k] is calculated for each freq. Now the loop should make the spacing between two points larger the further down the sphere we goes and surface_elements might overlap here. Check in the future the errors."
-
-
 			##CALCULATE FLUX OUT FROM BOX###########################################
 		if calculate_flux:
 			#"Initialize variables to be used, pf stands for 'per frequency'"
@@ -492,38 +456,8 @@ class Pyramid():
 			for n in range(len(flux_tot_out)):
 				flux_tot_out[n]=round(flux_tot_out[n],9)
 				P_tot_ff[n]=round(P_tot_ff[n],9)
-
+			##Some processing to calculate the flux ratios per frequency
 			if ff_calculations:
-				#"the for loop sums up the flux for all frequencies and stores it in flux_tot_value and flux_top_value"
-				#"it also calculates the ratio betwewen top and total flux out for all frequencies and stores it in an array 'flux_tot_pf_ratio'"
-				#ff_freqs = mp.get_near2far_freqs(nearfieldAbove)
-				# fig = plt.figure()
-				# ax = fig.gca(projection='3d')
-				# Pr_Max=max(Pr_Array)
-				# R = [n/Pr_Max  for n in Pr_Array]
-				# print(R)
-				# #R=1
-				# pts = len(Pr_Array)
-				# theta,phi = np.linspace(0,np.pi,pts), np.linspace(0,2*np.pi,pts)
-				# THETA,PHI = np.meshgrid(theta,phi)
-				# print(xPts)
-				# print(yPts)
-				# print(zPts)
-				# #X=np.zeros(pts**2)
-				# #Y=np.zeros(pts**2)
-				# #Z=np.zeros(pts**2)
-				# for n in range(pts):
-				# 	xPts[n] = R[n]*xPts[n]
-				# 	yPts[n] = R[n]*yPts[n]
-				# 	zPts[n] = R[n]*zPts[n]
-				# #print(X)
-				# #print(Y)
-				# #print(Z)
-				# ax.set_zlim(-100,100)
-				# ax.set_ylim(-100,100)
-				# ax.set_xlim(-100,100)
-				# ax.scatter(xPts,yPts,zPts)
-				# plt.show()
 				for i in range(self.number_of_freqs):	
 
 					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],9)		

@@ -74,21 +74,6 @@ def myPoyntingFlux(ff,nfreq):
 
 	return(Pr)
 
-def Unpacker(data):
-	num_dim=len(data)
-	if num_dim == 0:
-		print('Error: 0 dims to RBF')
-	elif num_dim == 1:
-		return(Rbf(data[0],sum(results,[])))
-	elif num_dim == 2:
-		return(Rbf(data[0],data[1],sum(results,[])))
-	elif num_dim == 3:
-		return(Rbf(data[0],data[1],data[2],sum(results,[])))
-	elif num_dim == 4:
-		return(Rbf(data[0],data[1],data[2],data[3],sum(results,[])))
-	else:
-		print('Error: merit function to many inparameters')
-
 def get_next(limit_x, limit_y, limit_z):
     x = uniform(limit_x["from"], limit_x["to"])
     y = uniform(limit_y["from"], limit_y["to"])
