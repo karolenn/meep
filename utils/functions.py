@@ -28,7 +28,6 @@ def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):
 		phi = (n % npts)*increment
 		xPts.append(R*math.cos(phi))
 		yPts.append(R*math.sin(phi))
-
 	return(xPts,yPts,zPts,npts)
 	
 
@@ -115,6 +114,7 @@ def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, alr
 			choice.append((x, y, z))
 	return choice
 
+#Select the best optima from the optimizers
 def RBF_max_point_selector(rbf_optima):
 	current_best = {'OPT': 'empty','Function value': -100000, 'sim point':[0,0,0]}
 	print(rbf_optima[2])
@@ -122,9 +122,9 @@ def RBF_max_point_selector(rbf_optima):
 		print('curr best func',current_best['Function value'])
 		print(rbf_optima[opt])
 		if (-1*rbf_optima[opt].fun > current_best['Function value']):
-				current_best['OPT']=opt
+				current_best['OPT']="DE" if opt == 0 else "SHGO" if opt == 1 else "DA"
 				current_best['Function value']=-1*rbf_optima[opt].fun
-				current_best['sim point']=rbf_optima[opt].x
+				current_best['sim point']=rbf_optima[opt].x.tolist() #convert to list for saving to JSON result
 	return current_best
 
 #Choose if we're going for exploration or explotation phase
@@ -194,7 +194,7 @@ def meritfunction(data,results,ff_calc):
 		#need to pick out above/under & certain frequency for result
 		##Check above/under for results. Pick the center frequency
 
-		RBF_Func=Rbf(data[0],data[1],results,function='thin_plate')
+		RBF_Func=Rbf(data[0],data[1],results,function='thin_plate',epsilon=0.001)
 		minx=min(data[0])
 		maxx=max(data[0])
 		miny=min(data[1])
@@ -241,6 +241,7 @@ def meritfunction(data,results,ff_calc):
 		ax.set_xlabel(sys.argv[3])
 		ax.set_ylabel(sys.argv[4])
 		plt.show()
+		print(current_best_rbf)
 		if Phase_Selector(data,results,current_best_rbf['Function value'])=='exploit':
 			next_sim = exploit_pt
 			print('next_sim',next_sim)
@@ -249,7 +250,7 @@ def meritfunction(data,results,ff_calc):
 			next_sim = explore_pt
 			print('next_sim',next_sim)
 			print('EXPLORATION','point',next_sim)
-		return next_sim
+		return next_sim, Phase_Selector(data,results,current_best_rbf['Function value']),current_best_rbf
 
 	elif num_dim == 3:
 		nfreq=len(results[0][0])

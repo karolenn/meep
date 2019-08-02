@@ -19,7 +19,9 @@ def merit_function(sim_name, ff_calc, args):
         sim_results=process_results(sim_results,ff_calc)
     #values and sim results are now arrays in arrays. Inner array is data from single simulation
   #  meritfunction(values,sim_results)
-    result = meritfunction(values,sim_results, ff_calc)
+    result, util_data, rbf_opt = meritfunction(values,sim_results, ff_calc)
+    #write optimizer and explore/exploit info to database
+    write_result("db/results/{}.json".format(sys.argv[1]), [result,util_data,rbf_opt])
     template = read("db/tmp/tmp.json")
     print('args',args)
     print('result from merit func',result)
@@ -31,7 +33,7 @@ def merit_function(sim_name, ff_calc, args):
 
 
 
-#usage python utility_function.py "Above/Below" 02 source_position pyramid_height pyramid_width
+#usage python utility_function.py 02 "Above/Below" source_position pyramid_height pyramid_width
 
 
 if __name__ == "__main__":

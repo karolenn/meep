@@ -127,4 +127,10 @@ Vi ska köra main på 2D. ->
 UTIL Function för 2d fungerar? Dock så kan exploit punkt hamna på simulerad punkt? Koll behövs? Nej diff max ska ta hand om detta.
 Plotta konvergens på en axel. Så på x axeln är det par av (ph,pw,sp).
 
+Varying total flux between x and y polarisation, ratio remains the same. Problem for calculating purcell effect?
+
+6 npts give  within 0.1% same result as 1600 npts for analytic case? What the?? Doesn't matter for analytic??!? How do I then present the choice of 1600 npts? Skip?
+
+Skulle antagligen kunna ligga runt npts=400 i nästkommande simuleringar. Verkar som värst skilja ungefär 0.2% från 1600 npts. Beräkningstid ned en tredjedel för (0.94,1.0.01) pyramid. :-( Hur göra i rapporten med npts?
+
 
