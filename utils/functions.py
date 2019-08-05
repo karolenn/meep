@@ -160,10 +160,10 @@ def Radial_random_chooser(data,num_dim):
 			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius*0.5, 1, max_time, data)
 		return exploration_pt
 	if num_dim == 2:
-		minx=min(data[0])
-		maxx=max(data[0])
-		miny=min(data[1])
-		maxy=max(data[1])
+		minx=min(data[0]) #min pyramid width
+		maxx=max(data[0]) #max pyramid width
+		miny=min(data[1]) #min source pos
+		maxy=max(data[1]) #max source pos
 		template = read("db/tmp/tmp.json")
    # for i, name in enumerate(args):
    #     template["pyramid"][name] = result[i]
@@ -174,12 +174,15 @@ def Radial_random_chooser(data,num_dim):
 		exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius, 1, max_time, data)
 		#if fail to find point, shrink radius to half
 		while exploration_pt == []:
-			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius*0.5, 1, max_time, data)
+			radius=radius*0.5
+			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius, 1, max_time, data)
 			print('im looking for a new point')
 			print('radius here',radius)
 		print('radius',radius)
+		exploration_pt=list(exploration_pt[0])
+		exploration_pt[2]=exploration_pt[0]*math.tan(math.pi*62/180)/2
 		#exploration point is a tuple within a list [(1,2)] so it is converted to a list
-	return list(exploration_pt[0])
+	return exploration_pt
 
 
 def meritfunction(data,results,ff_calc):
@@ -194,7 +197,7 @@ def meritfunction(data,results,ff_calc):
 		#need to pick out above/under & certain frequency for result
 		##Check above/under for results. Pick the center frequency
 
-		RBF_Func=Rbf(data[0],data[1],results,function='thin_plate',epsilon=0.001)
+		RBF_Func=Rbf(data[0],data[1],results,function='cubic',epsilon=0.001)
 		minx=min(data[0])
 		maxx=max(data[0])
 		miny=min(data[1])
@@ -250,7 +253,7 @@ def meritfunction(data,results,ff_calc):
 			next_sim = explore_pt
 			print('next_sim',next_sim)
 			print('EXPLORATION','point',next_sim)
-		return next_sim, Phase_Selector(data,results,current_best_rbf['Function value']),current_best_rbf
+		return next_sim, max(results), Phase_Selector(data,results,current_best_rbf['Function value']),current_best_rbf
 
 	elif num_dim == 3:
 		nfreq=len(results[0][0])
