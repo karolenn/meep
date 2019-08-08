@@ -90,6 +90,40 @@ def valid(x,y,z, selected, radius):
   #  limit_y = {"from": 1, "to":3 }
   # limit_z  z = {"from": 0.06, "to": 0.06 }
 
+#check distance between 2 pts, x,y and other_pt = [a,b], yeah I know... Refactoring needed.
+def dist_to_other_pt(x,y,X,Y):
+	dis = lambda f,s: (f-s)**2
+	distance = math.sqrt(dis(x,X)+dis(y,Y))
+	return distance
+
+
+def count(listOfTuple): 
+      
+    flag = False
+  
+    # To append Duplicate elements in list 
+    coll_list = []   
+    coll_cnt = 0
+    for t in listOfTuple: 
+          
+        # To check if Duplicate exist 
+        if t in coll_list:   
+            flag = True
+            continue
+          
+        else: 
+            coll_cnt = 0
+            for b in listOfTuple: 
+                if b[0] == t[0] and b[1] == t[1]: 
+                    coll_cnt = coll_cnt + 1
+              
+            # To print count if Duplicate of element exist 
+            if(coll_cnt > 1):  
+                print(t, "-", coll_cnt) 
+            coll_list.append(t) 
+                       
+    if flag == False: 
+        print("No Duplicates") 
 
 def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, already_selected):
 	#check if we already have some data points from simulations
@@ -160,35 +194,112 @@ def Radial_random_chooser(data,num_dim):
 			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius*0.5, 1, max_time, data)
 		return exploration_pt
 	if num_dim == 2:
-		minx=min(data[0]) #min pyramid width
-		maxx=max(data[0]) #max pyramid width
-		miny=min(data[1]) #min source pos
-		maxy=max(data[1]) #max source pos
-		template = read("db/tmp/tmp.json")
+		Choose = 'NOT shrinker'
+		if Choose == 'shrinker':
+			exploration_pt=rand_pt_shrink(data)
+		else:
+			exploration_pt=rand_pt_minmax(data)
+
+	return exploration_pt
+
+#shrink radius is point is not found
+def rand_pt_shrink(data):
+	minx=min(data[0]) #min pyramid width
+	maxx=max(data[0]) #max pyramid width
+	miny=min(data[1]) #min source pos
+	maxy=max(data[1]) #max source pos
+	template = read("db/tmp/tmp.json")
    # for i, name in enumerate(args):
    #     template["pyramid"][name] = result[i]
-		z = template["pyramid"]["source_position"]
-		limit_x = {"from": minx, "to":maxx }
-		limit_y = {"from": miny, "to":maxy }
-		limit_z = {"from": z, "to": z }
+	z = template["pyramid"]["source_position"]
+	limit_x = {"from": minx, "to":maxx }
+	limit_y = {"from": miny, "to":maxy }
+	limit_z = {"from": z, "to": z }
+	exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius, 1, max_time, data)
+	#if fail to find point, shrink radius to half
+	while exploration_pt == []:
+		radius=radius*0.5
 		exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius, 1, max_time, data)
-		#if fail to find point, shrink radius to half
-		while exploration_pt == []:
-			radius=radius*0.5
-			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius, 1, max_time, data)
-			print('im looking for a new point')
-			print('radius here',radius)
-		print('radius',radius)
-		exploration_pt=list(exploration_pt[0])
-		exploration_pt[2]=exploration_pt[0]*math.tan(math.pi*62/180)/2
-		#exploration point is a tuple within a list [(1,2)] so it is converted to a list
+		print('im looking for a new point')
+		print('radius here',radius)
+	print('radius',radius)
+	exploration_pt=list(exploration_pt[0])
+	exploration_pt[2]=exploration_pt[0]*math.tan(math.pi*62/180)/2
+	#exploration point is a tuple within a list [(1,2)] so it is converted to a list
 	return exploration_pt
+
+#select "best" (pt furthest away from others) pt if pt is not found
+def rand_pt_minmax(data):
+	satisfied = 1000 # number of random points to generate
+	#data[0]=data[0][:20]
+	#data[1]=data[1][:20]
+	minx=min(data[0]) #min pyramid width
+	maxx=max(data[0]) #max pyramid width
+	miny=min(data[1]) #min source pos
+	maxy=max(data[1]) #max source pos
+	#convert to 1x1 size plane
+	dict01={"from": 0, "to":1}
+	dict1={"from": minx, "to":maxx}
+	dict2={"from": miny, "to":maxy}
+	minX = 0
+	maxX = 1
+	minY = 0
+	maxY = 1
+	#check if we already have some data points from simulations
+	limit_x = {"from": minx, "to":maxx }
+	limit_y = {"from": miny, "to":maxy }
+	list_rand_pts=[]
+	for i in range(satisfied):
+		randX, randY, randZ = get_next(dict01,dict01,dict01)
+		list_rand_pts.append((randX,randY))
+	dist_to_closest_pt = 990
+	current_best_pt = [0,0]
+	current_longest_dist = 0
+#	print('length of data',len(data[0]))
+#	print('all pts',list_rand_pts)
+	for k in range(satisfied): #we generate #satisfied number of random pts that we loop through
+		randX = list_rand_pts[k][0] #current randomised pt position X, Y below
+		randY = list_rand_pts[k][1]
+	#	print('***--------------------------***')
+	#	print('Random pt being tested:',randX,randY)
+		for n in range(len(data[0])): #We compare the distance between randXY pt with data pts
+			dX=(data[0][n]-minx)/(maxx-minx) #convert distance to [0,1] distance instead of [a,b]
+			dY=(data[1][n]-miny)/(maxy-miny)
+		#	dX=data[0][n]
+		#	dY=data[1][n]
+		#	print('Current data pt being compared against:',dX,dY)
+			current_dist = dist_to_other_pt(randX,randY,dX,dY) #check euclidian distance between rand pt and pt in data set
+		#	print('current distance to data pt from rand pt',current_dist)
+		#	print('dist to closest pt currently',dist_to_closest_pt)
+			if current_dist < dist_to_closest_pt: #min part of maxmin, we need to save closest, i.e worst distance
+				dist_to_closest_pt = current_dist
+				#print('distance to closest pt',round(current_dist,3),'data pt',round(dX,3),round(dY,3),'rand pt',round(randX,3),round(randY,3))
+		if dist_to_closest_pt > current_longest_dist: #max part of minmax
+			current_best_pt=[randX,randY]
+			current_longest_dist = dist_to_closest_pt
+		#	print(dX,dY)
+		#	print('NEW BEST POINT!')
+		#	print('current best',current_best_pt,'distance:',current_dist,'clo',current_longest_dist)
+		#	print('--------------')
+		current_dist = 990 #reset current distance
+		dist_to_closest_pt=999
+	current_best_pt[0]=current_best_pt[0]*(maxx-minx)+minx
+	current_best_pt[1]=current_best_pt[1]*(maxy-miny)+miny
+#	print('returning pt',current_best_pt)
+	return current_best_pt
+
+
+
+
+
+
 
 
 def meritfunction(data,results,ff_calc):
 	#first we need to 'unpack' data and results into arrays
 	num_dim=len(data)
-	print(num_dim)
+	merge=list(zip(data[0],data[1]))
+	count(merge)
 	if not (2 <= num_dim <= 3):
 		raise ValueError (' utility function for D!=3 OR 2 not completed')
 	elif num_dim == 2:
@@ -197,7 +308,7 @@ def meritfunction(data,results,ff_calc):
 		#need to pick out above/under & certain frequency for result
 		##Check above/under for results. Pick the center frequency
 
-		RBF_Func=Rbf(data[0],data[1],results,function='cubic',epsilon=0.001)
+		RBF_Func=Rbf(data[0],data[1],results,function='thin_plate')
 		minx=min(data[0])
 		maxx=max(data[0])
 		miny=min(data[1])
@@ -230,20 +341,23 @@ def meritfunction(data,results,ff_calc):
 		current_best_rbf = RBF_max_point_selector(rbf_optima)
 		exploit_pt = current_best_rbf['sim point']
 		explore_pt = Exploration_point_selector(data,num_dim)
-		print('exploit',exploit_pt,'explore',explore_pt[0])
-		fig = plt.figure()
-		ax = plt.axes(projection='3d')
+		print('exploit',exploit_pt,'explore',explore_pt)
 		X,Y=np.meshgrid(x,y)
 		z = RBF_Func(X,Y)
-		ax.text(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),'EXPLORE POINT',fontsize=12)
-		ax.text(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),'EXPLOIT POINT',fontsize=12)
-		ax.scatter(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),s=50,c='r',marker='D')
-		ax.scatter(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),s=50,c='g',marker='D')
-		ax.scatter(data[0],data[1],results,alpha=1,c='k')
-		ax.plot_surface(X,Y,z,cmap=cm.jet)
-		ax.set_xlabel(sys.argv[3])
-		ax.set_ylabel(sys.argv[4])
-		plt.show()
+		if False:
+			fig = plt.figure()
+			ax = plt.axes(projection='3d')
+			ax.text(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),'EXPLORE POINT',fontsize=12)
+			ax.text(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),'EXPLOIT POINT',fontsize=12)
+			ax.scatter(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),s=50,c='r',marker='D')
+			ax.scatter(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),s=50,c='g',marker='D')
+			ax.scatter(data[0],data[1],results,alpha=1,c='k')
+			for i in range(len(data[0])):
+				ax.text(data[0][i],data[0][i],results[i],str(i))
+			ax.plot_surface(X,Y,z,cmap=cm.jet)
+			ax.set_xlabel('pyramid width')
+			ax.set_ylabel('source position')
+			plt.show()
 		print(current_best_rbf)
 		if Phase_Selector(data,results,current_best_rbf['Function value'])=='exploit':
 			next_sim = exploit_pt
