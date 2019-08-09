@@ -37,9 +37,8 @@ def sim_to_json(config,result):
     return config
 #"Takes in flux ratio results, withdraws flux ratio above OR below for center frequency"
 #"Function have two cases, flux ratio contains both above and below or only one of the cases. Controlled in the if case."
-def process_results(sim_results,ff_calc):
+def process_results(sim_results,ff_calc, freqn="center"):
     #Withdraw ff_ratio above or under from results.
-    print('asd',len(sim_results[0]))
    # if float(sim_results[0][0]): #Flux ratio only contains result above / under
     if len(sim_results[0])==1: 
         nfreqs=len(sim_results[0])
@@ -49,17 +48,22 @@ def process_results(sim_results,ff_calc):
       #  else:
         for n in range(len(sim_results)):
             sim_results[n]=sim_results[n][int(nfreqs/2)]
-        print('procc res1',sim_results)
         return sim_results
     else: #flux ratio contains both above and under ratios
         nfreqs=len(sim_results[0][0])
+        if freqn=="center":
+            freq=int(nfreqs/2)
+            print('frequency:',freq)
+        else:
+            freq=freqn
+            print('frequency:',freq)
         if ff_calc == "Below":
             for n in range(len(sim_results)):
-                sim_results[n]=sim_results[n][1][int(nfreqs/2)]
+                sim_results[n]=sim_results[n][1][freq]
         else:
             for n in range(len(sim_results)):
-                sim_results[n]=sim_results[n][0][int(nfreqs/2)]
-        print('procc res2',sim_results)
+                sim_results[n]=sim_results[n][0][freq]
+       # print('procc res2',sim_results)
         return sim_results
 
 "Usage: dataarray = db_to_array(db,pyramid,yourdata)"

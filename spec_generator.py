@@ -3,8 +3,8 @@ import copy
 from numpy import linspace
 import time
 from random import uniform 
-#import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from utils.functions import get_next
 from utils.functions import valid
 from math import tan, pi
@@ -28,6 +28,11 @@ def generate_eq_dist_fixed_angle(y, z):
         itx = ity*pyr_height
         for itz in linspace(z["from"], z["to"], z["steps"]):
             tests.append((itx,ity,itz))
+    if True: #Generate center point for RBF as well
+        ty = (y["to"]-y["from"])/2+y["from"]
+        tx = ty*pyr_height
+        tz = (z["to"]-z["from"])/2+z["from"]
+        tests.append((tx,ty,tz))
     return tests
 
 def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 3):
@@ -79,25 +84,26 @@ def test(template):
     #print(tests)
 
 def fixedangle(template):
-    y = {"from": 1, "to":8, "steps": 10} #pyramid width
-    z = {"from": 0.01, "to": 0.9, "steps": 10} #source position
+    y = {"from": 0.5, "to":0.8, "steps": 2} #pyramid width
+    z = {"from": 0.1, "to": 0.4, "steps": 2} #source position
    # pyr_height = tan((pi*62)/180)/2
    # x = {"from": y["from"]*pyr_height,"to": y["to"]*pyr_height, "steps": y["steps"]}
     result =  generate_eq_dist_fixed_angle(y,z) 
     tests = points_to_json(result, template)
     
     x,y,z = zip(*result)
-    #ax = plt.axes(projection='3d')
-    #ax.set_xlabel("pyramid height")
-    #ax.set_ylabel("pyramid width")
-    #ax.scatter(x,y,z)
-    #plt.show()
-    write("db/sim_spec/f1.json", tests)
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.set_xlabel("pyramid height")
+    ax.set_ylabel("pyramid width")
+    ax.scatter(y,z)
+    plt.show()
+    write("db/sim_spec/test11.json", tests)
 
 def testRand(template):
     
     x = {"from": 0.8, "to":0.8 }
-    y = {"from": 0.6, "to":1.2 }
+    y = {"from": 0.4, "to":0.8 }
     z = {"from": 0.1, "to": 0.6 }
     result = generate_rand_dist(x, y, z, 0.5, 4)
     x,y,z = zip(*result)
@@ -114,7 +120,7 @@ def testRand(template):
 if __name__ == "__main__":
     template={
         "simulate": {
-            "resolution": 60,
+            "resolution": 40,
             "use_fixed_time": False,
             "simulation_time": 10,
             "dpml": 0.1,
@@ -137,7 +143,7 @@ if __name__ == "__main__":
             "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 1.2,
-            "number_of_freqs": 6,
+            "number_of_freqs": 3,
             "cutoff": 4
         },
         "result": {}

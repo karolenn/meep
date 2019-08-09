@@ -16,7 +16,7 @@ def merit_function(sim_name, ff_calc, args):
     "withdraw the flux_ratio results from initial_runs simulations"
     sim_results=db_to_array(db,"result","flux_ratio")
     #Withdraw ff_ratio above or under from results. 
-    print('sim results passed to process',sim_results)
+ #   print('sim results passed to process',sim_results)
     if len(sim_results[0]) != 1:
         sim_results=process_results(sim_results,ff_calc)
     #values and sim results are now arrays in arrays. Inner array is data from single simulation
@@ -25,8 +25,8 @@ def merit_function(sim_name, ff_calc, args):
     #write optimizer and explore/exploit info to database
     write_result("db/results/{}.json".format(sys.argv[1]), [result,"max result:",max_result,util_data,rbf_opt])
     template = read("db/tmp/tmp.json")
-    print('args',args)
-    print('result from merit func',result)
+  #  print('args',args)
+   # print('result from merit func',result)
     for i, name in enumerate(args):
         template["pyramid"][name] = result[i]
     template["pyramid"]["pyramid_height"]=template["pyramid"]["pyramid_width"]*tan(pi*62/180)/2
