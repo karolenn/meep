@@ -67,7 +67,6 @@ class Pyramid():
 		sy=sx
 		sz=self.pyramid_height*simulation_ratio						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 		sh=substrate_height
-
 		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
 
@@ -331,6 +330,8 @@ class Pyramid():
 				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB6)
 		###RUN##########################################################################
 		#"Run the simulation"
+		#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,0),size=mp.Vector3(0,sx+2*dpml,sz+2*dpml)))
+	#	plt.show()
 		if use_fixed_time:
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
@@ -340,8 +341,6 @@ class Pyramid():
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
 			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3))
-		#	sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
-		#	plt.show()
 
 
 		###OUTPUT CALCULATIONS##########################################################
@@ -492,9 +491,7 @@ if __name__ == "__main__":
 	if (len(sys.argv)) != 2:
 		print("Not enough arguments")
 		exit(0)
-	print('wrapper*')
 	config = read("db/tmp/tmp.json")
-	print('wrapper^')
 	if config == None:
 		print("could not open tmp/tmp.json for simulation")
 		exit(0)

@@ -19,17 +19,51 @@ flux_ratioGA=[1.00986981,0.51229734,0.16118657,0.05922306,0.0265171,0.0133394,0.
 flux_ratioBA=[1.00989591,0.50942289,0.16111515,0.05894235,0.02627863,0.01319515,0.00740466,0.00430978,0.00087146]
 ff=[]
 
+flux_ratioRA2=[0.9601113,0.46287567,0.12860977,0.04502269,0.01923189,0.00947553,0.00517878,0.00305981,0.00061294]
+flux_ratioGA2=[0.98170228,0.47359017,0.13802445,0.05197849,0.0235193,0.0120552,0.00676817,0.00407432,0.00084641]
+flux_ratioBA2=[0.9980799,0.48160364,0.15266598,0.06548738,0.03210358,0.01719558,0.00989882,0.00604962,0.00128735]
 for n in range(1,9):
 	ff.append((3/4)*(1/12)*(math.cos(3*math.pi/n)-9*math.cos(math.pi/n)+8))
+ff.append((3/4)*(1/12)*(math.cos(3*math.pi/12)-9*math.cos(math.pi/12)+8))
 x=np.arange(0,math.pi+0.05,0.1)
 y=((np.sin(x/2))**4)*(np.cos(x)+2)
+error1R=[]
+error1G=[]
+error1B=[]
+error2R=[]
+error2G=[]
+error2B=[]
+error1=0
+error2=0
+print(ff)
+for n in range(len(flux_ratioBA)):
+	error1R.append(abs(flux_ratioRA[n]-ff[n])/ff[n])
+	error1G.append(abs(flux_ratioGA[n]-ff[n])/ff[n])
+	error1B.append(abs(flux_ratioBA[n]-ff[n])/ff[n])
+	error2R.append(abs(flux_ratioRA2[n]-ff[n])/ff[n])
+	error2G.append(abs(flux_ratioGA2[n]-ff[n])/ff[n])
+	error2B.append(abs(flux_ratioBA2[n]-ff[n])/ff[n])
+error1max=max(max(error1R),max(error1G),max(error1B))
+error2max=max(max(error2R),max(error2G),max(error2B))
+error1avR=sum(error1R)/len(flux_ratioGA)
+error1avG=sum(error1G)/len(flux_ratioGA)
+error1avB=sum(error1B)/len(flux_ratioGA)
+error2avR=sum(error2R)/len(flux_ratioGA)
+error2avG=sum(error2G)/len(flux_ratioGA)
+error2avB=sum(error2B)/len(flux_ratioGA)
+print('max',error1max,error2max)
+print('average',error1avR,error1avG,error1avB)
+print('average2',error2avR,error2avG,error2avB)
 
 #plt.plot(angle,ff)
 #plt.plot(angle,flux_ratio,'ro')
 plt.plot(x,y,color='y',label='analytical result')
-plt.scatter(angle,flux_ratioRA,color='r',marker='v',label='computed, f=~2.6')
-plt.scatter(angle,flux_ratioGA,color='g',marker='^',label='computed, f=~2.0')
-plt.scatter(angle,flux_ratioBA,color='b',marker='<',label='computed, f=~1.4')
+#plt.scatter(angle,flux_ratioRA,color='r',marker='v',label='f computed, f=~2.6')
+#plt.scatter(angle,flux_ratioGA,color='g',marker='^',label='f computed, f=~2.0')
+#plt.scatter(angle,flux_ratioBA,color='b',marker='<',label='f computed, f=~1.4')
+plt.scatter(angle,flux_ratioRA,color='r',marker='.',label='r computed, f=~2.6')
+plt.scatter(angle,flux_ratioGA,color='g',marker='o',label='r computed, f=~2.0')
+plt.scatter(angle,flux_ratioBA,color='b',marker='8',label='r computed, f=~1.4')
 plt.legend(loc='best')
 plt.xlabel('Angle in radians')
 plt.ylabel('Flux ratio')

@@ -133,4 +133,120 @@ Varying total flux between x and y polarisation, ratio remains the same. Problem
 
 Skulle antagligen kunna ligga runt npts=400 i nästkommande simuleringar. Verkar som värst skilja ungefär 0.2% från 1600 npts. Beräkningstid ned en tredjedel för (0.94,1.0.01) pyramid. :-( Hur göra i rapporten med npts?
 
+config = {
+        "simulate": {
+            "resolution": 80,
+            "use_fixed_time": False,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 1600,
+            "ff_calc": "Both",
+            "ff_cover": False,
+            "use_symmetries": True,
+            "calculate_flux": True,
+            "ff_calculations": True,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.41,
+            "pyramid_height": 7.52,
+            "pyramid_width": 8,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {}
+    }  
+
+freqs [1.4, 1.64, 1.8800000000000001, 2.12, 2.3600000000000003, 2.6000000000000005]
+([3.1359e-05, 5.2142e-05, 7.4395e-05, 7.6653e-05, 5.6195e-05, 3.375e-05], [[2.424069354699092e-05, 4.3624440312708394e-05, 6.625900713995495e-05, 7.198775901321774e-05, 5.4308781323440675e-05, 3.279111655718958e-05], [1.701545790884826e-55, 1.9092259081614614e-55, 2.2171245854099003e-55, 2.296043080531505e-55, 2.6158533571646917e-55, 2.7977296218755703e-55]], [[0.773005949, 0.836646855, 0.890637908, 0.939138181, 0.966434404, 0.971588639], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]], 222.9)
+
+Field time usage:
+        connecting chunks: 187.242 s
+            time stepping: 1828.85 s
+            communicating: 194.738 s
+     Fourier transforming: 343.962 s
+          everything else: 271.862 s
+
+
+Elapsed run time = 13381.1364 s  
+        
+Det verkar som något är skumt med större pyramider. Eventuellt med källa mot toppen? Ej upplösningsberoende problem ty ~samma resultat för upplösning 30,60,80. Ökade paddingen, substrate ratio och simulation ratio och då fick jag plötsligt division by zero error! 0 Total Flux för alla frekvenser. Eventuellt detta som ställer till det för större pyramider. 
+
+sim ratio 8/5  sub ratio 1/5 res10
+([7.7846e-05, 0.010639928, 0.158346027, 0.058081838, 5.2362e-05, 2.037e-05], [[2.5414638767180074e-06, 0.0004866409857552277, 0.012887687979673428, 0.0034375066067931542, 1.594273196573456e-06, 6.409103616855033e-07], [8.625085552942411e-05, 0.00014753078461592065, 0.0002391323740515589, 6.230815342791731e-06, 3.3441034588053457e-06, 3.939952237179612e-06]], [[0.032647328, 0.045737244, 0.081389399, 0.059183847, 0.030447141, 0.031463444], [1.107967725, 0.013865769, 0.001510189, 0.000107276, 0.063865083, 0.193419354]], 1.4)
+
+regular ratios res 10 
+([0.000118273, 0.004594234, 0.080928413, 0.033474981, 0.000205595, 6.5476e-05], [[7.921063111530226e-06, 0.000743282517222711, 0.009150683060878302, 0.00352556247563929, 1.9370471007682278e-05, 6.6692022794684456e-06], [2.1198535892219237e-09, 2.9782177464828457e-10, 1.5575536255575837e-10, 1.0976833240151915e-10, 2.0175377408233779e-10, 6.727376863499036e-10]], [[0.066972708, 0.161785951, 0.113071327, 0.105319327, 0.094216644, 0.101857204], [1.7923e-05, 6.5e-08, 2e-09, 3e-09, 9.81e-07, 1.0275e-05]], 5.2)
+
+superpyramid res30 regular ratio npts=100
+run 0 finished at t = 8.033333333333333 (482 timesteps)
+freqs [1.4, 1.64, 1.8800000000000001, 2.12, 2.3600000000000003, 2.6000000000000005]
+([1.1869e-05, 1.9457e-05, 2.6748e-05, 2.6785e-05, 1.9823e-05, 1.2365e-05], [[9.384930100533237e-06, 1.668523207159542e-05, 2.457286196335953e-05, 2.590072512063361e-05, 1.981605989818918e-05, 1.2360995430886145e-05], [1.1617602930410194e-33, 1.5722997649214446e-33, 9.18797890039885e-34, 1.1486214832989784e-33, 1.3444972830853243e-33, 9.821599303184232e-34]], [[0.79070942, 0.857543921, 0.918680349, 0.966986191, 0.999649896, 0.999676137], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]], 7.2)
+
+Problem hittat. Tidskonvergens ej visat för pyramid högre än 5. Oklart än det ty jag inte hade fixed angle pyramider vid tidskonvergens tester. Görs nu om. Inte bara det, för frekvenser långt upp på spektrat blir ration klart lägre. -> resultat för frekvenser andra än center sannolikt bogus. Cutoff parameter behövs vara större? Vad annars kan prövas?
+
+Superpeaken beror inte att vi ligger långt ut på väglängdsspektrat. Men vi har visat att den behövde längre tid att konvergera. Men för tidskonvergens för pw [1,8] så verkar 1e-3 duga. Which gives..? 
+
+Slutsats: Det finns anomalier för 1e-3. Så körningar för centerfrekvens verkar vara korrekt. Peaken är en konfiguration som behöver mycket längre tid att släckas ut antagligen. För frekvenser längre ifrån spektrat blir det helt fel dock. Vi har nfreq=6, kanske går att använda 1,2/4,5 istället?  
+
+(5,4.72,0.2) res 40
+1e-3
+freqs [2.6]
+([3.066859085], [[0.25496365241998165], [0.452158035144551]], [[0.083135105], [0.147433587]], 5.9)
+
+Samma körning fast t=120
+freqs [2.6]s
+([5.976786922], [[0.3778139232597254], [0.9032536651753265]], [[0.063213551], [0.151126965]], 22.4)
+
+Samma körning fast npts= 800 1e-5
+([3.066859085], [0.254962874], [0.083134851], 6.6)
+
+Denna körningen ovan är även helt fel mot tidskonvergens körningen?! Så "far out" frekvenser varierar kraftigt huruvida dom behöver 1e-3 eller bra mycket längre tid. Vad göra?
+
+Vi vet:
+Probe sensitivity helt urkukad för freq 1.4,2.6. Kolla ifall freq närmare duger eller ifall vi måste köra om referens-simuleringarna för "wider" freqs.
+Probe sensitivity 1e-3 svinlugnt för centerfrekvens 2 dock !!.
+Innan det: Bekräfta att lägre npts gäller. -> npts verkar inte spela stor roll.
+
+Varför gick jag från cutoff 2 till 4? Oavsett cutoff ska de såklart konvergera till samma sak.
+
+För (5,1,0.1) så räcker det ej med att köra 1e-3 för att konvergera för cutoff=4
+
+----Möte Torbjörn 09/08 17:26
+Slutsatsen:
+Man får köra simuleringen och kolla max(rbf), x antal bästa simuleringspunkter med högre konvergenskriterier. (I Diskussion kan man föra in att man "startar" om simuleringen här ifrån)
+
+-Dela upp resultatet i faser. Första konvergenstester. Optimeringsfas. Nya konvergenstester. Nya resultat. Stor diskussion.
+-------
+
+Är f1 resultaten konvergenta? För center freq? Eventuellt. För =/= center freq, med största sannolikhet inte. 
+
+ [[0.032857969, 0.154404141, 0.188809228, 0.197422411, 0.187575689, 0.
+097899619], [0.460675956, 0.009186983, 0.003400014, 0.001943892, 0.004044967, 0.230096799]] (5,4.72,0.2) npts 1600
+[[0.033856808, 0.15946082, 0.19015563, 0.194365581, 0.196360836, 0.093074171], [0.498888875, 0.009632108, 0.003525677, 0.002247581, 0.004519884, 0.252993275]], 16.9) (5,4.702,0.2) npts 400
+-> npts spelar ingen roll. 4.72 eller 4.702 spelar marginell roll. Frågan: Är de konvergenta? Om ja, hmm, då är nya 1e3,1e5 testerna ej konvergenta för 1e3. Om nej, 1e3 duger ej. 
+
+(2,0.1) verkar ha konvergerat för 1e5. Ej konvergerat för 1e3. Men 8% fel för centerfrekvens och 11% fel för freq 2.6.
+
+(5,0.2) ej konvergerat för 1e5.
+resultat från fields:
+[1.4, 1.64, 1.88, 2.12, 2.36, 2.6]
+([3.4922e-05, 0.049529044, 1.784887416, 3.024301365, 0.180946947, 0.000468604], 
+[[2.6387725812525886e-06, 0.00247466087602353, 0.1116768352155538, 0.19895337988
+479606, 0.012354391363937178, 2.397275247156283e-05], [1.8060582100577304e-05, 0
+.03280696168192678, 1.1315721924598399, 1.9127536109677217, 0.11706855207125187,
+ 0.00028894553004293346]], [[0.075561897, 0.049963833, 0.062568, 0.065784906, 0.
+068276318, 0.051157806], [0.51716918, 0.662378254, 0.633973988, 0.632461313, 0.6
+46977216, 0.616609184]], 49.6)
+
+
+
+
 

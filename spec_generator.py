@@ -98,7 +98,7 @@ def fixedangle(template):
     ax.set_ylabel("pyramid width")
     ax.scatter(y,z)
     plt.show()
-    write("db/sim_spec/test11.json", tests)
+    write("db/sim_spec/ftest.json", tests)
 
 def testRand(template):
     

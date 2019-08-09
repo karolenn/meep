@@ -18,16 +18,16 @@ def RBF_plotter(sim_name,pts,ff_calc,args):
         data.append(db_to_array(db,"pyramid",n))
     sim_results=db_to_array(db,"result","flux_ratio")
     #Withdraw ff_ratio above or under from results. 
-    print('sim results passed to process',sim_results)
-    print('data recieved',data)
+   # print('sim results passed to process',sim_results)
+   # print('data recieved',data)
     if len(sim_results[0]) != 1:
-        results=process_results(sim_results,ff_calc)
+        results=process_results(sim_results,ff_calc,5)
     datanx=data[0][:pts]
     datany=data[1][:pts]
     resultsn=results[:pts]
-    print('resultsn',resultsn)
-    print('datax',datanx)
-    print('datay',datany)
+   # print('resultsn',resultsn)
+    #print('datax',datanx)
+    #print('datay',datany)
     merge=list(zip(datanx,datany))
     count(merge)
     D1=[]
@@ -41,7 +41,7 @@ def RBF_plotter(sim_name,pts,ff_calc,args):
  #   datanx=D1
   #  datany=D2
    # resultsn=R
-    print(datanx)
+   # print(datanx)
     minx=min(datanx)
     maxx=max(datanx)
     miny=min(datany)
