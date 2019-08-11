@@ -1,0 +1,152 @@
+[
+    {
+        "simulate": {
+            "resolution": 80,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.4833801870717577,
+            "pyramid_height": 7.411354074123603,
+            "pyramid_width": 7.881373725188492,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {}
+    },
+    {
+        "simulate": {
+            "resolution": 80,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.01,
+            "pyramid_height": 7.5229058613853280,
+            "pyramid_width": 8,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {}
+    },
+    {
+        "simulate": {
+            "resolution": 80,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.04994822399783752,
+            "pyramid_height": 3.705347910519,
+            "pyramid_width": 3.9403368632208746,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {}
+    },
+    {
+        "simulate": {
+            "resolution": 80,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.01,
+            "pyramid_height": 6.58944266525757,
+            "pyramid_width": 7.0073376290200065,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {}
+    },
+    {
+        "simulate": {
+            "resolution": 80,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.2579347233720336,
+            "pyramid_height": 7.454983143507,
+            "pyramid_width": 7.9277697005608125,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {}
+    }
+]
