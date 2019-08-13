@@ -6,12 +6,12 @@ from utility_function import merit_function
 from src.execute_simulation import execute_simulation
 
 def main(sim_name,number_of_runs,ff_calc,args):
-
+    print(sys.argv)
     #Perform the initial runs and write the results to the database
-   # initial_runs(sim_name)
-    db = read("db/sim_spec/{}.json".format(sim_name))
-    for config in db:
-        execute_simulation(config, sim_name)
+    initial_runs(sim_name)
+    #db = read("db/sim_spec/{}.json".format(sim_name))
+    #for config in db:
+     #   execute_simulation(config, sim_name)
     #"place below in a for loop"
     #Take the initial run results, calculate the next input parameters for the simulation
     for n in range(int(number_of_runs)):

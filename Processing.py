@@ -8,9 +8,9 @@ import math
 
 #freqs pml [1.0, 1.2222222222222223, 1.4444444444444444, 1.6666666666666667, 1.8888888888888888, 2.111111111111111, 2.3333333333333335, 2.5555555555555554, 2.7777777777777777, 3.0]
 dpml_processing = False
-time_processing = False
-av_time = True
-db1r=sys.argv[1]
+time_processing = True
+av_time = False
+#db1r=sys.argv[1]
 #db2r=sys.argv[2]
 #db3r=sys.argv[3]
 #db = read("db/initial_results/{}.json".format(db))
@@ -34,7 +34,7 @@ if time_processing:
     db1 = read("db/initial_results/2convtime1.json")   
     db2 = read("db/initial_results/2convtime3.json")
     db3 = read("db/initial_results/2convtime5.json")
-    datax = db_to_array(db1,"pyramid","pyramid_height")
+    datax = db_to_array(db2,"pyramid","pyramid_height")
     datay1 = db_to_array(db1,"result","flux_ratio")
     datay2 = db_to_array(db2,"result","flux_ratio")
     datay3 = db_to_array(db3,"result","flux_ratio")
@@ -42,10 +42,13 @@ if time_processing:
     ploty2=[]
     ploty3=[]
     #data[n][v][k] n - pyr height v - 0/1 above or below [k] - freq
-    print('data raw',datay1)
-    print(datay1[2][0][1])
-    k=2 #freq index
-    for n in range(len(datay1)):
+   # print('data raw',datay1)
+  #  print(datay1[2][0][1])
+    k=0 #freq index
+    k=int(sys.argv[1])
+    print(len(datay2))
+    print(len(datay3))
+    for n in range(len(datay2)):
         ploty1.append(datay1[n][0][k]) 
         ploty2.append(datay2[n][0][k])
         ploty3.append(datay3[n][0][k])

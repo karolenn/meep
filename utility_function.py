@@ -23,13 +23,15 @@ def merit_function(sim_name, ff_calc, args):
   #  meritfunction(values,sim_results)
     result, max_result, util_data, rbf_opt = meritfunction(values,sim_results, ff_calc)
     #write optimizer and explore/exploit info to database
-    write_result("db/results/{}.json".format(sys.argv[1]), [result,"max result:",max_result,util_data,rbf_opt])
+    write_result("db/results/{}.json".format(sim_name), [result,"max result:",max_result,util_data,rbf_opt])
     template = read("db/tmp/tmp.json")
   #  print('args',args)
-   # print('result from merit func',result)
+    print('result from merit func',result,result[0],result[1])
     for i, name in enumerate(args):
+        print(i,result[i])
         template["pyramid"][name] = result[i]
-    template["pyramid"]["pyramid_height"]=template["pyramid"]["pyramid_width"]*tan(pi*62/180)/2
+    if "pyramid_height" not in args:
+        template["pyramid"]["pyramid_height"]=template["pyramid"]["pyramid_width"]*tan(pi*62/180)/2
     return template
 
 

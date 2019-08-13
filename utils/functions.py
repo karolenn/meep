@@ -91,9 +91,9 @@ def valid(x,y,z, selected, radius):
   # limit_z  z = {"from": 0.06, "to": 0.06 }
 
 #check distance between 2 pts, x,y and other_pt = [a,b], yeah I know... Refactoring needed.
-def dist_to_other_pt(x,y,X,Y):
+def dist_to_other_pt(x,y,z,X,Y,Z):
 	dis = lambda f,s: (f-s)**2
-	distance = math.sqrt(dis(x,X)+dis(y,Y))
+	distance = math.sqrt(dis(x,X)+dis(y,Y)+dis(z,Z))
 	return distance
 
 
@@ -177,7 +177,7 @@ def Exploration_point_selector(data,num_dim):
 def Radial_random_chooser(data,num_dim):
 	radius=0.5 #radius for the chooser
 	max_time = 10 #max time to run in seconds, else returns ....?? else shrink radius?
-	if num_dim == 3:
+	if False:
 		minx=min(data[0])
 		maxx=max(data[0])
 		miny=min(data[1])
@@ -193,7 +193,7 @@ def Radial_random_chooser(data,num_dim):
 		while exploration_pt == []:
 			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius*0.5, 1, max_time, data)
 		return exploration_pt
-	if num_dim == 2:
+	if True:
 		Choose = 'NOT shrinker'
 		if Choose == 'shrinker':
 			exploration_pt=rand_pt_shrink(data)
@@ -230,64 +230,114 @@ def rand_pt_shrink(data):
 
 #select "best" (pt furthest away from others) pt if pt is not found
 def rand_pt_minmax(data):
-	satisfied = 1000 # number of random points to generate
+	if len(data)==2:
+		satisfied = 1000 # number of random points to generate
 	#data[0]=data[0][:20]
 	#data[1]=data[1][:20]
-	minx=min(data[0]) #min pyramid width
-	maxx=max(data[0]) #max pyramid width
-	miny=min(data[1]) #min source pos
-	maxy=max(data[1]) #max source pos
-	#convert to 1x1 size plane
-	dict01={"from": 0, "to":1}
-	dict1={"from": minx, "to":maxx}
-	dict2={"from": miny, "to":maxy}
-	minX = 0
-	maxX = 1
-	minY = 0
-	maxY = 1
-	#check if we already have some data points from simulations
-	limit_x = {"from": minx, "to":maxx }
-	limit_y = {"from": miny, "to":maxy }
-	list_rand_pts=[]
-	for i in range(satisfied):
-		randX, randY, randZ = get_next(dict01,dict01,dict01)
-		list_rand_pts.append((randX,randY))
-	dist_to_closest_pt = 990
-	current_best_pt = [0,0]
-	current_longest_dist = 0
-#	print('length of data',len(data[0]))
-#	print('all pts',list_rand_pts)
-	for k in range(satisfied): #we generate #satisfied number of random pts that we loop through
-		randX = list_rand_pts[k][0] #current randomised pt position X, Y below
-		randY = list_rand_pts[k][1]
-	#	print('***--------------------------***')
-	#	print('Random pt being tested:',randX,randY)
-		for n in range(len(data[0])): #We compare the distance between randXY pt with data pts
-			dX=(data[0][n]-minx)/(maxx-minx) #convert distance to [0,1] distance instead of [a,b]
-			dY=(data[1][n]-miny)/(maxy-miny)
-		#	dX=data[0][n]
-		#	dY=data[1][n]
-		#	print('Current data pt being compared against:',dX,dY)
-			current_dist = dist_to_other_pt(randX,randY,dX,dY) #check euclidian distance between rand pt and pt in data set
-		#	print('current distance to data pt from rand pt',current_dist)
-		#	print('dist to closest pt currently',dist_to_closest_pt)
-			if current_dist < dist_to_closest_pt: #min part of maxmin, we need to save closest, i.e worst distance
-				dist_to_closest_pt = current_dist
-				#print('distance to closest pt',round(current_dist,3),'data pt',round(dX,3),round(dY,3),'rand pt',round(randX,3),round(randY,3))
-		if dist_to_closest_pt > current_longest_dist: #max part of minmax
-			current_best_pt=[randX,randY]
-			current_longest_dist = dist_to_closest_pt
-		#	print(dX,dY)
-		#	print('NEW BEST POINT!')
-		#	print('current best',current_best_pt,'distance:',current_dist,'clo',current_longest_dist)
-		#	print('--------------')
-		current_dist = 990 #reset current distance
-		dist_to_closest_pt=999
-	current_best_pt[0]=current_best_pt[0]*(maxx-minx)+minx
-	current_best_pt[1]=current_best_pt[1]*(maxy-miny)+miny
-#	print('returning pt',current_best_pt)
-	return current_best_pt
-
+		minx=min(data[0]) #min pyramid width
+		maxx=max(data[0]) #max pyramid width
+		miny=min(data[1]) #min source pos
+		maxy=max(data[1]) #max source pos
+		#convert to 1x1 size plane
+		dict01={"from": 0, "to":1}
+		dict1={"from": minx, "to":maxx}
+		dict2={"from": miny, "to":maxy}
+		minX = 0
+		maxX = 1
+		minY = 0
+		maxY = 1
+		#check if we already have some data points from simulations
+		limit_x = {"from": minx, "to":maxx }
+		limit_y = {"from": miny, "to":maxy }
+		list_rand_pts=[]
+		for i in range(satisfied):
+			randX, randY, randZ = get_next(dict01,dict01,dict01)
+			list_rand_pts.append((randX,randY))
+		dist_to_closest_pt = 990
+		current_best_pt = [0,0]
+		current_longest_dist = 0
+		#	print('length of data',len(data[0]))
+		#	print('all pts',list_rand_pts)
+		for k in range(satisfied): #we generate #satisfied number of random pts that we loop through
+			randX = list_rand_pts[k][0] #current randomised pt position X, Y below
+			randY = list_rand_pts[k][1]
+		#	print('***--------------------------***')
+		#	print('Random pt being tested:',randX,randY)
+			for n in range(len(data[0])): #We compare the distance between randXY pt with data pts
+				dX=(data[0][n]-minx)/(maxx-minx) #convert distance to [0,1] distance instead of [a,b]
+				dY=(data[1][n]-miny)/(maxy-miny)
+			#	dX=data[0][n]
+			#	dY=data[1][n]
+			#	print('Current data pt being compared against:',dX,dY)
+				current_dist = dist_to_other_pt(randX,randY,0,dX,dY,0) #check euclidian distance between rand pt and pt in data set
+			#	print('current distance to data pt from rand pt',current_dist)
+			#	print('dist to closest pt currently',dist_to_closest_pt)
+				if current_dist < dist_to_closest_pt: #min part of maxmin, we need to save closest, i.e worst distance
+					dist_to_closest_pt = current_dist
+					#print('distance to closest pt',round(current_dist,3),'data pt',round(dX,3),round(dY,3),'rand pt',round(randX,3),round(randY,3))
+			if dist_to_closest_pt > current_longest_dist: #max part of minmax
+				current_best_pt=[randX,randY]
+				current_longest_dist = dist_to_closest_pt
+			#	print(dX,dY)
+			#	print('NEW BEST POINT!')
+			#	print('current best',current_best_pt,'distance:',current_dist,'clo',current_longest_dist)
+			#	print('--------------')
+			current_dist = 990 #reset current distance
+			dist_to_closest_pt=999
+		current_best_pt[0]=current_best_pt[0]*(maxx-minx)+minx
+		current_best_pt[1]=current_best_pt[1]*(maxy-miny)+miny
+	#	print('returning pt',current_best_pt)
+		return current_best_pt
+	elif len(data)==3:
+		satisfied = 5000 # number of random points to generate
+		minx=min(data[0])
+		maxx=max(data[0])
+		miny=min(data[1])
+		maxy=max(data[1]) 
+		minz=min(data[2])
+		maxz=max(data[2])
+		#convert to 1x1 size volume
+		dict01={"from": 0, "to":1}
+		dict1={"from": minx, "to":maxx}
+		dict2={"from": miny, "to":maxy}
+		dict3={"from": minz, "to":maxz}
+		minX = 0
+		maxX = 1
+		minY = 0
+		maxY = 1
+		#check if we already have some data points from simulations
+		limit_x = {"from": minx, "to":maxx }
+		limit_y = {"from": miny, "to":maxy }
+		limit_z = {"from": minz, "to":maxz }
+		list_rand_pts=[]
+		for i in range(satisfied):
+			randX, randY, randZ = get_next(dict01,dict01,dict01)
+			list_rand_pts.append((randX,randY,randZ))
+		dist_to_closest_pt = 990
+		current_best_pt = [0,0,0]
+		current_longest_dist = 0
+		for k in range(satisfied): #we generate #satisfied number of random pts that we loop through
+			randX = list_rand_pts[k][0] #current randomised pt position X, Y below
+			randY = list_rand_pts[k][1]
+			randZ = list_rand_pts[k][2]
+			for n in range(len(data[0])): #We compare the distance between randXY pt with data pts
+				dX=(data[0][n]-minx)/(maxx-minx) #convert distance to [0,1] distance instead of [a,b]
+				dY=(data[1][n]-miny)/(maxy-miny)
+				dZ=(data[2][n]-minz)/(maxz-minz)
+				current_dist = dist_to_other_pt(randX,randY,randZ,dX,dY,dZ) #check euclidian distance between rand pt and pt in data set
+				if current_dist < dist_to_closest_pt: #min part of maxmin, we need to save closest, i.e worst distance
+					dist_to_closest_pt = current_dist
+			if dist_to_closest_pt > current_longest_dist: #max part of minmax
+				current_best_pt=[randX,randY,randZ]
+				current_longest_dist = dist_to_closest_pt
+			current_dist = 990 #reset current distance
+			dist_to_closest_pt=999
+		current_best_pt[0]=current_best_pt[0]*(maxx-minx)+minx
+		current_best_pt[1]=current_best_pt[1]*(maxy-miny)+miny
+		current_best_pt[2]=current_best_pt[2]*(maxz-minz)+minz
+		return current_best_pt
+	else:
+		raise ValueError ('minmax rand point gets wrong data dim!')
 
 
 
@@ -298,11 +348,12 @@ def rand_pt_minmax(data):
 def meritfunction(data,results,ff_calc):
 	#first we need to 'unpack' data and results into arrays
 	num_dim=len(data)
-	merge=list(zip(data[0],data[1]))
-	count(merge)
+	print('num dim ffs',num_dim)
 	if not (2 <= num_dim <= 3):
 		raise ValueError (' utility function for D!=3 OR 2 not completed')
 	elif num_dim == 2:
+		merge=list(zip(data[0],data[1]))
+		count(merge)
 		print('data',data)
 		print('results',results)
 		#need to pick out above/under & certain frequency for result
@@ -370,114 +421,76 @@ def meritfunction(data,results,ff_calc):
 		return next_sim, max(results), Phase_Selector(data,results,current_best_rbf['Function value']),current_best_rbf
 
 	elif num_dim == 3:
-		nfreq=len(results[0][0])
-		rbf_optima = {'DE':[[]]*nfreq,
-		'DA':[[]]*nfreq,
-		'SHGO':[[]]*nfreq
-		}
-		temp = []
-		if ff_calc == "Above":
-			for n in range(len(results)):
-				temp.append(results[n][0])
-		elif ff_calc == "Below":
-			for n in range(len(results)):
-				temp.append(results[n][1])
-		else:
-			raise ValueError ('ff_calc incorrect. Do you wish to optimize far field above or below?')
-		results_new = temp
+		merge=list(zip(data[0],data[1],data[2]))
+		count(merge)
+		print('data',data)
 		print('results',results)
-		print('results_new',results_new)
-		#Sort the results from the simulations 
-		results_pf=[]
-		for n in range(nfreq):
-			temp=[]
-			print(results_pf)
-			for k in range(len(results_new)):
-				temp.append(results_new[k][n])
-			results_pf.append(temp)
-		#Create a list with each element containing a RBF(data,freq). Lowest frequency first in the list.
-		RBF_List=[]
-		for n in range(nfreq):
-			RBF_List.append(Rbf(data[0],data[1],data[2],results_pf[n],function='thin_plate',smooth=0))
-		def RBF_min(var):
-			x=var[0]
-			y=var[1]
-			z=var[2]
-			return (-1*RBF_Func(x,y,z))
+		#need to pick out above/under & certain frequency for result
+		##Check above/under for results. Pick the center frequency
+
+		RBF_Func=Rbf(data[0],data[1],data[2],results,function='thin_plate')
 		minx=min(data[0])
 		maxx=max(data[0])
 		miny=min(data[1])
 		maxy=max(data[1])
 		minz=min(data[2])
 		maxz=max(data[2])
-		#print(len(data[0]))
+		minf=min(results)
+		maxf=max(results)
+		index_max = np.argmax(results)
+		#print(minx,maxx,miny,maxy,minf,maxf)
 		x = np.linspace(minx,maxx,num=30)
 		y = np.linspace(miny,maxy,num=30)
 		z = np.linspace(minz,maxz,num=30)
-		#local minimizers
-		init_guess=np.array([3,3,0.13])
-	#	rbf_optima = [[]]*3 #One list for every optimizer. Every sublist will then contain optima for RBF(freq1),RBF(freq2),..,RBF(freqN)
-		print(rbf_optima)
-		print('len',len(rbf_optima))
-		print(RBF_List)
-		#def RBF_TO_OPT(x):
-		#	return (-1*RBF_Func(x[0],x[1],x[2]))
-		for n in range(nfreq):
-			RBF_Func = RBF_List[n]
-			#The optimizers are minimizers, we then "flip" the RBF Func
-			def RBF_TO_OPT(x):
-				return (-1*RBF_Func(x[0],x[1],x[2]))
-			rbf_optima['DE'][n]=(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-			#rbf_optima['DE'][n].append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		#	rbf_optima['DE'][n].append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-			rbf_optima['DA'][n]=(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		#	rbf_optima['DA'][n].append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		#	rbf_optima['DA'][n].append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-			rbf_optima['SHGO'][n]=(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		#	rbf_optima['SHGO'][n].append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		#	rbf_optima['SHGO'][n].append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
-		#print('evo1',rbf_optima['DE'])
-		#print('DA',rbf_optima['DA'])
-		#print('SHGO',rbf_optima['SHGO'])
-		#Withdraw the best optima from all functions
-		rbf_func_max = []
-	#	print('DE',rbf_optima['DE'])
-		#print('SHGO',rbf_optima['SHGO'])
-		print(rbf_optima)
-		current_best = {'OPT': 'empty','Function value': -100000, 'sim point':[0,0,0], 'frequency index': 2}
-		for opt in rbf_optima:
-			for k in range(nfreq):
-				print('curr best func',current_best['Function value'])
-				if (-1*rbf_optima[opt][k].fun > current_best['Function value']):
-					current_best['OPT']=opt
-					current_best['Function value']=-1*rbf_optima[opt][k].fun
-					current_best['sim point']=rbf_optima[opt][k].x
-					current_best['frequency index']=k
-		rbf_func_max=current_best['Function value']
-		if Phase_Selector(data,results_new,nfreq,rbf_func_max)=='exploit':
-			next_sim = current_best['sim point']
+		f = np.linspace(minf,maxf,num=30)
+		#optimizer
+		init_guess = np.array([(maxx-minx)/2,(maxy-miny)/2,(maxz-minz)/2])
+		init_guess=np.array([data[0][index_max],data[1][index_max],data[2][index_max]])
+		rbf_optima=[]
+									
+		#global minimizers
+		def RBF_TO_OPT(x):
+			return (-1*RBF_Func(x[0],x[1],x[2]))
+		rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(differential_evolution(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+		#rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(shgo(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy],[minz,maxz]]))
+	#	rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#rbf_optima.append(dual_annealing(RBF_TO_OPT,bounds=[[minx,maxx],[miny,maxy]]))
+		#if true, exploit, if false, explore
+		current_best_rbf = RBF_max_point_selector(rbf_optima)
+		exploit_pt = current_best_rbf['sim point']
+		explore_pt = Exploration_point_selector(data,num_dim)
+		print('exploit',exploit_pt,'explore',explore_pt)
+		X,Y,Z=np.meshgrid(x,y,z)
+		z = RBF_Func(X,Y,X)
+		if False:
+			fig = plt.figure()
+			ax = plt.axes(projection='3d')
+			ax.text(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),'EXPLORE POINT',fontsize=12)
+			ax.text(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),'EXPLOIT POINT',fontsize=12)
+			ax.scatter(exploit_pt[0],exploit_pt[1],-1*RBF_TO_OPT(exploit_pt),s=50,c='r',marker='D')
+			ax.scatter(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),s=50,c='g',marker='D')
+			ax.scatter(data[0],data[1],results,alpha=1,c='k')
+			for i in range(len(data[0])):
+				ax.text(data[0][i],data[0][i],results[i],str(i))
+			ax.plot_surface(X,Y,z,cmap=cm.jet)
+			ax.set_xlabel('pyramid width')
+			ax.set_ylabel('source position')
+			plt.show()
+		print(current_best_rbf)
+		if Phase_Selector(data,results,current_best_rbf['Function value'])=='exploit':
+			next_sim = exploit_pt
 			print('next_sim',next_sim)
 			print('EXPLOATATIONS','point',next_sim)
-		#	next_sim = [next_sim[0][0]]+[next_sim[0][1]]
-			plot_color = 'r'
-		else:
-			next_sim = Exploration_point_selector(data,num_dim)
+		else: 
+			next_sim = explore_pt
 			print('next_sim',next_sim)
 			print('EXPLORATION','point',next_sim)
-			next_sim = [next_sim[0][0]]+[next_sim[0][1]]+[next_sim[0][2]]
-			plot_color = 'g'
-		print(current_best)
-		fig = plt.figure()
-		ax = Axes3D(fig)
-		ax.set_xlabel('pyramid height')
-		ax.set_ylabel('pyramid width')
-		ax.set_zlabel('source position')
-		ax.set_xlim(minx,maxx)
-		ax.set_ylim(miny,maxy)
-		ax.set_zlim(minz,maxz)
-		ax.scatter(current_best['sim point'][0],current_best['sim point'][1],current_best['sim point'][2],color='r')
-		plt.show()
-		return next_sim
+		return next_sim, max(results), Phase_Selector(data,results,current_best_rbf['Function value']),current_best_rbf
 
 
 

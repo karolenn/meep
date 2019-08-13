@@ -18,6 +18,11 @@ def generate_eq_dist(x, y, z):
         for ity in linspace(y["from"], y["to"], y["steps"]):
             for itz in linspace(z["from"], z["to"], z["steps"]):
                 tests.append((itx,ity,itz))
+    if True:
+        ty = (y["to"]-y["from"])/2+y["from"]
+        tx = (x["to"]-x["from"])/2+x["from"]
+        tz = (z["to"]-z["from"])/2+z["from"]
+        tests.append((tx,ty,tz))
     return tests
 
 def generate_eq_dist_fixed_angle(y, z):
@@ -70,17 +75,17 @@ def points_to_json(points, template):
 #x corresponds to pyramid height, y to pyramid width, z to source position for all three functions below
 #
 def test(template):
-    x = {"from": 1, "to":1 ,"steps": 1}
-    y = {"from": 1, "to":1 ,"steps": 1}
-    z = {"from": 0.01, "to": 0.4 ,"steps": 1}
+    x = {"from": 0.6, "to":1 ,"steps": 2}
+    y = {"from": 0.6, "to":1 ,"steps": 2}
+    z = {"from": 0.01, "to": 0.9 ,"steps": 2}
     result = generate_eq_dist(x, y, z)
     tests = points_to_json(result, template)
     
     x,y,z = zip(*result)
- #   ax = plt.axes(projection='3d')
-  #  ax.scatter(x,y,z)
-   # plt.show()
-    write("db/sim_spec/analytic2.json", tests)
+    ax = plt.axes(projection='3d')
+    ax.scatter(x,y,z)
+    plt.show()
+    write("db/sim_spec/test3d2.json", tests)
     #print(tests)
 
 def fixedangle(template):
@@ -98,7 +103,7 @@ def fixedangle(template):
     ax.set_ylabel("pyramid width")
     ax.scatter(y,z)
     plt.show()
-    write("db/sim_spec/ftest.json", tests)
+    write("db/sim_spec/fybest.json", tests)
 
 def testRand(template):
     
@@ -122,10 +127,10 @@ if __name__ == "__main__":
         "simulate": {
             "resolution": 40,
             "use_fixed_time": False,
-            "simulation_time": 10,
+            "simulation_time": 60,
             "dpml": 0.1,
             "padding": 0.025,
-            "ff_pts": 1600,
+            "ff_pts": 200,
             "ff_calc": "Both",
             "ff_cover": False,
             "use_symmetries": True,
@@ -143,9 +148,9 @@ if __name__ == "__main__":
             "source_direction": "mp.Ey",
             "frequency_center": 2,
             "frequency_width": 1.2,
-            "number_of_freqs": 3,
+            "number_of_freqs": 2,
             "cutoff": 4
         },
         "result": {}
     }  
-    fixedangle(template)
+    test(template)

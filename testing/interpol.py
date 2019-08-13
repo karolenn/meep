@@ -21,6 +21,45 @@ rbf = Rbf(ph,ff)
 fi = rbf(xi)
 print(rbf(xi))
 
+def gaussian(x):
+	return np.exp(-np.power(x,2))
+
+def thin_plate(x):
+#	if x <= 0:
+#		ret = - np.power(x,2)*np.log10(abs(x))
+#	else:
+	ret = np.power(x,2)*np.log10(abs(x))
+	return ret
+
+def multiquad_inverse(x):
+	return 1/np.sqrt(1+np.power(x,2))
+
+y_array = []
+for i in range(len(x)):
+#	print(len(x))
+	y_array.append(thin_plate(x[i]))
+
+pts=[0.5,2,3,4.5]
+values=[1,7,2,6]
+
+x=np.linspace(-3,7,num=100)
+RBF = Rbf(pts,values,function='thin_plate')
+plt.scatter(pts,values,c='k')
+#plt.grid(True)
+plt.axis('off')
+y=RBF(x)
+#print('pt',RBF(-1000000))
+#y=gaussian(x)
+#y=thin_plate(x)
+#y=multiquad_inverse(x)
+plt.plot(x,y)
+print('y0',y[0])
+#plt.xlim(min(pts)-0.5,max(pts)+0.5)
+plt.xlim(-2,7)
+#plt.ylim(-0.5,1.5)
+#plt.ylim(min(values)-0.2,max(values)+0.2)
+#print(x,RBF(x))
+plt.show()
 #plt.plot(ph,ff,'bo')
 #plt.plot(xi,fi,'g')
 #plt.plot(xi,np.cos(xi),'r')
@@ -46,7 +85,7 @@ for i in range(num):
 	X.append(1+i)
 	for j in range(num):
 		Y.append(1+j)
-print(X,Y)
+#print(X,Y)
 
 x=[1,1,1,2,2,2,3,3,3]
 y=[1,2,3,1,2,3,1,2,3]
@@ -64,8 +103,8 @@ ax.scatter(x,y,z,c,color='g',alpha=1)
 XI,YI=np.meshgrid(xi,yi)
 ZI = RBF_Func(XI,YI)
 ax.plot_surface(XI,YI,ZI,cmap=cm.jet)
-plt.show()
-print(RBF_Func(2,2))
+#plt.show()
+#print(RBF_Func(2,2))
 
 #x = np.random.rand(200)*20-10
 #y = np.random.rand(200)*20-10
