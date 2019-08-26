@@ -247,6 +247,10 @@ resultat från fields:
 46977216, 0.616609184]], 49.6)
 
 
+--RAPPORTEN----------16/08
+
+-Förklara symmetrier i maxwells ekvationer och varför jag bara simulerar Y,Z polarisation.
+
 
 
 

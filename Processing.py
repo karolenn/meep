@@ -8,8 +8,9 @@ import math
 
 #freqs pml [1.0, 1.2222222222222223, 1.4444444444444444, 1.6666666666666667, 1.8888888888888888, 2.111111111111111, 2.3333333333333335, 2.5555555555555554, 2.7777777777777777, 3.0]
 dpml_processing = False
-time_processing = True
-av_time = False
+time_processing = False
+res_process = False
+av_time = True
 #db1r=sys.argv[1]
 #db2r=sys.argv[2]
 #db3r=sys.argv[3]
@@ -21,15 +22,79 @@ av_time = False
 #datay = db_to_array(db,"result","flux_ratio")
 #print(datay)
 #print(datax)
+if res_process:
+    db1 = read("db/initial_results/convlarge30.json")   
+    db2 = read("db/initial_results/convlarge60.json")
+    db3 = read("db/initial_results/convlarge120.json")  
+    datay1 = db_to_array(db1,"result","flux_ratio")
+    datay2 = db_to_array(db2,"result","flux_ratio")
+    datay3 = db_to_array(db3,"result","flux_ratio")
+    ph = db_to_array(db1,"pyramid","pyramid_height")
+    pw = db_to_array(db1,"pyramid","pyramid_width")
+    sp= db_to_array(db1,"pyramid","source_position")
+    print(ph,pw,sp)
+    for i in range(len(pw)):
+        ph[i]=int(ph[i])
+        pw[i]=int(pw[i])
+    comb = list(zip(ph,pw,sp))
+    print(comb)
+    ploty1=[]
+    ploty2=[]
+    ploty3=[]
+    #frequencies [1.0, 1.2222222, 1.444444444, 1.666666667, 1.888888, 2.1111111, 2.33335, 2.55555554, 2.777777777, 3.0]
+
+    k=7
+    for n in range(len(datay2)):
+        ploty1.append(datay1[n][k]) 
+        ploty2.append(datay2[n][k])
+        ploty3.append(datay3[n][k])
+    print('ff30=',ploty1)
+    print('ff60=',ploty2)
+    print('ff120=',ploty3)
+    my_xticks = comb
+    index = []
+    for i in range(25):
+        index.append(i)
+    plt.xticks(index, my_xticks,fontsize=5,rotation='vertical')
+    plt.title(r'Varying resolution. Polarization Y. wavelength $\lambda \approx 390 \mu m $, x-axis read as (height, width, source position)')
+    plt.ylabel('LEE (%)')
+    plt.plot(index,[x * 100 for x in ploty1],color='g',marker='.',ls='--',label='resolution 30')
+    plt.plot(index,[x * 100 for x in ploty2],color='b',marker='^',ls='-.',label='resolution 60')
+    plt.plot(index,[x * 100 for x in ploty3],color='m',marker='o',ls=':',label='resolution 120')
+    plt.legend(loc='best')
+    plt.show()
 if av_time:
     db1r=sys.argv[1]
     db1 = read("db/initial_results/{}.json".format(db1r))
-    time = db_to_array(db1,"result",'Elapsed time (min)')   
-    Total = 0
+    time = db_to_array(db1,"result",'Elapsed time (min)')
+    FF =  db_to_array(db1,"result",'flux_ratio') 
+    FF_ABOVE = []
+    FF_CURR = 0
+    FF_ABOVEWL=[]
+    FF_CURRWL=0
+    for i in range(len(FF)):
+        FF_CURR = FF[i][1]
+        FF_CURR = FF_CURR[3]
+        FF_ABOVE.append(FF_CURR)
+        for k in range(len(FF[i][1])):
+            FF_CURRWL=FF[i][1][k]
+            FF_ABOVEWL.append(FF_CURRWL)
+    Total_ff = 0
+    Total_ffWL = 0
+  #  print('len ',len(FF_ABOVEWL))
+  #  print(FF_ABOVE)
+  #  print(FF_ABOVEWL)
+    for n in range(len(FF_ABOVE)):
+        Total_ff += FF_ABOVE[n]
+    for k in range(len(FF_ABOVEWL)):
+        Total_ffWL += FF_ABOVEWL[k]
+   #     print(Total_ffWL,FF_ABOVEWL[k])
+    Total_Time = 0
     for n in range(len(time)):
-        Total += time[n]
-    
-    print('Total time:',Total, 'Average time:', Total/len(time)) 
+        Total_Time += time[n]
+    #print('len ff above, ff above wl',len(FF_ABOVE),len(FF_ABOVEWL),Total_ff,Total_ffWL)
+    print('Total time (min):',Total_Time, 'Average time (min):', Total_Time/len(time)) 
+    print('Average LEE 740 nm:',Total_ff/len(FF_ABOVE),'Average LEE over all wavlengths:',Total_ffWL/len(FF_ABOVEWL))
 if time_processing:
     db1 = read("db/initial_results/2convtime1.json")   
     db2 = read("db/initial_results/2convtime3.json")

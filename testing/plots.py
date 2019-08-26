@@ -195,90 +195,115 @@ plt.show()
 #1e:8,10,12,14,18
 #3e: 40,50,62,66,82
 #5e: 172,198,279,251,327
-h=[1,2,3,4,5,6,7,8]
+h=[1,2,3,4,5]
 #k=0 OLD ONES
-#ff1e= [0.058163, 0.104982, 0.101295, 0.059538, 0.106018]
-#ff3e= [0.073477, 0.089777, 0.106469, 0.104877, 0.105709]
-#ff5e= [0.064533, 0.091159, 0.107745, 0.108996, 0.106176304]
-ff1e= [0.02137188, 0.000103422, 0.000151929, 0.002378566, 0.033845666, 0.008802663, 0.005158022, 0.018947004]
-ff3e= [0.04691264, 0.001203261, 0.000497963, 0.000204898, 0.033845666, 0.046520769, 0.025727793, 0.049638922]
-ff5e= [0.04691264, 0.059247406, 0.000497963, 0.000204898, 0.000253441, 0.046520769, 0.079518517, 0.049638922]
+ff1e= [0.058163, 0.104982, 0.101295, 0.059538, 0.106018]
+ff3e= [0.073477, 0.089777, 0.106469, 0.104877, 0.105709]
+ff5e= [0.064533, 0.091159, 0.107745, 0.108996, 0.106176304]
+#NEVER CORRECTS ONES BELOW OUTCOMMENTED, SHOWS THAT RESULTS HAVENT CONVERGED IN TIME
+#ff1e= [0.02137188, 0.000103422, 0.000151929, 0.002378566, 0.033845666, 0.008802663, 0.005158022, 0.018947004]
+#ff3e= [0.04691264, 0.001203261, 0.000497963, 0.000204898, 0.033845666, 0.046520769, 0.025727793, 0.049638922]
+#ff5e= [0.04691264, 0.059247406, 0.000497963, 0.000204898, 0.000253441, 0.046520769, 0.079518517, 0.049638922]
+ff1e[:] = [x * 100 for x in ff1e]
+ff3e[:] = [x * 100 for x in ff3e]
+ff5e[:] = [x * 100 for x in ff5e]
 plt.plot(h,ff1e,color='y',marker='.',ls='--',label='Probe sensitivity 1e-1')
 plt.plot(h,ff3e,color='k',marker='^',ls='-.',label='Probe sensitivity 1e-3')
 plt.plot(h,ff5e,color='c',marker='o',ls=':',label='Probe sensitivity 1e-5')
 plt.legend(loc='best')
-plt.title(r'$\lambda \approx 700$, source position=0.2')
+plt.title(r'$\lambda \approx 700$, pyramid width=1, source position=0.2, Polarization Y')
 plt.xlabel('Pyramid width')
-plt.ylabel('Flux ratio')
+plt.ylabel('LEE (%)')
+plt.savefig('convtime700.pdf') 
 plt.show()
 #k=1
-#ff1e= [0.049918, 0.083539, 0.102278, 0.109035, 0.119667]
-#ff3e= [0.050036, 0.083464, 0.102764, 0.10921, 0.119795]
-#ff5e= [0.050029, 0.083437, 0.102766, 0.109219, 0.119795968]
-ff1e= [0.07416225, 0.208664777, 0.18257614, 0.181509061, 0.196683345, 0.190870574, 0.41676869, 0.532988878]
-ff3e= [0.074157953, 0.098179511, 0.084058733, 0.134025995, 0.196683345, 0.187593356, 0.134565832, 0.129501948]
-ff5e= [0.074157953, 0.090472877, 0.084058733, 0.134025995, 0.183556356, 0.187593356, 0.134364168, 0.129501948]
+ff1e= [0.049918, 0.083539, 0.102278, 0.109035, 0.119667]
+ff3e= [0.050036, 0.083464, 0.102764, 0.10921, 0.119795]
+ff5e= [0.050029, 0.083437, 0.102766, 0.109219, 0.119795968]
+#ff1e= [0.07416225, 0.208664777, 0.18257614, 0.181509061, 0.196683345, 0.190870574, 0.41676869, 0.532988878]
+#ff3e= [0.074157953, 0.098179511, 0.084058733, 0.134025995, 0.196683345, 0.187593356, 0.134565832, 0.129501948]
+#ff5e= [0.074157953, 0.090472877, 0.084058733, 0.134025995, 0.183556356, 0.187593356, 0.134364168, 0.129501948]
+ff1e[:] = [x * 100 for x in ff1e]
+ff3e[:] = [x * 100 for x in ff3e]
+ff5e[:] = [x * 100 for x in ff5e]
 plt.plot(h,ff1e,color='y',marker='.',ls='--',label='Probe sensitivity 1e-1')
 plt.plot(h,ff3e,color='k',marker='^',ls='-.',label='Probe sensitivity 1e-3')
 plt.plot(h,ff5e,color='c',marker='o',ls=':',label='Probe sensitivity 1e-5')
 plt.legend(loc='best')
-plt.title(r'$\lambda \approx 500$, source position=0.2')
+plt.title(r'$\lambda \approx 500$, pyramid width=1, source position=0.2, Polarization Y')
 plt.xlabel('Pyramid width')
-plt.ylabel('Flux ratio')
+plt.ylabel('LEE (%)')
+plt.savefig('convtime500.pdf') 
 plt.show()
 #k=2
-#ff1e= [0.047181, 0.086435, 0.114375, 0.187308, 0.150384]
-#ff3e= [0.048941, 0.07694, 0.103934, 0.12796, 0.140555]
-#ff5e= [0.047511, 0.077334, 0.103717, 0.126637, 0.140422462]
-ff1e= [0.066228711, 0.001351743, 0.000769494, 0.007414897, 0.093136273, 0.03461264, 0.038136756, 0.153459475]
-ff3e= [0.061926882, 0.009460906, 0.001884746, 0.001659863, 0.093136273, 0.104701684, 0.072603565, 0.102389021]
-ff5e= [0.061926882, 0.083803753, 0.001884746, 0.001659863, 0.001799979, 0.104701684, 0.114912052, 0.102389021]
+ff1e= [0.047181, 0.086435, 0.114375, 0.187308, 0.150384]
+ff3e= [0.048941, 0.07694, 0.103934, 0.12796, 0.140555]
+ff5e= [0.047511, 0.077334, 0.103717, 0.126637, 0.140422462]
+#ff1e= [0.066228711, 0.001351743, 0.000769494, 0.007414897, 0.093136273, 0.03461264, 0.038136756, 0.153459475]
+#ff3e= [0.061926882, 0.009460906, 0.001884746, 0.001659863, 0.093136273, 0.104701684, 0.072603565, 0.102389021]
+#ff5e= [0.061926882, 0.083803753, 0.001884746, 0.001659863, 0.001799979, 0.104701684, 0.114912052, 0.102389021]
+ff1e[:] = [x * 100 for x in ff1e]
+ff3e[:] = [x * 100 for x in ff3e]
+ff5e[:] = [x * 100 for x in ff5e]
 plt.plot(h,ff1e,color='y',marker='.',ls='--',label='Probe sensitivity 1e-1')
 plt.plot(h,ff3e,color='k',marker='^',ls='-.',label='Probe sensitivity 1e-3')
 plt.plot(h,ff5e,color='c',marker='o',ls=':',label='Probe sensitivity 1e-5')
 plt.legend(loc='best')
-plt.title(r'$\lambda \approx 400$, source position=0.2')
+plt.title(r'$\lambda \approx 400$, pyramid width=1, source position=0.2, Polarization Y')
 plt.xlabel('Pyramid width')
-plt.ylabel('Flux ratio')
+plt.ylabel('LEE (%)')
+plt.savefig('convtime400.pdf') 
 plt.show()
 "###################DPML PLOTS######################"
 #vi vill jämföra lambda 690, 530, 430. Alltså k=2,4,6
 #k=2
 h=[1.0, 1.4444444444444444, 1.8888888888888888, 2.333333333333333, 2.7777777777777777, 3.2222222222222223, 3.6666666666666665, 4.111111111111111, 4.555555555555555, 5.0]
-ff1e= [0.0492, 0.0631, 0.0748, 0.0962, 0.1078, 0.0281, 0.1165, 0.2321, 0.2456, 0.0333]
-ff3e= [0.0492, 0.0631, 0.0748, 0.0962, 0.1078, 0.0281, 0.1165, 0.2321, 0.2456, 0.0333]
-ff5e= [0.0492, 0.0631, 0.0748, 0.0962, 0.1078, 0.0281, 0.1165, 0.2321, 0.2456, 0.0333]
-plt.plot(h,ff1e,color='indigo',marker='.',ls='--',label='PML depth 0.1')
-plt.plot(h,ff3e,color='navy',marker='^',ls='-.',label='PML depth 0.2')
-plt.plot(h,ff5e,color='hotpink',marker='o',ls=':',label='PML depth 0.4')
+ff1= [0.0492, 0.0631, 0.0748, 0.0962, 0.1078, 0.0281, 0.1165, 0.2321, 0.2456, 0.0333]
+ff3= [0.0492, 0.0631, 0.0748, 0.0962, 0.1078, 0.0281, 0.1165, 0.2321, 0.2456, 0.0333]
+ff5= [0.0492, 0.0631, 0.0748, 0.0962, 0.1078, 0.0281, 0.1165, 0.2321, 0.2456, 0.0333]
+ff1[:] = [x * 100 for x in ff1]
+ff3[:] = [x * 100 for x in ff3]
+ff5[:] = [x * 100 for x in ff5]
+plt.plot(h,ff1,color='indigo',marker='.',ls='--',label='PML depth 0.1')
+plt.plot(h,ff3,color='navy',marker='^',ls='-.',label='PML depth 0.2')
+plt.plot(h,ff5,color='hotpink',marker='o',ls=':',label='PML depth 0.4')
 plt.legend(loc='best')
-plt.title(r'$\lambda \approx 700$, pyramid width=1, source position=0.2')
+plt.title(r'$\lambda \approx 700$, pyramid width=1, source position=0.2, Polarization Y')
 plt.xlabel('Pyramid height')
-plt.ylabel('Flux ratio')
+plt.ylabel('LEE (%)')
+plt.savefig('convpml700.pdf') 
 plt.show()
 #k=4
 ffpml1= [0.0758, 0.0982, 0.1105, 0.1208, 0.1353, 0.2195, 0.1774, 0.3517, 0.4039, 0.3217]
 ffpml2= [0.0758, 0.0982, 0.1105, 0.1209, 0.1353, 0.2195, 0.1774, 0.3517, 0.4039, 0.3209]
 ffpml4= [0.0756, 0.0982, 0.1105, 0.1209, 0.1353, 0.2195, 0.1774, 0.3517, 0.4039, 0.3209]
-plt.plot(h,ff1e,color='indigo',marker='.',ls='--',label='PML depth 0.1')
-plt.plot(h,ff3e,color='navy',marker='^',ls='-.',label='PML depth 0.2')
-plt.plot(h,ff5e,color='hotpink',marker='o',ls=':',label='PML depth 0.4')
+ffpml1[:] = [x * 100 for x in ffpml1]
+ffpml2[:] = [x * 100 for x in ffpml2]
+ffpml4[:] = [x * 100 for x in ffpml4]
+plt.plot(h,ffpml1,color='indigo',marker='.',ls='--',label='PML depth 0.1')
+plt.plot(h,ffpml2,color='navy',marker='^',ls='-.',label='PML depth 0.2')
+plt.plot(h,ffpml4,color='hotpink',marker='o',ls=':',label='PML depth 0.4')
 plt.legend(loc='best')
-plt.title(r'$\lambda \approx 500$, pyramid width=1, source position=0.2')
+plt.title(r'$\lambda \approx 500$, pyramid width=1, source position=0.2, Polarization Y')
 plt.xlabel('Pyramid height')
-plt.ylabel('Flux ratio')
+plt.ylabel('LEE (%)')
+plt.savefig('convpml500.pdf') 
 plt.show()
 #k=6
 ffpml1= [0.0734, 0.089, 0.1225, 0.1785, 0.2006, 0.271, 0.2295, 0.3752, 0.3629, 0.2714]
 ffpml2= [0.0733, 0.0889, 0.1225, 0.1782, 0.2007, 0.271, 0.2293, 0.3752, 0.3629, 0.2716]
 ffpml4= [0.0733, 0.0889, 0.1225, 0.1782, 0.2006, 0.271, 0.2293, 0.3752, 0.3627, 0.2716]
-plt.plot(h,ff1e,color='indigo',marker='.',ls='--',label='PML depth 0.1')
-plt.plot(h,ff3e,color='navy',marker='^',ls='-.',label='PML depth 0.2')
-plt.plot(h,ff5e,color='hotpink',marker='o',ls=':',label='PML depth 0.4')
+ffpml1[:] = [x * 100 for x in ffpml1]
+ffpml2[:] = [x * 100 for x in ffpml2]
+ffpml4[:] = [x * 100 for x in ffpml4]
+plt.plot(h,ffpml1,color='indigo',marker='.',ls='--',label='PML depth 0.1')
+plt.plot(h,ffpml2,color='navy',marker='^',ls='-.',label='PML depth 0.2')
+plt.plot(h,ffpml4,color='hotpink',marker='o',ls=':',label='PML depth 0.4')
 plt.legend(loc='best')
-plt.title(r'$\lambda \approx 400$, pyramid width=1, source position=0.2')
+plt.title(r'$\lambda \approx 400$, pyramid width=1, source position=0.2, Polarization Y')
 plt.xlabel('Pyramid height')
-plt.ylabel('Flux ratio')
+plt.ylabel('LEE (%)')
+plt.savefig('convpml400.pdf') 
 plt.show()
 
 

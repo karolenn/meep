@@ -277,6 +277,9 @@ class Pyramid():
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
 				center=mp.Vector3(0,0,abs_source_position))]
+		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+				component=-1*mp.Ey,
+				center=mp.Vector3(0,0,abs_source_position)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				geometry=geometry,
@@ -452,6 +455,50 @@ class Pyramid():
 			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
 			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
 			print('freqs',mp.get_flux_freqs(flux_total))
+			if False:
+				fig = plt.figure()
+				ax = fig.gca(projection='3d')
+				Pr_Max=max(Pr_Array)
+				R = [n/Pr_Max  for n in Pr_Array]
+				print(R)
+	#			R=1
+				pts = len(Pr_Array)
+				theta,phi = np.linspace(0,np.pi,pts), np.linspace(0,2*np.pi,pts)
+				THETA,PHI = np.meshgrid(theta,phi)
+				#print(xPts)
+				# print(yPts)
+				# print(zPts)
+				X=np.zeros(pts**2)
+				Y=np.zeros(pts**2)
+				Z=np.zeros(pts**2)
+				print('pts',pts)
+				for n in range(pts):
+					xPts[n] = R[n]*xPts[n]
+					yPts[n] = R[n]*yPts[n]
+					zPts[n] = R[n]*zPts[n]
+				# #print(X)
+				# #print(Y)
+				# #print(Z)
+				# ax.set_zlim(-100,100)
+				# ax.set_ylim(-100,100)
+
+			#	ax.scatter(xPts,yPts,zPts)
+				u = np.linspace(0, 2 * np.pi, 100)
+				v = np.linspace(0, np.pi, 100)
+				r_ = np.asarray(R)
+				x = np.outer(np.cos(u), np.sin(v))
+				y = np.outer(np.sin(u), np.sin(v))
+				z = R*np.outer(np.ones(np.size(u)), np.cos(v))
+				print('lenx',len(x),'leny',len(y),'lenz',len(z))
+			#	r = np.sqrt(xPts**2+yPts**2+zPts**2)
+			#	plot(r)
+				ax.plot_surface(x,y,z,cmap='plasma')
+				ax.quiver(0,0,0,0,0,1,length=1.2,color='brown',normalize='true')
+				ax.text(0,0,1.3, '$\mathcal{P}$',size=20, zdir=None)
+				ax.set_zlim(-1,1)
+				ax.axis('off')
+			#	ax.plot_trisurf(list(x),list(y),list(z),cmap='plasma')
+				plt.show()
 			for n in range(len(flux_tot_out)):
 				flux_tot_out[n]=round(flux_tot_out[n],9)
 				P_tot_ff[n]=round(P_tot_ff[n],9)
