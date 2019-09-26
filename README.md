@@ -7,7 +7,7 @@ search a given variable space and attempts to find the pyramid design in the var
 
 
 TODO: 
--Round of values down to 1/resolution to remove ambiguity when meep \\
--Process simulation results using e.g pandas. Using nested lists is pain when list depth is varying \\
+-Round of values down to 1/resolution to remove ambiguity when meep \
+-Process simulation results using e.g pandas. Using nested lists is pain when list depth is varying \
 -Implement calculations for purcell effect
 
