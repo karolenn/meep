@@ -19,6 +19,7 @@ import time
 
 ###FUNCTIONS##########################################################
 ###Create points using the fibbonacci sphere algorithm
+###empty array xPts is passed to the function for some obscure reason I cant remember
 def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):
 	range_npts=int((theta/math.pi)*npts)
 	increment = math.pi*(3 - math.sqrt(5))
@@ -84,6 +85,7 @@ def dist_to_other_pt(x,y,z,X,Y,Z):
 	return distance
 
 
+###Calculate duplicates in a list of tuples. 
 def count(listOfTuple): 
       
     flag = False
@@ -108,9 +110,9 @@ def count(listOfTuple):
             if(coll_cnt > 1):  
                 print(t, "-", coll_cnt) 
             coll_list.append(t) 
-                       
+             
     if flag == False: 
-        print("No Duplicates") 
+        return "No Duplicates"
 
 def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, already_selected):
 	#check if we already have some data points from simulations
@@ -127,8 +129,8 @@ def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, alr
 	t = time.time()
 	while time.time() - t < max_time:
 		if len(choice) >= satisfied:
-			print('selected',selected)
-			print('choice',choice)
+			print('selected point in generate_rand_pt',selected)
+			print('choice point in generate_rand_pt',choice)
 			break
 		x, y, z = get_next(limit_x, limit_y, limit_z)
 		if valid(x,y,z, selected, radius):
@@ -162,34 +164,33 @@ def Exploration_point_selector(data,num_dim):
 
 #Choose next sim point by the radial random chooser
 def Radial_random_chooser(data,num_dim):
-	radius=0.5 #radius for the chooser
-	max_time = 10 #max time to run in seconds, else returns ....?? else shrink radius?
-	if False:
-		minx=min(data[0])
-		maxx=max(data[0])
-		miny=min(data[1])
-		maxy=max(data[1])
-		minz=min(data[2])
-		maxz=max(data[2])
-		template = read("db/tmp/tmp.json")
-		limit_x = {"from": minx, "to":maxx }
-		limit_y = {"from": miny, "to":maxy }
-		limit_z = {"from": minz, "to": maxz }
-		exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius, 1, max_time, data)
-		#if fail to find point, shrink radius to half
-		while exploration_pt == []:
-			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius*0.5, 1, max_time, data)
-		return exploration_pt
-	if True:
-		Choose = 'NOT shrinker'
-		if Choose == 'shrinker':
-			exploration_pt=rand_pt_shrink(data)
-		else:
-			exploration_pt=rand_pt_minmax(data)
+#	radius=0.5 #radius for the chooser
+#	max_time = 10 #max time to run in seconds, else returns ....?? else shrink radius?
+#	if False:
+#		minx=min(data[0])
+#		maxx=max(data[0])
+#		miny=min(data[1])
+#		maxy=max(data[1])
+#		minz=min(data[2])
+#		maxz=max(data[2])
+#		template = read("db/tmp/tmp.json")
+#		limit_x = {"from": minx, "to":maxx }
+#		limit_y = {"from": miny, "to":maxy }
+#		limit_z = {"from": minz, "to": maxz }
+#		exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius, 1, max_time, data)
+#		#if fail to find point, shrink radius to half
+#		while exploration_pt == []:
+#			exploration_pt = generate_rand_pt(limit_x, limit_y, limit_z, radius*0.5, 1, max_time, data)
+#		return exploration_pt
+###Two methods to choose next random point in variable space. Minmax or "shrink method"###
+	Choice = 'NOT shrinker'
+	if Choice == 'shrinker':
+		exploration_pt=rand_pt_shrink(data)
+	else:
+		exploration_pt=rand_pt_minmax(data)
 
 	return exploration_pt
 
-#shrink radius is point is not found
 def rand_pt_shrink(data):
 	minx=min(data[0]) #min pyramid width
 	maxx=max(data[0]) #max pyramid width
@@ -340,6 +341,8 @@ def utility_function(data,results,ff_calc):
 	elif num_dim == 2:
 		merge=list(zip(data[0],data[1]))
 		count(merge)
+		if count(merge) != 'No Duplicates':
+			raise ValueError ('Duplicate simulation results in database. RBF can can not handle duplicate data points')
 		print('data',data)
 		print('results',results)
 		#need to pick out above/under & certain frequency for result
@@ -376,6 +379,7 @@ def utility_function(data,results,ff_calc):
 		X,Y=np.meshgrid(x,y)
 		z = RBF_Func(X,Y)
 		if False:
+			# FOR TESTING PURPOSES
 			fig = plt.figure()
 			ax = plt.axes(projection='3d')
 			ax.text(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),'EXPLORE POINT',fontsize=12)
@@ -442,6 +446,7 @@ def utility_function(data,results,ff_calc):
 		X,Y,Z=np.meshgrid(x,y,z)
 		z = RBF_Func(X,Y,X)
 		if False:
+			# FOR TESTING PURPOSES
 			fig = plt.figure()
 			ax = plt.axes(projection='3d')
 			ax.text(explore_pt[0],explore_pt[1],-1*RBF_TO_OPT(explore_pt),'EXPLORE POINT',fontsize=12)
