@@ -1,80 +1,23 @@
-from utils.api import *
+from functionality.api import *
 import copy
 from numpy import linspace
 import time
 from random import uniform 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from utils.functions import get_next
-from utils.functions import valid
+from functionality.spec_generator_functions import *
 from math import tan, pi
 
 ###spec_generator creates a .json file in db/sim_spec that is a template for initial_runs & main.py to run.
-#We now have 3 ways to create different pyramids to be simulated. 'eq dist', 'eq dist with fixed angle between base and top' and 'rand' way
 
-def generate_eq_dist(x, y, z):
-    tests = []
-    for itx in linspace(x["from"], x["to"], x["steps"]):
-        for ity in linspace(y["from"], y["to"], y["steps"]):
-            for itz in linspace(z["from"], z["to"], z["steps"]):
-                tests.append((itx,ity,itz))
-    if True:
-        ty = (y["to"]-y["from"])/2+y["from"]
-        tx = (x["to"]-x["from"])/2+x["from"]
-        tz = (z["to"]-z["from"])/2+z["from"]
-        tests.append((tx,ty,tz))
-    return tests
-
-def generate_eq_dist_fixed_angle(y, z):
-    tests = []
-    pyr_height = tan((pi*62)/180)/2
-  #  for itx in linspace(x["from"], x["to"], x["steps"]):
-    for ity in linspace(y["from"], y["to"], y["steps"]):
-        itx = ity*pyr_height
-        for itz in linspace(z["from"], z["to"], z["steps"]):
-            tests.append((itx,ity,itz))
-    if True: #Generate center point for RBF as well
-        ty = (y["to"]-y["from"])/2+y["from"]
-        tx = ty*pyr_height
-        tz = (z["to"]-z["from"])/2+z["from"]
-        tests.append((tx,ty,tz))
-    return tests
-
-def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 3):
-	#check if we already have some data points from simulations
-	selected=[]
-	for _ , x in limit_x.items():
-		for _ , y in limit_y.items():
-			for _ , z in limit_z.items():
-				if (x,y,z) not in selected:
-					selected.append((x,y,z))
-
-	t = time.time()
-
-	while time.time() - t < max_time:
-		if len(selected) >= satisfied:
-		#	print('selected',selected)
-			break
-		x, y, z = get_next(limit_x, limit_y, limit_z)
-		if valid(x,y,z, selected, radius):
-			selected.append((round(x,2), round(y,2), round(z,2)))
-	return selected
+###Name of the sim_spec.json file
+sim_spec_filename = 'refactor'
 
 
-def points_to_json(points, template):
-    tests = []
-    for x,y,z in points:
-        tmp = copy.deepcopy(template)
-        tmp["pyramid"]["pyramid_height"] = x
-        tmp["pyramid"]["pyramid_width"] = y
-        tmp["pyramid"]["source_position"] = z
-        tests.append(tmp)
-    return tests
-
-
-#x corresponds to pyramid height, y to pyramid width, z to source position for all three functions below
+###We now have 3 ways to create different pyramids to be simulated. 'eq dist', 'eq dist with fixed angle between base and top' and 'rand' way
+###x corresponds to pyramid height, y to pyramid width, z to source position for all three functions below
 #
-def test(template):
+def equaldistance(template,sim_spec_filename):
     x = {"from": 0.6, "to":1 ,"steps": 2}
     y = {"from": 0.6, "to":1 ,"steps": 2}
     z = {"from": 0.01, "to": 0.9 ,"steps": 2}
@@ -83,46 +26,57 @@ def test(template):
     
     x,y,z = zip(*result)
     ax = plt.axes(projection='3d')
+    plt.title('Pyramids to be simulated')
+    ax.set_xlabel("pyramid height")
+    ax.set_ylabel("pyramid width")
+    ax.set_zlabel("source position")
     ax.scatter(x,y,z)
     plt.show()
-    write("db/sim_spec/test3d2.json", tests)
-    #print(tests)
+    write("db/sim_spec/{}.json".format(sim_spec_filename), tests)
 
-def fixedangle(template):
+###Generate equally distance points with fixed base-tip angle relationship. Center point in search space is included.
+def fixedangle(template,sim_spec_filename):
     y = {"from": 0.5, "to":0.8, "steps": 2} #pyramid width
     z = {"from": 0.1, "to": 0.4, "steps": 2} #source position
-   # pyr_height = tan((pi*62)/180)/2
-   # x = {"from": y["from"]*pyr_height,"to": y["to"]*pyr_height, "steps": y["steps"]}
     result =  generate_eq_dist_fixed_angle(y,z) 
     tests = points_to_json(result, template)
     
     x,y,z = zip(*result)
     fig = plt.figure()
     ax = plt.axes(projection='3d')
-    ax.set_xlabel("pyramid height")
-    ax.set_ylabel("pyramid width")
+    plt.title('Pyramids to be simulated')
+    ax.set_xlabel("pyramid width")
+    ax.set_ylabel("pyramid source position")
     ax.scatter(y,z)
     plt.show()
-    write("db/sim_spec/fybest.json", tests)
+    write("../db/sim_spec/{}.json".format(sim_spec_filename), tests)
 
-def testRand(template):
+
+###Generate randomly sampled initial points
+def minmaxrand(template,sim_spec_filename):
     
-    x = {"from": 0.8, "to":0.8 }
+    x = {"from": 0.4, "to":0.8 }
     y = {"from": 0.4, "to":0.8 }
     z = {"from": 0.1, "to": 0.6 }
-    result = generate_rand_dist(x, y, z, 0.5, 4)
+    result = generate_rand_dist(x, y, z, 0.5, 16)
     x,y,z = zip(*result)
 
     tests = points_to_json(result, template)
 
-    #ax = plt.axes(projection='3d')
-    #ax.scatter(x,y,z)
-    #plt.show()
-    write("db/sim_spec/laptop.json", tests)
-    #print(tests)
+    ax = plt.axes(projection='3d')
+    plt.title('Pyramids to be simulated')
+    ax.set_xlabel("pyramid height")
+    ax.set_ylabel("pyramid width")
+    ax.set_zlabel("source position")
+    ax.scatter(x,y,z)
+    plt.show()
+    write("db/sim_spec/{}.json".format(sim_spec_filename), tests)
 
 
+###This is where you choose how to sample your initial runs using one of the three functions above, i.e equaldistance OR fixedangle OR minmaxrand
 if __name__ == "__main__":
+
+
     template={
         "simulate": {
             "resolution": 40,
@@ -152,5 +106,17 @@ if __name__ == "__main__":
             "cutoff": 4
         },
         "result": {}
-    }  
-    test(template)
+    }
+
+    minmaxrand(template,sim_spec_filename)
+
+
+##This is the template file for generating a new simulation specification db. 
+
+
+
+
+
+
+
+

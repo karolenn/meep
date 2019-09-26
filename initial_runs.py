@@ -1,7 +1,11 @@
-from utils.api import *
-from src.execute_simulation import execute_simulation
+from functionality.api import read
+from execute.execute_simulation import execute_simulation
 
-def initial_runs(sim_name):
+###This script reads a sim specification file and simulates each structure in the given db 
+###To run, type python initial_runs db n where db is the sim_spec file to run and n is the number of cores that MPIRUN use
+
+
+def initial_runs(sim_name,cores):
 
     db = read("db/sim_spec/{}.json".format(sim_name))
     if db == None:
@@ -9,13 +13,15 @@ def initial_runs(sim_name):
         exit(0)
 
     for config in db:
-        execute_simulation(config, sim_name)
+        execute_simulation(config, sim_name, cores)
 
 
 if __name__ == "__main__":
     import sys
-    if (len(sys.argv)) == 2:
-        initial_runs(sys.argv[1])
+    if len(sys.argv) == 3 :
+        print(sys.argv)
+        print([arg.strip() for arg in sys.argv[1:]])
+        initial_runs(sys.argv[1],sys.argv[2])
     else:
-        print("Not enough arguments")
+        print("Specify database to run and the number of CPU cores to use")
         exit(0)

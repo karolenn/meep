@@ -1,1 +1,382 @@
-[{"simulate": {"resolution": 60, "use_fixed_time": true, "simulation_time": 60, "dpml": 0.1, "padding": 0.025, "ff_pts": 800, "ff_calc": "Both", "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/10"}, "pyramid": {"source_position": 0.4833801870717577, "pyramid_height": 7.411354074123603, "pyramid_width": 7.881373725188492, "truncation": 0, "source_direction": "mp.Ey", "frequency_center": 2, "frequency_width": 1.2, "number_of_freqs": 6, "cutoff": 4}, "result": {"total_flux": [4.6071e-05, 0.042259985, 1.750365337, 3.052538194, 0.197112857, 0.000472312], "ff_at_angle": [[1.4207513119368537e-06, 0.0014690865478820092, 0.060949701460243935, 0.1077499253884679, 0.006493884862445891, 1.5295074655437795e-05], [2.0015246547044588e-05, 0.01865259058804948, 0.7558980531400095, 1.4259863007963298, 0.095808010981109, 0.00022412175626566913]], "flux_ratio": [[0.0308383, 0.034763064, 0.034821131, 0.035298469, 0.032945009, 0.032383413], [0.434443501, 0.441377123, 0.43185159, 0.467147734, 0.48605663, 0.474520563]], "Elapsed time (min)": 155.8}}, {"simulate": {"resolution": 60, "use_fixed_time": true, "simulation_time": 60, "dpml": 0.1, "padding": 0.025, "ff_pts": 800, "ff_calc": "Both", "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/10"}, "pyramid": {"source_position": 0.01, "pyramid_height": 7.522905861385328, "pyramid_width": 8, "truncation": 0, "source_direction": "mp.Ey", "frequency_center": 2, "frequency_width": 1.2, "number_of_freqs": 6, "cutoff": 4}, "result": {"total_flux": [4.836e-06, 0.006791844, 0.362539063, 0.758500071, 0.062541392, 0.000202127], "ff_at_angle": [[3.7255078307600656e-07, 0.0004620829135594835, 0.021791068322552974, 0.04021609766259247, 0.0029858411662745986, 9.05884028801202e-06], [2.549409532940471e-06, 0.0039631823133650206, 0.2289728490731451, 0.5116623003574335, 0.04421291217725399, 0.00014794648531257475]], "flux_ratio": [[0.077036969, 0.068034972, 0.060106815, 0.053020559, 0.047741841, 0.044817567], [0.527173187, 0.58352081, 0.63158118, 0.674571196, 0.706938409, 0.731948158]], "Elapsed time (min)": 164.2}}, {"simulate": {"resolution": 60, "use_fixed_time": true, "simulation_time": 60, "dpml": 0.1, "padding": 0.025, "ff_pts": 800, "ff_calc": "Both", "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/10"}, "pyramid": {"source_position": 0.01, "pyramid_height": 7.522905861385328, "pyramid_width": 8, "truncation": 0, "source_direction": "mp.Ey", "frequency_center": 2, "frequency_width": 1.2, "number_of_freqs": 6, "cutoff": 4}, "result": {"total_flux": [4.836e-06, 0.006791844, 0.362539063, 0.758500071, 0.062541392, 0.000202127], "ff_at_angle": [[3.7255078307600656e-07, 0.0004620829135594835, 0.021791068322552974, 0.04021609766259247, 0.0029858411662745986, 9.05884028801202e-06], [2.549409532940471e-06, 0.0039631823133650206, 0.2289728490731451, 0.5116623003574335, 0.04421291217725399, 0.00014794648531257475]], "flux_ratio": [[0.077036969, 0.068034972, 0.060106815, 0.053020559, 0.047741841, 0.044817567], [0.527173187, 0.58352081, 0.63158118, 0.674571196, 0.706938409, 0.731948158]], "Elapsed time (min)": 164.2}}, {"simulate": {"resolution": 60, "use_fixed_time": true, "simulation_time": 60, "dpml": 0.1, "padding": 0.025, "ff_pts": 800, "ff_calc": "Both", "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/10"}, "pyramid": {"source_position": 0.04994822399783752, "pyramid_height": 3.705347910519, "pyramid_width": 3.9403368632208746, "truncation": 0, "source_direction": "mp.Ey", "frequency_center": 2, "frequency_width": 1.2, "number_of_freqs": 6, "cutoff": 4}, "result": {"total_flux": [2.6513e-05, 0.029605009, 1.15057856, 1.943123095, 0.163959569, 0.000576828], "ff_at_angle": [[1.2108206823511678e-06, 0.0016133396817884667, 0.07986646193599935, 0.15295621113002236, 0.011889134564324852, 3.5678577514788195e-05], [1.823220138956256e-05, 0.018801306917865628, 0.6256897199400521, 0.9833038695244614, 0.09599149694579817, 0.00039781573230876255]], "flux_ratio": [[0.045668943, 0.054495497, 0.069414175, 0.078716686, 0.0725126, 0.061853061], [0.687670252, 0.635071819, 0.543804432, 0.506043015, 0.585458339, 0.689660925]], "Elapsed time (min)": 28.2}}, {"simulate": {"resolution": 60, "use_fixed_time": true, "simulation_time": 60, "dpml": 0.1, "padding": 0.025, "ff_pts": 800, "ff_calc": "Both", "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/10"}, "pyramid": {"source_position": 0.01, "pyramid_height": 6.58944266525757, "pyramid_width": 7.0073376290200065, "truncation": 0, "source_direction": "mp.Ey", "frequency_center": 2, "frequency_width": 1.2, "number_of_freqs": 6, "cutoff": 4}, "result": {"total_flux": [4.085e-06, 0.005525277, 0.287512437, 0.590681704, 0.048258869, 0.000155597], "ff_at_angle": [[3.371573809966783e-07, 0.00041191439969528944, 0.019388426445768336, 0.03552949534567252, 0.002598359297096435, 7.701487625407209e-06], [2.010397423162707e-06, 0.0030034991263258658, 0.16973987880324093, 0.3745765741953059, 0.03251340876368181, 0.00011010080005267463]], "flux_ratio": [[0.082535467, 0.074550905, 0.067435088, 0.060149985, 0.053842109, 0.049496376], [0.492141352, 0.543592498, 0.590374039, 0.634142841, 0.673729191, 0.707602332]], "Elapsed time (min)": 112.4}}, {"simulate": {"resolution": 60, "use_fixed_time": true, "simulation_time": 60, "dpml": 0.1, "padding": 0.025, "ff_pts": 800, "ff_calc": "Both", "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/10"}, "pyramid": {"source_position": 0.2579347233720336, "pyramid_height": 7.454983143507, "pyramid_width": 7.9277697005608125, "truncation": 0, "source_direction": "mp.Ey", "frequency_center": 2, "frequency_width": 1.2, "number_of_freqs": 6, "cutoff": 4}, "result": {"total_flux": [4.179e-05, 0.04902953, 1.92481493, 2.757081599, 0.184130562, 0.000536921], "ff_at_angle": [[1.9116919009582887e-06, 0.0020971006736835713, 0.07811097419420922, 0.13222704999570145, 0.00750079425479007, 1.711325262519737e-05], [2.3913036734476456e-05, 0.028354603553824104, 1.146562687597373, 1.6207269511348121, 0.11265466899363731, 0.0003513981794081395]], "flux_ratio": [[0.0457452, 0.042772196, 0.040581031, 0.047959063, 0.040736281, 0.031872943], [0.572219113, 0.578316854, 0.595674249, 0.587841489, 0.611819503, 0.654469055]], "Elapsed time (min)": 157.4}}]
+[
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.4833801870717577,
+            "pyramid_height": 7.411354074123603,
+            "pyramid_width": 7.881373725188492,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {
+            "total_flux": [
+                4.6071e-05,
+                0.042259985,
+                1.750365337,
+                3.052538194,
+                0.197112857,
+                0.000472312
+            ],
+            "ff_at_angle": [
+                [
+                    1.4207513119368537e-06,
+                    0.0014690865478820092,
+                    0.060949701460243935,
+                    0.1077499253884679,
+                    0.006493884862445891,
+                    1.5295074655437795e-05
+                ],
+                [
+                    2.0015246547044588e-05,
+                    0.01865259058804948,
+                    0.7558980531400095,
+                    1.4259863007963298,
+                    0.095808010981109,
+                    0.00022412175626566913
+                ]
+            ],
+            "flux_ratio": [
+                [
+                    0.0308383,
+                    0.034763064,
+                    0.034821131,
+                    0.035298469,
+                    0.032945009,
+                    0.032383413
+                ],
+                [
+                    0.434443501,
+                    0.441377123,
+                    0.43185159,
+                    0.467147734,
+                    0.48605663,
+                    0.474520563
+                ]
+            ],
+            "Elapsed time (min)": 155.8
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.01,
+            "pyramid_height": 7.522905861385328,
+            "pyramid_width": 8,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {
+            "total_flux": [
+                4.836e-06,
+                0.006791844,
+                0.362539063,
+                0.758500071,
+                0.062541392,
+                0.000202127
+            ],
+            "ff_at_angle": [
+                [
+                    3.7255078307600656e-07,
+                    0.0004620829135594835,
+                    0.021791068322552974,
+                    0.04021609766259247,
+                    0.0029858411662745986,
+                    9.05884028801202e-06
+                ],
+                [
+                    2.549409532940471e-06,
+                    0.0039631823133650206,
+                    0.2289728490731451,
+                    0.5116623003574335,
+                    0.04421291217725399,
+                    0.00014794648531257475
+                ]
+            ],
+            "flux_ratio": [
+                [
+                    0.077036969,
+                    0.068034972,
+                    0.060106815,
+                    0.053020559,
+                    0.047741841,
+                    0.044817567
+                ],
+                [
+                    0.527173187,
+                    0.58352081,
+                    0.63158118,
+                    0.674571196,
+                    0.706938409,
+                    0.731948158
+                ]
+            ],
+            "Elapsed time (min)": 164.2
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.04994822399783752,
+            "pyramid_height": 3.705347910519,
+            "pyramid_width": 3.9403368632208746,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {
+            "total_flux": [
+                2.6513e-05,
+                0.029605009,
+                1.15057856,
+                1.943123095,
+                0.163959569,
+                0.000576828
+            ],
+            "ff_at_angle": [
+                [
+                    1.2108206823511678e-06,
+                    0.0016133396817884667,
+                    0.07986646193599935,
+                    0.15295621113002236,
+                    0.011889134564324852,
+                    3.5678577514788195e-05
+                ],
+                [
+                    1.823220138956256e-05,
+                    0.018801306917865628,
+                    0.6256897199400521,
+                    0.9833038695244614,
+                    0.09599149694579817,
+                    0.00039781573230876255
+                ]
+            ],
+            "flux_ratio": [
+                [
+                    0.045668943,
+                    0.054495497,
+                    0.069414175,
+                    0.078716686,
+                    0.0725126,
+                    0.061853061
+                ],
+                [
+                    0.687670252,
+                    0.635071819,
+                    0.543804432,
+                    0.506043015,
+                    0.585458339,
+                    0.689660925
+                ]
+            ],
+            "Elapsed time (min)": 28.2
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.01,
+            "pyramid_height": 6.58944266525757,
+            "pyramid_width": 7.0073376290200065,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {
+            "total_flux": [
+                4.085e-06,
+                0.005525277,
+                0.287512437,
+                0.590681704,
+                0.048258869,
+                0.000155597
+            ],
+            "ff_at_angle": [
+                [
+                    3.371573809966783e-07,
+                    0.00041191439969528944,
+                    0.019388426445768336,
+                    0.03552949534567252,
+                    0.002598359297096435,
+                    7.701487625407209e-06
+                ],
+                [
+                    2.010397423162707e-06,
+                    0.0030034991263258658,
+                    0.16973987880324093,
+                    0.3745765741953059,
+                    0.03251340876368181,
+                    0.00011010080005267463
+                ]
+            ],
+            "flux_ratio": [
+                [
+                    0.082535467,
+                    0.074550905,
+                    0.067435088,
+                    0.060149985,
+                    0.053842109,
+                    0.049496376
+                ],
+                [
+                    0.492141352,
+                    0.543592498,
+                    0.590374039,
+                    0.634142841,
+                    0.673729191,
+                    0.707602332
+                ]
+            ],
+            "Elapsed time (min)": 112.4
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": true,
+            "simulation_time": 60,
+            "dpml": 0.1,
+            "padding": 0.025,
+            "ff_pts": 800,
+            "ff_calc": "Both",
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/10"
+        },
+        "pyramid": {
+            "source_position": 0.2579347233720336,
+            "pyramid_height": 7.454983143507,
+            "pyramid_width": 7.9277697005608125,
+            "truncation": 0,
+            "source_direction": "mp.Ey",
+            "frequency_center": 2,
+            "frequency_width": 1.2,
+            "number_of_freqs": 6,
+            "cutoff": 4
+        },
+        "result": {
+            "total_flux": [
+                4.179e-05,
+                0.04902953,
+                1.92481493,
+                2.757081599,
+                0.184130562,
+                0.000536921
+            ],
+            "ff_at_angle": [
+                [
+                    1.9116919009582887e-06,
+                    0.0020971006736835713,
+                    0.07811097419420922,
+                    0.13222704999570145,
+                    0.00750079425479007,
+                    1.711325262519737e-05
+                ],
+                [
+                    2.3913036734476456e-05,
+                    0.028354603553824104,
+                    1.146562687597373,
+                    1.6207269511348121,
+                    0.11265466899363731,
+                    0.0003513981794081395
+                ]
+            ],
+            "flux_ratio": [
+                [
+                    0.0457452,
+                    0.042772196,
+                    0.040581031,
+                    0.047959063,
+                    0.040736281,
+                    0.031872943
+                ],
+                [
+                    0.572219113,
+                    0.578316854,
+                    0.595674249,
+                    0.587841489,
+                    0.611819503,
+                    0.654469055
+                ]
+            ],
+            "Elapsed time (min)": 157.4
+        }
+    }
+]

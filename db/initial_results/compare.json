@@ -1,0 +1,78 @@
+[
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": false,
+            "simulation_time": 30,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 3200,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "10/5",
+            "substrate_ratio": "1/2"
+        },
+        "pyramid": {
+            "source_position": 0.1,
+            "pyramid_height": 0.4,
+            "pyramid_width": 0.92376,
+            "source_direction": "mp.Ey",
+            "frequency_center": 3,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                47.84037235656071
+            ],
+            "ff_at_angle": [
+                0.8002234123630141
+            ],
+            "flux_ratio": [
+                0.01672694782554872
+            ]
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 60,
+            "use_fixed_time": false,
+            "simulation_time": 30,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 3200,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "10/5",
+            "substrate_ratio": "1/2"
+        },
+        "pyramid": {
+            "source_position": 0.1,
+            "pyramid_height": 0.6,
+            "pyramid_width": 0.92376,
+            "source_direction": "mp.Ey",
+            "frequency_center": 3,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                34.44625325931982
+            ],
+            "ff_at_angle": [
+                1.1142154013453163
+            ],
+            "flux_ratio": [
+                0.03234649042835603
+            ]
+        }
+    }
+]

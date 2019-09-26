@@ -1,1 +1,412 @@
-[{"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.01, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [20.1491], "ff_at_angle": [0.102], "flux_ratio": [0.0051], "Elapsed time (min)": 45.3}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.05333333333333334, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [9.5784], "ff_at_angle": [0.0345], "flux_ratio": [0.0036], "Elapsed time (min)": 54.1}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.09666666666666666, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [8.4883], "ff_at_angle": [0.026], "flux_ratio": [0.0031], "Elapsed time (min)": 57.9}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.14, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [9.0268], "ff_at_angle": [0.0322], "flux_ratio": [0.0036], "Elapsed time (min)": 58.9}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.18333333333333335, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [10.2985], "ff_at_angle": [0.0539], "flux_ratio": [0.0052], "Elapsed time (min)": 69.7}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.22666666666666668, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [12.9976], "ff_at_angle": [0.0956], "flux_ratio": [0.0074], "Elapsed time (min)": 72.4}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.27, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [19.0063], "ff_at_angle": [0.1573], "flux_ratio": [0.0083], "Elapsed time (min)": 59.8}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.31333333333333335, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [25.8575], "ff_at_angle": [0.2243], "flux_ratio": [0.0087], "Elapsed time (min)": 59.0}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.3566666666666667, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [24.9561], "ff_at_angle": [0.2643], "flux_ratio": [0.0106], "Elapsed time (min)": 58.2}}, {"simulate": {"resolution": 240, "use_fixed_time": false, "simulation_time": 10, "dpml": 0.1, "padding": 0.1, "ff_pts": 1600, "ff_below": false, "ff_cover": false, "use_symmetries": true, "calculate_flux": true, "ff_calculations": true, "ff_angle": 6, "simulation_ratio": "6/5", "substrate_ratio": "1/20"}, "pyramid": {"source_position": 0.4, "pyramid_height": 1.0, "pyramid_width": 1.0, "truncation": 0, "source_direction": "mp.Ez", "frequency_center": 2, "frequency_width": 0.5, "number_of_freqs": 1, "cutoff": 2}, "result": {"total_flux": [16.4974], "ff_at_angle": [0.2701], "flux_ratio": [0.0164], "Elapsed time (min)": 66.9}}]
+[
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.01,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                20.1491
+            ],
+            "ff_at_angle": [
+                0.102
+            ],
+            "flux_ratio": [
+                0.0051
+            ],
+            "Elapsed time (min)": 45.3
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.05333333333333334,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                9.5784
+            ],
+            "ff_at_angle": [
+                0.0345
+            ],
+            "flux_ratio": [
+                0.0036
+            ],
+            "Elapsed time (min)": 54.1
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.09666666666666666,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                8.4883
+            ],
+            "ff_at_angle": [
+                0.026
+            ],
+            "flux_ratio": [
+                0.0031
+            ],
+            "Elapsed time (min)": 57.9
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.14,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                9.0268
+            ],
+            "ff_at_angle": [
+                0.0322
+            ],
+            "flux_ratio": [
+                0.0036
+            ],
+            "Elapsed time (min)": 58.9
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.18333333333333335,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                10.2985
+            ],
+            "ff_at_angle": [
+                0.0539
+            ],
+            "flux_ratio": [
+                0.0052
+            ],
+            "Elapsed time (min)": 69.7
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.22666666666666668,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                12.9976
+            ],
+            "ff_at_angle": [
+                0.0956
+            ],
+            "flux_ratio": [
+                0.0074
+            ],
+            "Elapsed time (min)": 72.4
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.27,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                19.0063
+            ],
+            "ff_at_angle": [
+                0.1573
+            ],
+            "flux_ratio": [
+                0.0083
+            ],
+            "Elapsed time (min)": 59.8
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.31333333333333335,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                25.8575
+            ],
+            "ff_at_angle": [
+                0.2243
+            ],
+            "flux_ratio": [
+                0.0087
+            ],
+            "Elapsed time (min)": 59.0
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.3566666666666667,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                24.9561
+            ],
+            "ff_at_angle": [
+                0.2643
+            ],
+            "flux_ratio": [
+                0.0106
+            ],
+            "Elapsed time (min)": 58.2
+        }
+    },
+    {
+        "simulate": {
+            "resolution": 240,
+            "use_fixed_time": false,
+            "simulation_time": 10,
+            "dpml": 0.1,
+            "padding": 0.1,
+            "ff_pts": 1600,
+            "ff_below": false,
+            "ff_cover": false,
+            "use_symmetries": true,
+            "calculate_flux": true,
+            "ff_calculations": true,
+            "ff_angle": 6,
+            "simulation_ratio": "6/5",
+            "substrate_ratio": "1/20"
+        },
+        "pyramid": {
+            "source_position": 0.4,
+            "pyramid_height": 1.0,
+            "pyramid_width": 1.0,
+            "truncation": 0,
+            "source_direction": "mp.Ez",
+            "frequency_center": 2,
+            "frequency_width": 0.5,
+            "number_of_freqs": 1,
+            "cutoff": 2
+        },
+        "result": {
+            "total_flux": [
+                16.4974
+            ],
+            "ff_at_angle": [
+                0.2701
+            ],
+            "flux_ratio": [
+                0.0164
+            ],
+            "Elapsed time (min)": 66.9
+        }
+    }
+]

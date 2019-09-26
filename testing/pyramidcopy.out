@@ -1,3 +1,0 @@
-Total_Flux: [0.18431583350354713] Flux_ff: [1.32335552e-03] ratio: [0.00717983] sim_time: 10 dpml: 0.1 res: 20 source_pos: 0.08 p_height: 2.0 p_width: 2.0 freqs: [2.2] Elapsed run time = 22.4549 s
-Total_Flux: [0.13902170514121048] Flux_ff: [0.00232767] ratio: [0.01674324] sim_time: 10 dpml: 0.1 res: 20 source_pos: 0.08 p_height: 2.2 p_width: 2.2 freqs: [2.2] Elapsed run time = 34.3530 s
-Total_Flux: [0.0884201393673371] Flux_ff: [0.00228594] ratio: [0.02585316] sim_time: 10 dpml: 0.1 res: 20 source_pos: 0.08 p_height: 2.4 p_width: 2.4 freqs: [2.2] Elapsed run time = 47.4465 s
