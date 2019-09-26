@@ -10,5 +10,6 @@ TODO: \
 -Round of values down to 1/resolution to remove ambiguity when meep rounds values\
 -Process simulation results using e.g pandas. Using nested lists is pain when list depth is varying \
 -Implement calculations for purcell effect \
+-There is a possible bug that one result is written several time to json result causing rbf method to crash \
 -and a lot more..
 
