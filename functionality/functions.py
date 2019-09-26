@@ -11,7 +11,7 @@ from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 from collections import defaultdict
 from random import uniform
-from api import read
+from functionality.api import read
 import sys
 import time
 
@@ -343,8 +343,6 @@ def utility_function(data,results,ff_calc):
 		count(merge)
 		if count(merge) != 'No Duplicates':
 			raise ValueError ('Duplicate simulation results in database. RBF can can not handle duplicate data points')
-		print('data',data)
-		print('results',results)
 		#need to pick out above/under & certain frequency for result
 		##Check above/under for results. Pick the center frequency
 

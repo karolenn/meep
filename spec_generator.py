@@ -49,7 +49,7 @@ def fixedangle(template,sim_spec_filename):
     ax.set_ylabel("pyramid source position")
     ax.scatter(y,z)
     plt.show()
-    write("../db/sim_spec/{}.json".format(sim_spec_filename), tests)
+    write("db/sim_spec/{}.json".format(sim_spec_filename), tests)
 
 
 ###Generate randomly sampled initial points
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         "result": {}
     }
 
-    minmaxrand(template,sim_spec_filename)
+    fixedangle(template,sim_spec_filename)
 
 
 ##This is the template file for generating a new simulation specification db. 

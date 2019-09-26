@@ -1,5 +1,6 @@
 from functionality.api import *
-from functions import utility_function
+from functionality.functions import utility_function
+from math import tan, pi
 
 
 ###This function only processes data so it can be passed and retrieved from the utility function that decides the next point to simulate 
@@ -7,9 +8,10 @@ from functions import utility_function
 #usage python utility_function.py 02 "Above/Below" source_position pyramid_height pyramid_width
 
 def pass_data_utility_function(sim_name, ff_calc, args):
-    db = read("../db/initial_results/{}.json".format(sim_name))
+    db = read("db/initial_results/{}.json".format(sim_name))
     #withdraw the (**args) source_pos, pyramid size etc from initial results and store them in array"
     values = []
+    print(db)
     for n in args: #n is index in db
         values.append(db_to_array(db,"pyramid",n))
     #withdraw the flux_ratio results from initial_runs simulations"
@@ -21,13 +23,16 @@ def pass_data_utility_function(sim_name, ff_calc, args):
         sim_results=process_results(sim_results,ff_calc)
 
     #Pass simulation results to utility function and returns next simulation to run along with other data
+    print('#############UTILITY FUNCTION CALCULATING NEXT POINT####################')
     result, max_result, util_data, rbf_opt = utility_function(values,sim_results, ff_calc)
+    print('####################UTILITY FUNCTION FINISHED###########################')
+    print('')
     #write optimizer and explore/exploit info to database
     write_result("db/results/{}.json".format(sim_name), [result,"max result:",max_result,util_data,rbf_opt])
     template = read("db/tmp/tmp.json")
     for i, name in enumerate(args):
-        print(i,result[i])
         template["pyramid"][name] = result[i]
+    #If we don't iterate over pyramid height, the assumption is that we're using the fixed angle relationship of 62 degrees between tip and base
     if "pyramid_height" not in args:
         template["pyramid"]["pyramid_height"]=template["pyramid"]["pyramid_width"]*tan(pi*62/180)/2
     return template
