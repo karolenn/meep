@@ -8,7 +8,7 @@ from execute.execute_simulation import execute_simulation
 
 def main(sim_name,cores,number_of_runs,ff_calc,args):
     #Perform the initial runs and write the results to the database
-    #initial_runs(sim_name,cores)
+    initial_runs(sim_name,cores)
     #Take the initial run results, calculate the next input parameters for the simulation
     for n in range(int(number_of_runs)):
         next_run = pass_data_utility_function(sim_name,ff_calc,args)

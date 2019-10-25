@@ -66,7 +66,12 @@ def process_results(sim_results,ff_calc, freqn="center"):
        # print('procc res2',sim_results)
         return new_results
 
-
+#Returns total flux for a given frequency as a list
+def return_total_flux(sim_results, freqn):
+    new_results=[]
+    for n in range(len(sim_results)):
+        new_results.append(sim_results[n][freqn])
+    return new_results
 
 ###Convert json result entries to python lists
 ###Usage: dataarray = db_to_array(db,pyramid,yourdata)"

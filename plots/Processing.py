@@ -9,8 +9,8 @@ import math
 #freqs pml [1.0, 1.2222222222222223, 1.4444444444444444, 1.6666666666666667, 1.8888888888888888, 2.111111111111111, 2.3333333333333335, 2.5555555555555554, 2.7777777777777777, 3.0]
 dpml_processing = False
 time_processing = False
-res_process = False
-av_time = True
+res_process = True
+av_time = False
 #db1r=sys.argv[1]
 #db2r=sys.argv[2]
 #db3r=sys.argv[3]
@@ -23,9 +23,9 @@ av_time = True
 #print(datay)
 #print(datax)
 if res_process:
-    db1 = read("db/initial_results/convlarge30.json")   
-    db2 = read("db/initial_results/convlarge60.json")
-    db3 = read("db/initial_results/convlarge120.json")  
+    db1 = read("../db/initial_results/convlarge30.json")   
+    db2 = read("../db/initial_results/convlarge60.json")
+    db3 = read("../db/initial_results/convlarge120.json")  
     datay1 = db_to_array(db1,"result","flux_ratio")
     datay2 = db_to_array(db2,"result","flux_ratio")
     datay3 = db_to_array(db3,"result","flux_ratio")

@@ -5,7 +5,7 @@ import sys
 
 config = {
     "simulate": {
-        "resolution": 30,
+        "resolution": 60,
         "use_fixed_time": True,
         "simulation_time": 30,
         "dpml": 0.1,
@@ -25,7 +25,7 @@ config = {
         "pyramid_height": 1.0835834397989268,
         "pyramid_width": 1.1523030698665553,
         "truncation": 0,
-        "source_direction": "mp.Ez",
+        "source_direction": "mp.Ey",
         "frequency_center": 2,
         "frequency_width": 1.2,
         "number_of_freqs": 6,

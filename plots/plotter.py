@@ -7,7 +7,7 @@ from math import tan, pi
 #freqs [1.0, 1.2222222222222223, 1.4444444444444444, 1.6666666666666667, 1.8888888888888888, 2.111111111111111, 2.3333333333333335, 2.5555555555555554, 2.7777777777777777, 3.0]
 #[1.4, 1.64, 1.8800000000000001, 2.12, 2.3600000000000003, 2.6000000000000005]
 
-def RBF_plotter(sim_name, pts, ff_calc, args):
+def RBF_plotter(sim_name, pts, ff_calc, args, Purcell = False):
     db = read("db/initial_results/{}.json".format(sim_name))
     data = []
     print(args)
@@ -21,11 +21,23 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
         print(args)
         for n in args:  # n is index in db
             data.append(db_to_array(db, "pyramid", n))
-        sim_results = db_to_array(db, "result", "flux_ratio")
+
         #Withdraw ff_ratio above or under from results.
         # print('sim results passed to process',sim_results)
         # print('data recieved',data)
-        if len(sim_results[0]) != 1:
+        sim_results = db_to_array(db, "result", "total_flux")
+        if ff_calc == False:
+            for n in range(len(sim_results)):
+                for k in range(len(sim_results[n])):
+                    sim_results[n][k]=sim_results[n][k]/Purcell[k]
+            results = return_total_flux(sim_results, freqn=3)
+            resultsk1 = return_total_flux(sim_results, freqn=1)
+            resultsk2 = return_total_flux(sim_results, freqn=2)
+            resultsk0 = return_total_flux(sim_results, freqn=0)
+            resultsk4 = return_total_flux(sim_results, freqn=4)
+            resultsk5 = return_total_flux(sim_results, freqn=5)
+
+        if ff_calc != False:
             results = process_results(sim_results,ff_calc)
             resultsk0 = process_results(sim_results, ff_calc,freqn=0)
             resultsk1 = process_results(sim_results, ff_calc,freqn=1)
@@ -103,7 +115,7 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
         #   plt.tight_layout()
         plt.show()
         "PLOT HEATMAP"
-        if True:
+        if Purcell != False:
             pw=[0]*len(datanx)
             sp=[0]*len(datany)
             for i in range(len(datanx)):
@@ -115,9 +127,34 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
             index = []
             for i in range(len(resultsn)):
                 index.append(i)
-            plt.xticks(index, my_xticks,fontsize=6.5,rotation='vertical')
+            plt.xticks(index, my_xticks,fontsize=12.5,rotation='vertical')
             #[1.4, 1.64, 1.8800000000000001, 2.12, 2.3600000000000003, 2.6000000000000005]
-            plt.title(r'Polarization Y. x-axis read as (pyramid width, source position)')
+            plt.title(r'Purcell plot. x-axis read as (pyramid width, source position)')
+            plt.ylabel(r'Purcell Factor (%) $\frac{pyramid}{bulk}')
+            plt.plot(index,[x * 100 for x in resultsnk0],color='r',marker='.',ls='--',label=r'$\lambda \approx 715 nm $')
+            plt.plot(index,[x * 100 for x in resultsnk1],color='orange',marker='.',ls='--',label=r'$\lambda \approx 610 nm $')
+            plt.plot(index,[x * 100 for x in resultsnk2],color='g',marker='.',ls='--',label=r'$\lambda \approx 530 nm $')
+            plt.plot(index,[x * 100 for x in resultsn],color='b',marker='.',ls='--',label= r'$\lambda \approx 470 nm $')
+            plt.plot(index,[x * 100 for x in resultsnk4],color='c',marker='.',ls='--',label=r'$\lambda \approx 425 nm $')
+            plt.plot(index,[x * 100 for x in resultsnk5],color='m',marker='.',ls='--',label=r'$\lambda \approx 385 nm $')
+            plt.legend(loc='best')
+           # plt.tight_layout()
+            plt.show()
+        if Purcell != True:
+            pw=[0]*len(datanx)
+            sp=[0]*len(datany)
+            for i in range(len(datanx)):
+                pw[i]=round((datanx[i]),2)
+                sp[i]=round((datany[i]),3)
+            comb = list(zip(pw,sp))
+          #  print(comb)
+            my_xticks = comb
+            index = []
+            for i in range(len(resultsn)):
+                index.append(i)
+            plt.xticks(index, my_xticks,fontsize=12.5,rotation='vertical')
+            #[1.4, 1.64, 1.8800000000000001, 2.12, 2.3600000000000003, 2.6000000000000005]
+            plt.title(r'Polarization Z. x-axis read as (pyramid width, source position)')
             plt.ylabel('LEE (%)')
             plt.plot(index,[x * 100 for x in resultsnk0],color='r',marker='.',ls='--',label=r'$\lambda \approx 715 nm $')
             plt.plot(index,[x * 100 for x in resultsnk1],color='orange',marker='.',ls='--',label=r'$\lambda \approx 610 nm $')
@@ -126,6 +163,7 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
             plt.plot(index,[x * 100 for x in resultsnk4],color='c',marker='.',ls='--',label=r'$\lambda \approx 425 nm $')
             plt.plot(index,[x * 100 for x in resultsnk5],color='m',marker='.',ls='--',label=r'$\lambda \approx 385 nm $')
             plt.legend(loc='best')
+           # plt.tight_layout()
             plt.show()
 
         
@@ -140,10 +178,10 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
         print('len sim res',len(sim_results))
         for j in range(n_best_pts):
             for i in range(len(temp_results)): #loop over all flux ratioo results
-                temp = temp_results[i][0]
+                temp = temp_results[i][1]
              #   print('temp',temp,len(temp))
                 for k in range(len(temp)): #loop over all wavelengths
-                    current = temp_results[i][0][k]
+                    current = temp_results[i][1][k]
                     if best_per_current_freq < current:
                         best_per_current_freq = current
                         ind = i
@@ -151,7 +189,7 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
           #  print('best:::',best_per_current_freq,kfreq,'width',round(datanx[ind],3),'sp',round(datany[ind],2))
             best_pyr.append(('best:::',round(best_per_current_freq,3),kfreq,'width',round(datanx[ind],3),'sp',round(datany[ind],2)))
             best_per_current_freq=0
-            del temp_results[ind][0][kfreq]
+            del temp_results[ind][1][kfreq]
         print(best_pyr)
             
 
@@ -177,7 +215,7 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
         print('best:', best_guys)
     elif len(data) == 3:
             pts = int(pts)
-            db = read("db/initial_results/{}.json".format(sim_name))
+            db = read("../db/initial_results/{}.json".format(sim_name))
             data = []
             print(args)
             for n in args:  # n is index in db
@@ -275,9 +313,9 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
                 index = []
                 for i in range(len(resultsn)):
                     index.append(i)
-                plt.xticks(index, my_xticks,fontsize=6.5,rotation='vertical')
+                plt.xticks(index, my_xticks,fontsize=11.5,rotation='vertical')
                 #[1.4, 1.64, 1.8800000000000001, 2.12, 2.3600000000000003, 2.6000000000000005]
-                plt.title(r'Polarization Z. x-axis read as (pyramid height, pyramid width, source position)')
+                plt.title(r'Polarization Y. x-axis read as (pyramid height, pyramid width, source position)')
                 plt.ylabel('LEE (%)')
                 plt.plot(index,[x * 100 for x in resultsk0],color='r',marker='.',ls='--',label=r'$\lambda \approx 715 nm $')
                 plt.plot(index,[x * 100 for x in resultsk1],color='orange',marker='.',ls='--',label=r'$\lambda \approx 610 nm $')
@@ -289,7 +327,7 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
                 plt.show()
 
             #PLOTTER CONV
-            if True:
+            if False:
                 db = read("db/results/{}.json".format(sim_name))                
                 ph=[0]*len(datanx)
                 pw=[0]*len(datany)
@@ -305,7 +343,7 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
                 for i in range(len(resultsn)):
                     index.append(i)
                 plt.gca().get_xticklabels()[3].set_color("red")
-                plt.xticks(index, my_xticks,fontsize=6.5,rotation='vertical')
+                plt.xticks(index, my_xticks,fontsize=16.5,rotation='vertical')
                 #[1.4, 1.64, 1.8800000000000001, 2.12, 2.3600000000000003, 2.6000000000000005]
                 plt.title(r'Polarization Z. x-axis read as (pyramid height, pyramid width, source position)')
                 plt.ylabel('LEE (%)')
@@ -357,7 +395,7 @@ def RBF_plotter(sim_name, pts, ff_calc, args):
 
 
 def plotter(db, x, y):
-    db = read("db/initial_results/{}.json".format(db))
+    db = read("../db/initial_results/{}.json".format(db))
     if db == None:
         print("could not open db/initial_results/{}.json".format(db))
         exit(0)
