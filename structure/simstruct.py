@@ -223,6 +223,7 @@ class SimStruct():
 			else:
 				return air
 		#paints out a hexagon with the help of 4 straight lines in the big if statement
+		#here, v is measured from center to vertice. h is measured from center to edge.
 		def isInsidexy2(vec):
 			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
 				v=(self.pyramid_width/(2*self.pyramid_height))*vec.z+(self.pyramid_width/(2*self.pyramid_height))*(sh+self.pyramid_height-sz/2)
