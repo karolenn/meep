@@ -260,9 +260,9 @@ class SimStruct():
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
 				center=mp.Vector3(0,0,abs_source_position))]
-		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-				component=-1*mp.Ey,
-				center=mp.Vector3(0,0,abs_source_position)))
+		#source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+		#		component=-1*mp.Ey,
+		#		center=mp.Vector3(0,0,abs_source_position)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				geometry=geometry,
@@ -484,9 +484,12 @@ class SimStruct():
 				plt.show()
 			for n in range(len(flux_tot_out)):
 				flux_tot_out[n]=round(flux_tot_out[n],9)
-				P_tot_ff[n]=round(P_tot_ff[n],9)
+			#	P_tot_ff[n]=round(P_tot_ff[n],9)
 			##Some processing to calculate the flux ratios per frequency
 			if ff_calculations:
+				for n in range(len(flux_tot_out)):
+				#	flux_tot_out[n]=round(flux_tot_out[n],9)
+					P_tot_ff[n]=round(P_tot_ff[n],9)
 				for i in range(self.number_of_freqs):	
 
 					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],9)		
@@ -506,7 +509,7 @@ class SimStruct():
 				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
 
 			else:
-				self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
+			#	self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
 				return flux_tot_out, None , None
 
 
