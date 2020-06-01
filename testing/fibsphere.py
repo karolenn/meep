@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math as math			
 angleTheta=math.pi/3
-npts=1600
+npts=200
 range_npts=int((angleTheta/math.pi)*npts)
-R=100
+R=47
 x=[]
 y=[]
 z=[]
@@ -27,7 +27,7 @@ fig = plt.figure()
 ax = Axes3D(fig)
 #plt.xlim(-4,4)
 #plt.ylim(-4,4)
-plt.gca().set_aspect('equal', adjustable='box')
+#plt.gca().set_aspect('equal', adjustable='box')
 ax.scatter3D(x,y,z)
 ax.set_zlim(-100,100)
 ax.set_xlabel('x-axis')

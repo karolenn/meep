@@ -1,5 +1,6 @@
 import json
-
+import numpy as np
+#from functionality.functions import complex_to_polar_conv
 # Loading the file and returns it if found else returns None
 def read(db):
     try:
@@ -26,12 +27,40 @@ def write_result(db, info):
     else:
         data = [info]
     write(db, data)
-        
 
-def sim_to_json(config,result):
-    flux_tot_out, P_tot_ff, flux_tot_ff_ratio, elapsed_time = result
-    result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (min)":elapsed_time }
+#Convert far-fields form complex numbers to polar "numbers" because JSON sucks (can't store complex numbers)
+#this should be stored in functions.py but importing from there would create circular importing
+def complex_to_polar_conv(list_dict):
+    for k in range(len(list_dict)):
+        for j in range(len(list_dict[0]["field"])):
+            list_dict[k]["field"][j] = (np.abs(list_dict[k]["field"][j]),np.angle(list_dict[k]["field"][j]))
+    return list_dict
+
+#convert polar numbers to complex numbers
+#a+b*i=r*e^(i*angle)
+def polar_to_complex_conv(list_dict):
+    for k in range(len(list_dict)):
+        for j in range(len(list_dict[0]["field"])):
+            list_dict[k]["field"][j] = list_dict[k]["field"][j][0]*np.exp(1j*np.abs(list_dict[k]["field"][j][1]))
+    return list_dict
+
+
+
+#TODO: rewrite to be able to handle arbitrary results
+def sim_to_json(config,result,qw=False):
+  #  len_results = len(result)
+  #  result = dict(zip(result),zip(str(result)))
     config["result"] = result
+    if qw:
+        flux_tot_out, P_tot_ff, flux_tot_ff_ratio, fields, elapsed_time = result
+        #JSON cant handle complex number so it is converted to polar coords. I want to save E,H fields so this seems to be a plausible workaround
+        fields = complex_to_polar_conv(fields)
+        result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "far_fields":fields, "Elapsed time (min)":elapsed_time }
+        config["result"] = result
+    else:
+        flux_tot_out, P_tot_ff, flux_tot_ff_ratio, elapsed_time = result
+        result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (min)":elapsed_time }
+        config["result"] = result
     return config
 #"Takes in flux ratio results, withdraws flux ratio above OR below for center frequency"
 #"Function have two cases, flux ratio contains both above and below or only one of the cases. Controlled in the if case."

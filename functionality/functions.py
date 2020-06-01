@@ -18,6 +18,9 @@ import time
 
 
 ###FUNCTIONS##########################################################
+
+
+		 
 ###Create points using the fibbonacci sphere algorithm
 ###empty array xPts is passed to the function for some obscure reason I cant remember
 def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):

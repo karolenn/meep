@@ -11,7 +11,7 @@ from math import tan, pi
 ###spec_generator creates a .json file in db/sim_spec that is a template for initial_runs & main.py to run.
 
 ###Name of the sim_spec.json file
-sim_spec_filename = 'refactor'
+sim_spec_filename = 'qw'
 
 
 ###We now have 3 ways to create different pyramids to be simulated. 'eq dist', 'eq dist with fixed angle between base and top' and 'rand' way
@@ -59,6 +59,7 @@ def minmaxrand(template,sim_spec_filename):
     y = {"from": 0.4, "to":0.8 }
     z = {"from": 0.1, "to": 0.6 }
     result = generate_rand_dist(x, y, z, 0.5, 16)
+    print(result)
     x,y,z = zip(*result)
 
     tests = points_to_json(result, template)
@@ -73,31 +74,46 @@ def minmaxrand(template,sim_spec_filename):
     write("db/sim_spec/{}.json".format(sim_spec_filename), tests)
 
 
+def generate_qw(template,sim_spec_filename):
+    nr_of_dipoles = 2
+    polarization = ["mp.Ex","mp.Ey","mp.Ez"]
+    pyramid_list = []
+    for j in range(nr_of_dipoles):
+        source_pos = (0,uniform(-1,1),uniform(0,1))
+        for k in range(len(polarization)):
+            tmp = copy.deepcopy(template)
+            tmp["pyramid"]["source_position"] = source_pos
+            tmp["pyramid"]["source_direction"] = polarization[k]
+            pyramid_list.append(tmp)
+
+    write("db/sim_spec/{}.json".format(sim_spec_filename), pyramid_list)
+
 ###This is where you choose how to sample your initial runs using one of the three functions above, i.e equaldistance OR fixedangle OR minmaxrand
 if __name__ == "__main__":
 
 
     template={
         "simulate": {
-            "resolution": 40,
+            "resolution": 30,
             "use_fixed_time": False,
             "simulation_time": 60,
             "dpml": 0.1,
             "padding": 0.025,
             "ff_pts": 200,
-            "ff_calc": "Both",
+            "ff_calc": "Above",
             "ff_cover": False,
-            "use_symmetries": True,
+            "use_symmetries": False,
             "calculate_flux": True,
             "ff_calculations": True,
             "ff_angle": 6,
             "simulation_ratio": "6/5",
-            "substrate_ratio": "1/10"
+            "substrate_ratio": "1/10",
+            "quantum_well": True
         },
         "pyramid": {
-            "source_position": 0.2,
-            "pyramid_height": 0.5,
-            "pyramid_width": 0.5,
+            "source_position": (0,0.2,0.3451462262234885),
+            "pyramid_height": 1.0835834397989268,
+            "pyramid_width": 1.1523030698665553,
             "truncation": 0,
             "source_direction": "mp.Ey",
             "frequency_center": 2,
@@ -108,7 +124,7 @@ if __name__ == "__main__":
         "result": {}
     }
 
-    fixedangle(template,sim_spec_filename)
+    generate_qw(template,sim_spec_filename)
 
 
 ##This is the template file for generating a new simulation specification db. 

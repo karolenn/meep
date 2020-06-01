@@ -42,12 +42,12 @@ if __name__ == "__main__":
 	if config == None:
 		print("could not open tmp/tmp.json for simulation")
 		exit(0)
-
 	pyramid = Pyramid()
 	pyramid.setup(config["pyramid"])
 	result = pyramid.simulate(config["simulate"])
-	data = sim_to_json(config, result)
-	print('pyramid data:',data)
+	qw = config["simulate"]["quantum_well"]
+	data = sim_to_json(config, result,qw)
+	#print('pyramid data:',data)
 	write_result("db/initial_results/{}.json".format(sys.argv[1]), data)
 	for k,v in data["result"].items():
 		print(k, v)

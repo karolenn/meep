@@ -31,6 +31,7 @@ class SimStruct():
 		ff_angle = math.pi/config["ff_angle"]
 		simulation_ratio = eval(config["simulation_ratio"])
 		substrate_ratio = eval(config["substrate_ratio"])
+		quantum_well = config["quantum_well"]
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
@@ -256,14 +257,25 @@ class SimStruct():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
 		#"Source position"
-		
-		abs_source_position=sz/2-sh-self.pyramid_height*(1-self.truncation)+self.pyramid_height*(self.source_position)*(1-self.truncation)		
+		abs_source_position_x = (self.pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+		abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(self.pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+		abs_source_position_z=sz/2-sh-self.pyramid_height*(1-self.truncation)+self.pyramid_height*(self.source_position[2])*(1-self.truncation)	
+		print('spos:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
+
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
-				center=mp.Vector3(0,0,abs_source_position))]
-		#source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-		#		component=-1*mp.Ey,
-		#		center=mp.Vector3(0,0,abs_source_position)))
+				amplitude=1,
+				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z))]
+				
+#		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+#				component=mp.Ey,
+#				amplitude=1,
+#				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+
+#		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+#				component=mp.Ez,
+#				amplitude=1,
+#				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				geometry=geometry,
@@ -317,8 +329,13 @@ class SimStruct():
 				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB6)
 		###RUN##########################################################################
 		#"Run the simulation"
-		#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,0),size=mp.Vector3(0,sx+2*dpml,sz+2*dpml)))
-	#	plt.show()
+		if False:
+			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,abs_source_position_y,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
+			plt.show()
+			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(abs_source_position_x,0,0),size=mp.Vector3(0,sy+2*dpml,sz+2*dpml)))
+			plt.show()
+			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
+			plt.show()
 		if use_fixed_time:
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
@@ -327,7 +344,7 @@ class SimStruct():
 		else:
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position+0.2),1e-3))
+			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position_z+0.2),1e-3))
 
 
 		###OUTPUT CALCULATIONS##########################################################
@@ -337,6 +354,7 @@ class SimStruct():
 		nfreq=self.number_of_freqs
 		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
 		if ff_calculations:
+			fields = []
 			P_tot_ff = np.zeros(self.number_of_freqs)						
 			npts=ff_pts							#number of far-field points
 			Px=0
@@ -385,6 +403,7 @@ class SimStruct():
 				#npts=range_npts
 
 				if ff_calc == "Both":
+					#Pr_ArrayA for above, B for below
 					Pr_ArrayA=[]
 					Pr_ArrayB=[]
 					P_tot_ffA = [0]*(self.number_of_freqs)
@@ -421,6 +440,10 @@ class SimStruct():
 				if ff_calc == "Above":
 					for n in range(range_npts):
 						ff=sim.get_farfield(nearfieldAbove, mp.Vector3(xPts[n],yPts[n],zPts[n]))
+						fields.append({"pos":(xPts[n],yPts[n],zPts[n]),"field":ff})
+				#		print('ff,n,x,y,z',n,xPts[n],yPts[n],zPts[n],ff)
+				#		print('fields',fields[n])
+				#		print('------')
 						i=0
 						for k in range(nfreq):
 							"Calculate the poynting vector in x,y,z direction"
@@ -507,7 +530,11 @@ class SimStruct():
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)				
 				elapsed_time = round((time.time()-start)/60,1)
-				return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
+			#	print(fields)
+				if quantum_well:
+					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), fields, elapsed_time
+				else:
+					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
 
 			else:
 			#	self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
