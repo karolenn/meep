@@ -34,17 +34,18 @@ def write_result(db, info):
 def complex_to_polar_conv(list_dict):
     for k in range(len(list_dict)):
         for j in range(len(list_dict[0]["field"])):
+            #numpy maps angle to (-pi,pi]
             list_dict[k]["field"][j] = (np.abs(list_dict[k]["field"][j]),np.angle(list_dict[k]["field"][j]))
     return list_dict
 
 #convert polar numbers to complex numbers
 #a+b*i=r*e^(i*angle)
 def polar_to_complex_conv(list_dict):
-    #withdraw the number of points
+    #withdraw the number of ff points
     for k in range(len(list_dict)):
         #withdraw the number of points times frequencies (?)
-        for j in range(len(list_dict[0]["field"])):
-            list_dict[k]["field"][j] = list_dict[k]["field"][j][0]*np.exp(1j*np.abs(list_dict[k]["field"][j][1]))
+        for i in range(len(list_dict[0]["field"])):
+            list_dict[k]["field"][i] = list_dict[k]["field"][i][0]*np.exp(1j*np.abs(list_dict[k]["field"][i][1]))
     return list_dict
 
 

@@ -26,11 +26,14 @@ def calculate_poynting_field(summed_ff,number_of_pyramids,ff_pts,nfreq):
     ff_at_pt = []
     for ffpt_i in range(ff_pts):
         ff_at_pt = summed_ff[ffpt_i]
-      #  print(ff_at_pt)
+        print('ff_at_pt',ff_at_pt)
         poynting_vector_at_pt=[]
+        i=0
         for freq in range(nfreq):
-            Pr = myPoyntingFlux(ff_at_pt,freq)
+            Pr = myPoyntingFlux(ff_at_pt,i)
             poynting_vector_at_pt.append(Pr)
+            print('vec',poynting_vector_at_pt)
+            i = i + 6 #to keep track of the correct index in the far-field array for frequencies, (freq=1) Ex1,Ey1,..,Hx1,..Hz1,Ex2,...,Hz2,..
         tmp.append(poynting_vector_at_pt)
     return tmp
 
@@ -43,22 +46,21 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
     #TODO:verify that conversion from complex->polar->complex works
     all_ffields = []
+
     #Withdraw all the far fields from all the pyramids in active db
     for pyramid in db:
         all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
     number_of_pyramids=len(all_ffields)
     ff_pts = len(all_ffields[0])
     nfreq=db[0]["pyramid"]["number_of_freqs"]
-    print('llll')
     print('nr of pyr',number_of_pyramids)
     print('number of ff pts',len(all_ffields[0]))
-    #print(all_ffields)
+
     #Withdraw the E,H fields from polarization x,y,z
     #every triple is actually one dipole emission, but 1 pyramid emits from x, 1 from y, 1 from z, so they need to be added together, here called a "3-group"
     #this loop will go through the number of pyramids, but each pyramid will be selected in the inner loop
     poynting_master_field =[0]*nfreq
     poynting_master_field=[poynting_master_field]*ff_pts
-    print(poynting_master_field)
 
     #Loop through each "3-group"
     for i in range(0,number_of_pyramids,3):
@@ -72,14 +74,34 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         fval_z_dipole = [d['field'] for d in ff_z_dipole]
         #Linear combine the 3-groups E,H fields 
         summed_ff = linear_combine_fields(fval_x_dipole,fval_y_dipole,fval_z_dipole,1,1,1,ff_pts)
+        #if i == 0:
+        #    print('fvalx',fval_x_dipole)
+        #    print('summed_ff',summed_ff)
         #Calculate the resulting poynting field from the 3 group, and scale with number of pyramids 
-        poynting_field = calculate_poynting_field(summed_ff,number_of_pyramids,ff_pts,nfreq)
-        print('poynting field',poynting_field)
-        poynting_master_field = add_poynting_fields(poynting_master_field,poynting_field, ff_pts)
+      #  poynting_field = calculate_poynting_field(summed_ff,number_of_pyramids,ff_pts,nfreq)
+     #   print('poynting field',poynting_field)
+     #   poynting_master_field = add_poynting_fields(poynting_master_field,poynting_field, ff_pts)
+
 
     print('master:',poynting_master_field)
-   # print('combined',len(combined_ff[0]))
-#possibly add the poynting field to the corresponding pyramid
+
+
+    "TEST CODE FOR VERIFICATION"
+    surface_Element = 3713.656582066039
+    exff=all_ffields[0]
+    #print('exff',exff)
+    exfval = [d['field'] for d in exff]
+    print('vals',exfval)
+    print('---')
+    expoyn = calculate_poynting_field(exfval,number_of_pyramids,ff_pts,nfreq)
+
+
+    print('poyn',expoyn)
+
+
+
+
+
 
 
 
