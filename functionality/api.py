@@ -8,7 +8,7 @@ def read(db):
             data_json = json.load(f)
             return data_json
     except OSError as err:
-        print('unable to load using json.load')
+        print('unable to load using json.load,error:',err)
         return None
 
 def write(db, data):
@@ -16,7 +16,7 @@ def write(db, data):
         with open(db, 'w') as outfile:
             json.dump(data, outfile)
     except OSError as err:
-        print(err)
+        print('unable to write using json.dump,error:',err)
         return False
     return True
 
@@ -29,7 +29,8 @@ def write_result(db, info):
     write(db, data)
 
 #Convert far-fields form complex numbers to polar "numbers" because JSON sucks (can't store complex numbers)
-#this should be stored in functions.py but importing from there would create circular importing
+#TODO:this should be stored in functions.py but importing from there would create circular importing
+#list dict is in the form 
 def complex_to_polar_conv(list_dict):
     for k in range(len(list_dict)):
         for j in range(len(list_dict[0]["field"])):
@@ -39,7 +40,9 @@ def complex_to_polar_conv(list_dict):
 #convert polar numbers to complex numbers
 #a+b*i=r*e^(i*angle)
 def polar_to_complex_conv(list_dict):
+    #withdraw the number of points
     for k in range(len(list_dict)):
+        #withdraw the number of points times frequencies (?)
         for j in range(len(list_dict[0]["field"])):
             list_dict[k]["field"][j] = list_dict[k]["field"][j][0]*np.exp(1j*np.abs(list_dict[k]["field"][j][1]))
     return list_dict

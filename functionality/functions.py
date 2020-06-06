@@ -48,7 +48,8 @@ def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):
 	return(xPts,yPts,zPts)
 
 
-###Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and numerically integrate it 
+###Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and return it to later numerically integrate it 
+###ff is a point in the far-field containing E,H field for frequency="nfreq"
 def myPoyntingFlux(ff,nfreq):
 	i=nfreq
 	P=0 #The poynting flux at point (xPts,yPts,zPts)
