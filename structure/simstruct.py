@@ -264,18 +264,18 @@ class SimStruct():
 
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=self.source_direction,
-				amplitude=1,
+				amplitude=3,
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z))]
 				
-#		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-#				component=mp.Ey,
-#				amplitude=1,
-#				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+				component=mp.Ey,
+				amplitude=2,
+				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 
-#		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-#				component=mp.Ez,
-#				amplitude=1,
-#				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+	#	source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+	#			component=mp.Ez,
+	#			amplitude=0/math.sqrt(3),
+	#			center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				geometry=geometry,
@@ -283,7 +283,7 @@ class SimStruct():
 				sources=source,
 				eps_averaging=True,
 				dimensions=3,
-			#	default_material=GaN,
+				default_material=GaN,
 				material_function=isInsidexy2,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
@@ -453,7 +453,11 @@ class SimStruct():
 							"divided by npts and we get evenly sized area chunks" 					
 							surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
 							P_tot_ff[k] += surface_Element*(1)*(Pr)
+							print('S',surface_Element)
 							i = i + 6 #to keep track of the correct entries in the ff array
+					print('P_tot_ff',P_tot_ff)
+				#	print('fields',fields)
+					print('Pr_Array',Pr_Array)
 
 			##CALCULATE FLUX OUT FROM BOX###########################################
 		if calculate_flux:

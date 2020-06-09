@@ -45,7 +45,7 @@ def polar_to_complex_conv(list_dict):
     for k in range(len(list_dict)):
         #withdraw the number of points times frequencies (?)
         for i in range(len(list_dict[0]["field"])):
-            list_dict[k]["field"][i] = list_dict[k]["field"][i][0]*np.exp(1j*np.abs(list_dict[k]["field"][i][1]))
+            list_dict[k]["field"][i] = list_dict[k]["field"][i][0]*np.exp(1j*list_dict[k]["field"][i][1])
     return list_dict
 
 
