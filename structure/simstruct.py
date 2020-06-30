@@ -188,10 +188,12 @@ class SimStruct():
 					size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
 		
+
+		
 		#Truncation block of air to truncate the pyramid. NEEDS TO BE REWRITTEN
-		geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh-self.pyramid_height),
-					size=mp.Vector3(self.pyramid_width,self.pyramid_width,self.truncation*self.pyramid_height*2),
-					material=air))
+	#	geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh-self.pyramid_height),
+	#				size=mp.Vector3(self.pyramid_width,self.pyramid_width,self.truncation*self.pyramid_height*2),
+	#				material=air))
 
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
@@ -236,6 +238,7 @@ class SimStruct():
 					return air
 			else:
 				return air
+		#isInsidexy2.do_averaging = True
 		#paints out on forth of a hexagon
 		def isInsidexy3(vec):
 			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
@@ -257,33 +260,35 @@ class SimStruct():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 
 		#"Source position"
-		abs_source_position_x = (self.pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+		abs_source_position_x = (self.pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)-0.01/resolution
 		abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(self.pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
-		abs_source_position_z=sz/2-sh-self.pyramid_height*(1-self.truncation)+self.pyramid_height*(self.source_position[2])*(1-self.truncation)	
+		abs_source_position_z=sz/2-sh-self.pyramid_height*(1-self.truncation)+self.pyramid_height*(self.source_position[2])*(1-self.truncation)#+1/resolution	
 		print('spos:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-				component=self.source_direction,
-				amplitude=3,
+				component=mp.Ex,
+				amplitude=self.source_direction[0],
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z))]
 				
 		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=mp.Ey,
-				amplitude=2,
+				amplitude=self.source_direction[1],
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 
-	#	source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-	#			component=mp.Ez,
-	#			amplitude=0/math.sqrt(3),
-	#			center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+				component=mp.Ez,
+				amplitude=self.source_direction[2],
+				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				geometry=geometry,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
+				#subpixel_tol=1e-4,
+				#subpixel_maxeval=1000,
 				dimensions=3,
-				default_material=GaN,
+				#default_material=TiO2,
 				material_function=isInsidexy2,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
@@ -342,9 +347,17 @@ class SimStruct():
 			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 			until=simulation_time)
 		else:
+			max_index = self.source_direction.index(max(self.source_direction))
+			if max_index == 0:
+				detector_pol = mp.Ex
+			elif max_index == 1:
+				detector_pol = mp.Ey
+			else:
+				detector_pol = mp.Ez
+			#TODO: exchange self.source_direction to maxmimum dipole ampltitude
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,self.source_direction,mp.Vector3(0,0,abs_source_position_z+0.2),1e-3))
+			until_after_sources=mp.stop_when_fields_decayed(2,detector_pol,mp.Vector3(0,0,abs_source_position_z+0.2),1e-3))
 
 
 		###OUTPUT CALCULATIONS##########################################################
@@ -399,6 +412,7 @@ class SimStruct():
 				else:
 					offset=2/npts
 				fibspherepts(r,theta,npts,xPts,yPts,zPts,offset)
+				
 				range_npts=int((theta/math.pi)*npts)
 				#npts=range_npts
 
@@ -453,7 +467,7 @@ class SimStruct():
 							"divided by npts and we get evenly sized area chunks" 					
 							surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
 							P_tot_ff[k] += surface_Element*(1)*(Pr)
-							print('S',surface_Element)
+					#		print('S',surface_Element)
 							i = i + 6 #to keep track of the correct entries in the ff array
 					print('P_tot_ff',P_tot_ff)
 				#	print('fields',fields)

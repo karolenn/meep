@@ -3,14 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math as math			
-angleTheta=math.pi/3
-npts=200
+angleTheta=math.pi/6
+npts=16
 range_npts=int((angleTheta/math.pi)*npts)
 R=47
 x=[]
 y=[]
 z=[]
-offset=2/npts
+offset=0.8/npts
 increment = math.pi*(3 - math.sqrt(5))
 
 for n in range(range_npts):

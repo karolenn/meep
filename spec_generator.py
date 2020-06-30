@@ -11,7 +11,7 @@ from math import tan, pi
 ###spec_generator creates a .json file in db/sim_spec that is a template for initial_runs & main.py to run.
 
 ###Name of the sim_spec.json file
-sim_spec_filename = 'qw50_1'
+sim_spec_filename = 'qw60_000'
 
 
 ###We now have 3 ways to create different pyramids to be simulated. 'eq dist', 'eq dist with fixed angle between base and top' and 'rand' way
@@ -75,12 +75,12 @@ def minmaxrand(template,sim_spec_filename):
 
 
 def generate_qw(template,sim_spec_filename):
-    nr_of_dipoles = 1
-    polarization = ["mp.Ex","mp.Ey", "mp.Ez"]
+    nr_of_dipoles = 100
+    polarization = [(1,0,0),(0,1,0),(0,0,1)]
     pyramid_list = []
     for j in range(nr_of_dipoles):
-        #source_pos = (0,uniform(-1,1),uniform(0,1))
-        source_pos = (0,0,0)
+        source_pos = (0,uniform(-1,1),uniform(0,1))
+        #source_pos = (0,0,0)
         for k in range(len(polarization)):
             tmp = copy.deepcopy(template)
             tmp["pyramid"]["source_position"] = source_pos
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     template={
         "simulate": {
-            "resolution": 50,
+            "resolution": 60,
             "use_fixed_time": False,
             "simulation_time": 60,
             "dpml": 0.1,
@@ -116,10 +116,10 @@ if __name__ == "__main__":
             "pyramid_height": 1.0835834397989268,
             "pyramid_width": 1.1523030698665553,
             "truncation": 0,
-            "source_direction": "mp.Ey",
+            "source_direction": (0,0,0),
             "frequency_center": 2,
             "frequency_width": 1.2,
-            "number_of_freqs": 2,
+            "number_of_freqs": 3,
             "cutoff": 4
         },
         "result": {}
