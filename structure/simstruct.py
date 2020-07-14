@@ -258,13 +258,29 @@ class SimStruct():
 		###SOURCE#######################################################################
 
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
+		#Assuming a 100 nm capping layer, (that is included in the total pyramid height and width)
+		#I can assume the inner pyramid to be pyramid height - 100 nm and pyramid with - 2*100 nm
+		inner_pyramid_height = self.pyramid_height - 0.1
 
 		#"Source position"
-		abs_source_position_x = (self.pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)-0.01/resolution
-		abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(self.pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
-		abs_source_position_z=sz/2-sh-self.pyramid_height*(1-self.truncation)+self.pyramid_height*(self.source_position[2])*(1-self.truncation)#+1/resolution	
+		abs_source_position_x = (inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+		abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+		abs_source_position_z=sz/2-sh-inner_pyramid_height*(1-self.truncation)+inner_pyramid_height*(self.source_position[2])*(1-self.truncation)
 		print('spos:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 
+		#Sets the polarization of the dipole to be in the plane, that is the pyramid wall
+		Polarization_in_Plane = False
+		if Polarization_in_Plane == True: 
+			length_of_normal = math.sin(math.pi/6)*self.pyramid_width*math.sqrt(self.pyramid_height**2+((math.cos(math.pi/6))**2)*self.pyramid_width**2)
+			source_direction_x = self.source_direction[0]*(1-math.sin(math.pi/6)*self.pyramid_width*self.pyramid_height/length_of_normal)
+			source_direction_y = self.source_direction[1]
+			source_direction_z = self.source_direction[2]*(1-self.pyramid_width**2*math.sin(math.pi/3)*(1/2)/length_of_normal)
+			length_of_pol = math.sqrt(source_direction_x**2+source_direction_y**2+source_direction_z**2)
+			self.source_direction = (source_direction_x/length_of_pol,source_direction_y/length_of_pol,source_direction_z/length_of_pol)
+			print('length of pol.vector:',length_of_pol)
+			print('new source direction:',self.source_direction)
+
+		print('self',self.source_direction)
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=mp.Ex,
 				amplitude=self.source_direction[0],
@@ -335,9 +351,9 @@ class SimStruct():
 		###RUN##########################################################################
 		#"Run the simulation"
 		if False:
-			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,abs_source_position_y,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
+			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0*abs_source_position_y,0),size=mp.Vector3(0,sy+2*dpml,sz+2*dpml)))
 			plt.show()
-			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(abs_source_position_x,0,0),size=mp.Vector3(0,sy+2*dpml,sz+2*dpml)))
+			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0*abs_source_position_x,0,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
 			plt.show()
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			plt.show()
@@ -469,9 +485,9 @@ class SimStruct():
 							P_tot_ff[k] += surface_Element*(1)*(Pr)
 					#		print('S',surface_Element)
 							i = i + 6 #to keep track of the correct entries in the ff array
-					print('P_tot_ff',P_tot_ff)
+				#	print('P_tot_ff',P_tot_ff)
 				#	print('fields',fields)
-					print('Pr_Array',Pr_Array)
+				#	print('Pr_Array',Pr_Array)
 
 			##CALCULATE FLUX OUT FROM BOX###########################################
 		if calculate_flux:
