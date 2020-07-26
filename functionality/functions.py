@@ -48,6 +48,30 @@ def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):
 	return(xPts,yPts,zPts)
 
 
+#Change the polarization from completely random in space to polarized parallel to the pyramid wall
+#and normalized the polarization
+def PolarizeInPlane(source_direction,pyramid_height,pyramid_width):
+	ph = pyramid_height
+	pw = pyramid_width
+	old_source_direction = np.asarray(source_direction)
+	
+	#calculate the normal of the pyramid wall. (Take three points on the wall and the cross prduct)
+	#Points are (pwcos(30)/2,pwsin(30)/2,sz/2-sh) and (pwcos(30)/2,-pwsin(30)/2,sz/2-sh) and (0,0,sz/2-sh-ph)
+	normal = np.array([pw*ph*math.sin(math.pi/6),0,math.sin(math.pi/6)*math.cos(math.pi/6)*pw**2])
+	normal_norm = np.linalg.norm(normal)
+	normal = normal/normal_norm
+
+	#Project the source direction into the pyramid wall
+	new_source_dir = old_source_direction - (np.dot(old_source_direction,normal))*normal
+	#Norm the new projection
+	new_source_dir_norm = np.linalg.norm(new_source_dir)
+	new_source_dir = new_source_dir / new_source_dir_norm
+
+	#set it to a tuple from a np array
+	source_direction_new = (new_source_dir[0],new_source_dir[1],new_source_dir[2])
+	
+	return source_direction_new
+
 ###Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and return it to later numerically integrate it 
 ###ff is a point in the far-field containing E,H field for frequency="nfreq"
 def myPoyntingFlux(ff,nfreq):
@@ -65,6 +89,43 @@ def myPoyntingFlux(ff,nfreq):
 
 	return(Pr)
 
+
+
+#this function linearly adds E,H fields with weights wx, wy, wz which corresponds due to linearity to the pyramids polarization, so (wx=1,wy=0,wz=0) is x polarized dipole
+#TODO:We might need to convert this to a faster method with increasing ffpts
+def linear_combine_fields(f1,f2,f3,wx,wy,wz,ff_pts):
+    tmp = []
+    #f is a list of lists of length ff_pts
+    for ffpt_i in range(ff_pts):
+        tmp.append([wx*px + wy*py + wz*pz for px, py, pz in zip(f1[ffpt_i], f2[ffpt_i], f3[ffpt_i])])
+    return tmp
+
+def add_poynting_fields(P_ff1,P_ff2,ff_pts):
+    tmp = []
+    #print(P_ff1)
+    for ffpt_i in range(ff_pts):
+        tmp.append([a + b for a, b in zip(P_ff1[ffpt_i], P_ff2[ffpt_i])])
+    return tmp
+
+
+
+#Calculate the poynting scalar field for a 3-group of pyramids
+#works for 1 pyramid
+def calculate_poynting_field(summed_ff,ff_pts,nfreq):
+    tmp = []
+    ff_at_pt = []
+    for ffpt_i in range(ff_pts):
+        ff_at_pt = summed_ff[ffpt_i]
+   #     print('ff_at_pt',ff_at_pt)
+        poynting_vector_at_pt=[]
+        i=0
+        for freq in range(nfreq):
+            Pr = myPoyntingFlux(ff_at_pt,i)
+            poynting_vector_at_pt.append(Pr)
+        #    print('vec',poynting_vector_at_pt)
+            i = i + 6 #to keep track of the correct index in the far-field array for frequencies, (freq=1) Ex1,Ey1,..,Hx1,..Hz1,Ex2,...,Hz2,..
+        tmp.append(poynting_vector_at_pt)
+    return tmp
 
 ###Draw a point in 3d space from a uniform distribution
 def get_next(limit_x, limit_y, limit_z):

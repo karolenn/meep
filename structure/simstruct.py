@@ -32,6 +32,7 @@ class SimStruct():
 		simulation_ratio = eval(config["simulation_ratio"])
 		substrate_ratio = eval(config["substrate_ratio"])
 		quantum_well = config["quantum_well"]
+		polarization_in_plane = config["polarization_in_plane"]
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
@@ -185,7 +186,7 @@ class SimStruct():
 		geometry=[]
 		#Substrate
 		geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
-					size=mp.Vector3(sx+2*dpml,sy+2*dpml,sh+dpml),
+					size=mp.Vector3(2*sx+2*dpml,2*sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
 		
 
@@ -269,18 +270,12 @@ class SimStruct():
 		print('spos:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 
 		#Sets the polarization of the dipole to be in the plane, that is the pyramid wall
-		Polarization_in_Plane = False
-		if Polarization_in_Plane == True: 
-			length_of_normal = math.sin(math.pi/6)*self.pyramid_width*math.sqrt(self.pyramid_height**2+((math.cos(math.pi/6))**2)*self.pyramid_width**2)
-			source_direction_x = self.source_direction[0]*(1-math.sin(math.pi/6)*self.pyramid_width*self.pyramid_height/length_of_normal)
-			source_direction_y = self.source_direction[1]
-			source_direction_z = self.source_direction[2]*(1-self.pyramid_width**2*math.sin(math.pi/3)*(1/2)/length_of_normal)
-			length_of_pol = math.sqrt(source_direction_x**2+source_direction_y**2+source_direction_z**2)
-			self.source_direction = (source_direction_x/length_of_pol,source_direction_y/length_of_pol,source_direction_z/length_of_pol)
-			print('length of pol.vector:',length_of_pol)
-			print('new source direction:',self.source_direction)
 
-		print('self',self.source_direction)
+		#TODO: Move to pyramid.py
+		if polarization_in_plane == True: 
+			self.source_direction = PolarizeInPlane(self.source_direction,self.pyramid_height,self.pyramid_width)
+			print('new source dir',self.source_direction)
+
 		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=mp.Ex,
 				amplitude=self.source_direction[0],
@@ -297,7 +292,7 @@ class SimStruct():
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
-				geometry=geometry,
+			#	geometry=geometry,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
@@ -354,8 +349,10 @@ class SimStruct():
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0*abs_source_position_y,0),size=mp.Vector3(0,sy+2*dpml,sz+2*dpml)))
 			plt.show()
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0*abs_source_position_x,0,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
+			
 			plt.show()
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
+			#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,sz/2-sh-0.01),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			plt.show()
 		if use_fixed_time:
 			sim.run(
@@ -363,6 +360,7 @@ class SimStruct():
 			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 			until=simulation_time)
 		else:
+			#Withdraw maximum dipole amplitude direction
 			max_index = self.source_direction.index(max(self.source_direction))
 			if max_index == 0:
 				detector_pol = mp.Ex
@@ -512,7 +510,8 @@ class SimStruct():
 				X=np.zeros(pts**2)
 				Y=np.zeros(pts**2)
 				Z=np.zeros(pts**2)
-				print('pts',pts)
+				print('R pts',pts)
+				print('sample pts',len(xPts))
 				for n in range(pts):
 					xPts[n] = R[n]*xPts[n]
 					yPts[n] = R[n]*yPts[n]
@@ -523,21 +522,21 @@ class SimStruct():
 				# ax.set_zlim(-100,100)
 				# ax.set_ylim(-100,100)
 
-			#	ax.scatter(xPts,yPts,zPts)
-				u = np.linspace(0, 2 * np.pi, 100)
-				v = np.linspace(0, np.pi, 100)
-				r_ = np.asarray(R)
-				x = np.outer(np.cos(u), np.sin(v))
-				y = np.outer(np.sin(u), np.sin(v))
-				z = R*np.outer(np.ones(np.size(u)), np.cos(v))
-				print('lenx',len(x),'leny',len(y),'lenz',len(z))
+				ax.scatter(xPts,yPts,zPts)
+			#	u = np.linspace(0, 2 * np.pi, 100)
+			#	v = np.linspace(0, np.pi, 100)
+			#	r_ = np.asarray(R)
+			#	x = np.outer(np.cos(u), np.sin(v))
+			#	y = np.outer(np.sin(u), np.sin(v))
+			#	z = R*np.outer(np.ones(np.size(u)), np.cos(v))
+			#	print('lenx',len(x),'leny',len(y),'lenz',len(z))
 			#	r = np.sqrt(xPts**2+yPts**2+zPts**2)
 			#	plot(r)
-				ax.plot_surface(x,y,z,cmap='plasma')
-				ax.quiver(0,0,0,0,0,1,length=1.2,color='brown',normalize='true')
-				ax.text(0,0,1.3, '$\mathcal{P}$',size=20, zdir=None)
-				ax.set_zlim(-1,1)
-				ax.axis('off')
+			#	ax.plot_surface(x,y,z,cmap='plasma')
+			#	ax.quiver(0,0,0,0,0,1,length=1.2,color='brown',normalize='true')
+			#	ax.text(0,0,1.3, '$\mathcal{P}$',size=20, zdir=None)
+			#	ax.set_zlim(-1,1)
+			#	ax.axis('off')
 			#	ax.plot_trisurf(list(x),list(y),list(z),cmap='plasma')
 				plt.show()
 			for n in range(len(flux_tot_out)):
