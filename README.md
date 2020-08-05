@@ -8,9 +8,10 @@ search a given variable space and attempts to find the pyramid design in the var
 
 TODO: \
 -Round of values down to 1/resolution to remove ambiguity when meep rounds values\
--Process simulation results using e.g pandas. Using nested lists is pain when list depth is varying \
+-Process simulation results using e.g pandas/numpy/dicts. Using nested lists is pain when list depth is varying \
 -Create coherent simstruct simulate function that allows input from arbitrary geometries and sources \
 -Implement calculations for purcell effect \
 -There is a possible bug that one result is written several time to json result causing rbf method to crash \
+-Compare flux above simulation cell with far field again \
 -and a lot more..
 
