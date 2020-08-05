@@ -292,7 +292,7 @@ class SimStruct():
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
-			#	geometry=geometry,
+				geometry=geometry,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
@@ -481,7 +481,7 @@ class SimStruct():
 							"divided by npts and we get evenly sized area chunks" 					
 							surface_Element=2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
 							P_tot_ff[k] += surface_Element*(1)*(Pr)
-					#		print('S',surface_Element)
+							#print('S',surface_Element,'r',r,'theta',theta,'range npts',range_npts)
 							i = i + 6 #to keep track of the correct entries in the ff array
 				#	print('P_tot_ff',P_tot_ff)
 				#	print('fields',fields)
@@ -540,16 +540,16 @@ class SimStruct():
 			#	ax.plot_trisurf(list(x),list(y),list(z),cmap='plasma')
 				plt.show()
 			for n in range(len(flux_tot_out)):
-				flux_tot_out[n]=round(flux_tot_out[n],9)
+				flux_tot_out[n]=round(flux_tot_out[n],11)
 			#	P_tot_ff[n]=round(P_tot_ff[n],9)
 			##Some processing to calculate the flux ratios per frequency
 			if ff_calculations:
 				for n in range(len(flux_tot_out)):
 				#	flux_tot_out[n]=round(flux_tot_out[n],9)
-					P_tot_ff[n]=round(P_tot_ff[n],9)
+					P_tot_ff[n]=round(P_tot_ff[n],11)
 				for i in range(self.number_of_freqs):	
 
-					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],9)		
+					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],11)		
 				if ff_calc == "Both":
 					P_tot_ff = []
 					P_tot_ff.append(P_tot_ffA)
@@ -558,8 +558,8 @@ class SimStruct():
 					flux_tot_ff_ratioA = [0]*(self.number_of_freqs)	
 					flux_tot_ff_ratioB = [0]*(self.number_of_freqs)	
 					for i in range(self.number_of_freqs):	
-						flux_tot_ff_ratioA[i] =round(P_tot_ffA[i]/flux_tot_out[i],9)		
-						flux_tot_ff_ratioB[i] =round(P_tot_ffB[i]/flux_tot_out[i],9)
+						flux_tot_ff_ratioA[i] =round(P_tot_ffA[i]/flux_tot_out[i],11)		
+						flux_tot_ff_ratioB[i] =round(P_tot_ffB[i]/flux_tot_out[i],11)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)				
 				elapsed_time = round((time.time()-start)/60,1)

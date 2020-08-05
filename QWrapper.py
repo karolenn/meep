@@ -1,45 +1,11 @@
-from functionality.api import read, db_to_array, polar_to_complex_conv
-from functionality.functions import myPoyntingFlux
+from functionality.api import read, db_to_array, polar_to_complex_conv, complex_to_polar_conv
+from functionality.functions import myPoyntingFlux,PolarizeInPlane,linear_combine_fields,calculate_poynting_field,add_poynting_fields
+import matplotlib.pyplot as plt
 import numpy as np
 import math as math
 from random import uniform
     #keeps track on number of emission positions and dipole arrangement per position
 
-#this function linearly adds E,H fields with weights wx, wy, wz which corresponds due to linearity to the pyramids polarization, so (wx=1,wy=0,wz=0) is x polarized dipole
-#TODO:We might need to convert this to a faster method with increasing ffpts
-def linear_combine_fields(f1,f2,f3,wx,wy,wz,ff_pts):
-    tmp = []
-    #f is a list of lists of length ff_pts
-    for ffpt_i in range(ff_pts):
-        tmp.append([wx*px + wy*py + wz*pz for px, py, pz in zip(f1[ffpt_i], f2[ffpt_i], f3[ffpt_i])])
-    return tmp
-
-def add_poynting_fields(P_ff1,P_ff2,ff_pts):
-    tmp = []
-    #print(P_ff1)
-    for ffpt_i in range(ff_pts):
-        tmp.append([a + b for a, b in zip(P_ff1[ffpt_i], P_ff2[ffpt_i])])
-    return tmp
-
-
-
-#Calculate the poynting scalar field for a 3-group of pyramids
-#works for 1 pyramid
-def calculate_poynting_field(summed_ff,number_of_pyramids,ff_pts,nfreq):
-    tmp = []
-    ff_at_pt = []
-    for ffpt_i in range(ff_pts):
-        ff_at_pt = summed_ff[ffpt_i]
-   #     print('ff_at_pt',ff_at_pt)
-        poynting_vector_at_pt=[]
-        i=0
-        for freq in range(nfreq):
-            Pr = myPoyntingFlux(ff_at_pt,i)
-            poynting_vector_at_pt.append(Pr)
-        #    print('vec',poynting_vector_at_pt)
-            i = i + 6 #to keep track of the correct index in the far-field array for frequencies, (freq=1) Ex1,Ey1,..,Hx1,..Hz1,Ex2,...,Hz2,..
-        tmp.append(poynting_vector_at_pt)
-    return tmp
 
 def Qwell_wrapper(sim_name,number_of_dipoles):
 
@@ -55,7 +21,14 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     for pyramid in db:
         all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
     number_of_pyramids=len(all_ffields)-30*0
-    ff_pts = len(all_ffields[0])
+    ff_pts = db[0]["simulate"]["ff_pts"]
+    theta = math.pi/db[0]["simulate"]["ff_angle"]
+    if theta == math.pi/6:
+        npts = ff_pts*3
+    else:
+        npts = ff_pts
+    range_npts=int((theta/math.pi)*npts) 
+    ff_pts = range_npts
     nfreq=db[0]["pyramid"]["number_of_freqs"]
     print('nr of pyr',number_of_pyramids)
     print('number of ff pts',len(all_ffields[0]))
@@ -64,23 +37,18 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #Withdraw the E,H fields from polarization x,y,z
     #every triple is actually one dipole emission, but 1 pyramid emits from x, 1 from y, 1 from z, so they need to be added together, here called a "3-group"
     #this loop will go through the number of pyramids, but each pyramid will be selected in the inner loop
-    poynting_master_field =[0]*nfreq
-    poynting_master_field=[poynting_master_field]*ff_pts
+    poynting_total_field =[0]*nfreq
+    poynting_total_field=[poynting_total_field]*ff_pts
     total_flux = [0]*nfreq
     ff_flux = [0]*nfreq
     ff_flux_int = [0]*nfreq
-
-
+    ff_flux_int2 = []
+    total_flux_int = [0]*nfreq
+    total_flux_int2 = []
+    
 
     r=2*math.pow(db[0]["pyramid"]["pyramid_height"],2)*db[0]["pyramid"]["frequency_center"]*2*10
-    theta = math.pi/db[0]["simulate"]["ff_angle"]
-    if theta == math.pi/6:
-        npts = ff_pts*3
-    else:
-        npts = ff_pts
-    range_npts=int((theta/math.pi)*npts) 
-    print(r,theta,range_npts)
-    S = 2*math.pi*pow(r,2)*(1-math.cos(theta))/60
+    S = 2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
     print('r,theta,range_npts',r,theta,range_npts)
     print('S',S)
     #Loop through each "3-group"
@@ -97,47 +65,113 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         wx= uniform(-1,1)
         wy= uniform(-1,1)
         wz= uniform(-1,1)
+        #Project the polarization down in the plane, that is, the pyramid wall
+
+        plane_pol = PolarizeInPlane((wx,wy,wz),db[i]["pyramid"]["pyramid_height"],db[i]["pyramid"]["pyramid_width"])
+        
+        wx_plane = plane_pol[0]
+        wy_plane = plane_pol[1]
+        wz_plane = plane_pol[2]
+
         #Linear combine the 3-groups E,H fields 
-        summed_ff = linear_combine_fields(fval_x_dipole,fval_y_dipole,fval_z_dipole,wx,wy,wz,ff_pts)
 
+        summed_ff = linear_combine_fields(fval_x_dipole,fval_y_dipole,fval_z_dipole,wx_plane,wy_plane,wz_plane,ff_pts)
 
+        #Calculate the resulting poynting field from the 3 group
+        poynting_field = calculate_poynting_field(summed_ff,ff_pts,nfreq)
 
-        #print('summed_ff',summed_ff)
-        #    poyn_field = calculate_poynting_field(summed_ff,number_of_pyramids,ff_pts,nfreq)
-        #Calculate the resulting poynting field from the 3 group, and scale with number of pyramids 
-        poynting_field = calculate_poynting_field(summed_ff,number_of_pyramids,ff_pts,nfreq)
-      #  print('poynting field',poynting_field)
-        poynting_master_field = add_poynting_fields(poynting_master_field,poynting_field, ff_pts)
+        #add the poynting field from the 3-group to the total field
+        poynting_total_field = add_poynting_fields(poynting_total_field,poynting_field, ff_pts)
 
+        #Add the poynting vector values 
+        ff_flux_int = [0]*nfreq
         for n in range(ff_pts):
             for k in range(nfreq):
-                ff_flux_int[k] += poynting_master_field[n][k]
-        print(ff_flux_int)
+                ff_flux_int[k] += S*poynting_total_field[n][k]
+
+       # for k in range(nfreq):
+         #   for n in range(ff_pts):
+        #        ff_flux_int[k] += S*poynting_total_field[n][k]
+
+       # if i == 0:
+        #    print(poynting_field)
+        #    print(poynting_total_field)
+        #Due to the way lists are handle in python I can not save total_flux to a list so I need to create an internal list to save total_flux for each iteration
+        total_flux_int=[0]*nfreq
         for k in range(nfreq):
-            total_flux[k] += db[i+0]["result"]["total_flux"][k]*wx*wx+db[i+1]["result"]["total_flux"][k]*wy*wy+db[i+2]["result"]["total_flux"][k]*wz*wz
-            print('pyramid,freq, ratio:',i,k,ff_flux_int[k]/total_flux[k])
-          #  print(k,db[i+0]["result"]["total_flux"][k]*wx*wx)
-          #  print(k,db[i+1]["result"]["total_flux"][k]*wy*wy)
-          #  print(k,db[i+2]["result"]["total_flux"][k]*wz*wz)
-        #print('pol',wx,wy,wz)
-       # print('total flux',total_flux)
-       # print('new pyramid',i)
+            total_flux[k] += db[i+0]["result"]["total_flux"][k]*wx_plane*wx_plane+db[i+1]["result"]["total_flux"][k]*wy_plane*wy_plane+db[i+2]["result"]["total_flux"][k]*wz_plane*wz_plane
+            total_flux_int[k] += total_flux[k]
 
-   # print('poynting field fin',poynting_field)
-       # print('master:',poynting_master_field)
 
+
+        ff_flux_int2.append(ff_flux_int)
+        total_flux_int2.append(total_flux_int)
+ 
+
+        i_ = int(i/3)
+        freq=2
+        current_total_ratio = round(ff_flux_int2[i_][freq]/total_flux_int2[i_][freq],4)
+        print(f"pyramid group {i_}, result: total flux: {round(total_flux_int2[i_][freq],4)}, far field: {round(ff_flux_int2[i_][freq],6)}, ratio: {current_total_ratio}")
+       # print('ff flux int',ff_flux_int)
+      #  print('pyr flux',db[i+0]["result"]["total_flux"][freq]+db[i+1]["result"]["total_flux"][freq]+db[i+2]["result"]["total_flux"][freq])
+       # print('ff int',ff_flux_int[freq])
+        #print(db[i+0]["result"]["ff_at_angle"][freq],db[i+1]["result"]["ff_at_angle"][freq],db[i+2]["result"]["ff_at_angle"][freq])
+     #   print(db[i+0]["result"]["total_flux"][freq],db[i+1]["result"]["total_flux"][freq],db[i+2]["result"]["total_flux"][freq])
+     #   print('pyr ff',db[i+0]["result"]["ff_at_angle"][freq]+db[i+1]["result"]["ff_at_angle"][freq]+db[i+2]["result"]["ff_at_angle"][freq])
+       # print('3-group flux',db[i+0]["result"]["total_flux"][k]*wx_plane*wx_plane+db[i+1]["result"]["total_flux"][k]*wy_plane*wy_plane+db[i+2]["result"]["total_flux"][k]*wz_plane*wz_plane)
+        #print(i_,db[i_]["pyramid"]["source_direction"],db[i_]["result"]["ff_at_angle"][0],db[i_]["result"]["total_flux"][0],db[i_]["result"]["flux_ratio"][0],'tot ff',ff_flux_int2[i_][freq],'tot flux',total_flux_int2[i_][freq],'totratio',ff_flux_int2[i_][freq]/total_flux_int2[i_][freq])
+     #   print('tot ff',ff_flux_int2[i_][freq],'tot flux',total_flux_int2[i_][freq],'totratio',ff_flux_int2[i_][freq]/total_flux_int2[i_][freq])
 
     "TEST CODE FOR VERIFICATION"
-
+    print('ff db sum')
+    sum_ff=[0]*nfreq
+    sum_tot=[0]*nfreq
+    for pyramid in db:
+        for k in range(nfreq):
+            sum_ff[k] += pyramid["result"]["ff_at_angle"][k]
+            sum_tot[k] += pyramid["result"]["total_flux"][k]
+    print('db um',sum_ff,sum_tot)
 
     for n in range(ff_pts):
         for k in range(nfreq):
-            ff_flux[k] += S*poynting_master_field[n][k]
-    print('ff flux',ff_flux)
-    print('tot flux',total_flux)
-    for k in range(nfreq):
-        print('final freq,ratio:',k,ff_flux[k]/total_flux[k])
+            ff_flux[k] += S*poynting_total_field[n][k]
 
+
+    for k in range(nfreq):
+        print('final freq',k,'ff_angle',round(ff_flux[k],4),'tot',round(total_flux[k],4),'ratio',round(100*ff_flux[k]/total_flux[k],2),'%')
+
+    ff_1 = []
+    ff_2 = []
+    ff_3 = []
+    tot_1 = []
+    tot_2 = []
+    tot_3 = []
+    ratio_1 = []
+    ratio_2 = []
+    ratio_3 = []
+    ratio_4 = []
+
+    ratio_5 = []
+    index = []
+    for n in range(len(ff_flux_int2)):
+        ratio_1.append(100*ff_flux_int2[n][0]/total_flux_int2[n][0])
+        ratio_2.append(100*ff_flux_int2[n][1]/total_flux_int2[n][1])
+        ratio_3.append(100*ff_flux_int2[n][2]/total_flux_int2[n][2])
+       # ratio_4.append(100*ff_flux_int2[n][3]/total_flux_int2[n][3])
+      #  ratio_5.append(100*ff_flux_int2[n][4]/total_flux_int2[n][4])
+        index.append(n)
+
+
+    plt.plot(index,ratio_1,color='red',label='714 nm')
+    plt.plot(index,ratio_2,color='g',label='500 nm')#588 orange
+    plt.plot(index,ratio_3,color='m',label='385 nm')#500 g
+   # plt.plot(index,ratio_4,color='b',label='435 nm')
+   # plt.plot(index,ratio_5,color='m',label=' 385 nm')
+    plt.legend(loc='best')
+    plt.grid()
+    plt.ylabel('LEE (%)')
+    plt.xlabel('Number of dipoles')
+    plt.show()
 
 
 

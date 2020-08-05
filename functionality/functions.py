@@ -93,16 +93,15 @@ def myPoyntingFlux(ff,nfreq):
 
 #this function linearly adds E,H fields with weights wx, wy, wz which corresponds due to linearity to the pyramids polarization, so (wx=1,wy=0,wz=0) is x polarized dipole
 #TODO:We might need to convert this to a faster method with increasing ffpts
-def linear_combine_fields(f1,f2,f3,wx,wy,wz,ff_pts):
+def linear_combine_fields(f1,f2,f3,wx,wy,wz,f_pts):
     tmp = []
     #f is a list of lists of length ff_pts
-    for ffpt_i in range(ff_pts):
+    for ffpt_i in range(f_pts):
         tmp.append([wx*px + wy*py + wz*pz for px, py, pz in zip(f1[ffpt_i], f2[ffpt_i], f3[ffpt_i])])
     return tmp
 
 def add_poynting_fields(P_ff1,P_ff2,ff_pts):
     tmp = []
-    #print(P_ff1)
     for ffpt_i in range(ff_pts):
         tmp.append([a + b for a, b in zip(P_ff1[ffpt_i], P_ff2[ffpt_i])])
     return tmp
