@@ -19,7 +19,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #Withdraw all the far fields from all the pyramids in active db
     for pyramid in db:
         all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
-    number_of_pyramids=len(all_ffields)
+    number_of_pyramids=len(all_ffields)-3*50
     ff_pts = db[0]["simulate"]["ff_pts"]
     theta = math.pi/db[0]["simulate"]["ff_angle"]
     if theta == math.pi/6:
@@ -170,11 +170,11 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         index.append(n)
 
 
-    plt.plot(index,ratio_1,color='red',label='714 nm')
+    #plt.plot(index,ratio_1,color='red',label='714 nm')
     plt.plot(index,ratio_2,color='orange',label='588 nm')#588 orange
     plt.plot(index,ratio_3,color='g',label='500 nm')#500 g
     plt.plot(index,ratio_4,color='b',label='435 nm')
-    plt.plot(index,ratio_5,color='m',label=' 385 nm')
+    #plt.plot(index,ratio_5,color='m',label=' 385 nm')
     plt.legend(loc='best')
     plt.grid()
     plt.ylabel('LEE (%)')
@@ -243,12 +243,19 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     ax = plt.axes(projection='3d')
     ax.plot_trisurf(x_coord, y_coord, ff_pts_norm,
                 cmap='viridis', edgecolor='none')
+    ax.set_zlabel(r'$Normalized flux')
+    ax.set_title(r'$\lambda = 500 nm$')
+    ax.set_xlabel('x-coordinates')
+    ax.set_ylabel('y-coordinates')
     X, Y = np.meshgrid(x, y)
     z = RBF(X, Y)
-    print(z)
-    #
 
-    # plt.plot(x_cr,ff_pts_cr)
+    plt.show()
+
+    plt.plot(x,z[24])
+    plt.xlabel('x-coordinates')
+    plt.ylabel('Normalized flux (y=0)')
+    print('z24',z[24])
     plt.show()
 
  
