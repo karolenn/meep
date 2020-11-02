@@ -19,7 +19,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #Withdraw all the far fields from all the pyramids in active db
     for pyramid in db:
         all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
-    number_of_pyramids=len(all_ffields)-3*50
+    number_of_pyramids=len(all_ffields)
     ff_pts = db[0]["simulate"]["ff_pts"]
     theta = math.pi/db[0]["simulate"]["ff_angle"]
     if theta == math.pi/6:
@@ -44,6 +44,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     ff_flux_int2 = []
     total_flux_int = [0]*nfreq
     total_flux_int2 = []
+    dipole_positions = []
     
 
     r=2*math.pow(db[0]["pyramid"]["pyramid_height"],2)*db[0]["pyramid"]["frequency_center"]*2*10
@@ -52,6 +53,9 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     print('S',S)
     #Loop through each "3-group"
     for i in range(0,number_of_pyramids,3):
+
+
+        dipole_positions.append(db[i]["pyramid"]["source_position"])
         #select position and field from all_ffields from pyramid with dipole x,y,z respectively.
         ff_x_dipole = all_ffields[i+0]
         ff_y_dipole = all_ffields[i+1]
@@ -181,8 +185,29 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     plt.xlabel('Number of dipoles')
     plt.show()
 
+
+    pyramid_height = db[0]["pyramid"]["pyramid_height"]
+    inner_pyramid_height = pyramid_height - 0.1
+    simulation_ratio = 6/5
+    subsrate_ratio = 1/10
+    sh = subsrate_ratio*pyramid_height
+    sz=pyramid_height*simulation_ratio
+
     #PLOTTER FUNCTIONS
-    
+    #dipole plot
+    ax = plt.axes(projection='3d')
+    print('dipol pos',dipole_positions)
+    x_spos,y_spos,z_spos = zip(*dipole_positions)
+    xspos = []
+    yspos = []
+    zspos = []
+    for n in range(len(x_spos)):
+        xspos.append((inner_pyramid_height*z_spos[n]*math.cos(math.pi/6))/math.tan(62*math.pi/180))
+        yspos.append(y_spos[n]*math.tan(math.pi/6)*(inner_pyramid_height*z_spos[n]*math.cos(math.pi/6))/math.tan(62*math.pi/180))
+        zspos.append(sz/2-sh-inner_pyramid_height+inner_pyramid_height*z_spos[n])
+    ax.scatter(xspos,yspos,zspos)
+    plt.show()
+
     #field freq to plot
     ff_pts_norm = []
     for n in range(ff_pts):
@@ -201,8 +226,8 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     phi = []
     y_coord = []
     theta = []
-    print('ff_coords',ff_coords)
-    print('ff',ff_pts_norm)
+  # print('ff_coords',ff_coords)
+   # print('ff',ff_pts_norm)
     for k in range(len(ff_coords)):
         x = ff_coords[k][0]
         y = ff_coords[k][1]
