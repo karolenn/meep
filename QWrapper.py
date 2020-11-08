@@ -1,5 +1,6 @@
 from functionality.api import read, db_to_array, polar_to_complex_conv, complex_to_polar_conv
-from functionality.functions import myPoyntingFlux,PolarizeInPlane,linear_combine_fields,calculate_poynting_field,add_poynting_fields
+from functionality.functions import myPoyntingFlux,PolarizeInPlane, draw_uniform
+from functionality.QWrapper_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
 import math as math
@@ -9,19 +10,25 @@ from random import uniform
 
 def Qwell_wrapper(sim_name,number_of_dipoles):
 
+    #load simulation data
     db = read("db/initial_results/{}.json".format(sim_name))
     if db == None:
         print("could not open db/initial_results/{}.json".format(sim_name))
         exit(0)
 
+    #array to save resulting E,H far-fields in
     all_ffields = []
 
     #Withdraw all the far fields from all the pyramids in active db
+    #in db fields are stored in polar it is converted to complex here as well
     for pyramid in db:
         all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
+
+    #load simulation parameters
     number_of_pyramids=len(all_ffields)
     ff_pts = db[0]["simulate"]["ff_pts"]
     theta = math.pi/db[0]["simulate"]["ff_angle"]
+    #TODO: Redesign this ugly hack in the fibbonacci sampling algorithm
     if theta == math.pi/6:
         npts = ff_pts*3
     else:
@@ -29,16 +36,19 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     range_npts=int((theta/math.pi)*npts) 
     ff_pts = range_npts
     nfreq=db[0]["pyramid"]["number_of_freqs"]
-    print('nr of pyr',number_of_pyramids)
-    print('number of ff pts',len(all_ffields[0]))
-    print('nr of freqs',nfreq)
 
     #Withdraw the E,H fields from polarization x,y,z
     #every triple is actually one dipole emission, but 1 pyramid emits from x, 1 from y, 1 from z, so they need to be added together, here called a "3-group"
     #this loop will go through the number of pyramids, but each pyramid will be selected in the inner loop
+
+    #initialize lists for the loop below
+
+    #stores the poyning vecors
     poynting_total_field =[0]*nfreq
     poynting_total_field=[poynting_total_field]*ff_pts
+    #stores the total summed up flux
     total_flux = [0]*nfreq
+    #stores the far field for one 3 group
     ff_flux = [0]*nfreq
     ff_flux_int = [0]*nfreq
     ff_flux_int2 = []
@@ -60,29 +70,28 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         ff_x_dipole = all_ffields[i+0]
         ff_y_dipole = all_ffields[i+1]
         ff_z_dipole = all_ffields[i+2]
+
         #select only the field values at each far-field point
         fval_x_dipole = [d['field'] for d in ff_x_dipole]
         fval_y_dipole = [d['field'] for d in ff_y_dipole]
         fval_z_dipole = [d['field'] for d in ff_z_dipole]
+
         #randomize polarization for the 3-groups dipole
-        wx= uniform(-1,1)
-        wy= uniform(-1,1)
-        wz= uniform(-1,1)
+        pol_range = {"from": -1, "to": 1}
+        wx,wy,wz = draw_uniform(pol_range,pol_range,pol_range)
+
         #Project the polarization down in the plane, that is, the pyramid wall
-
-        plane_pol = PolarizeInPlane((wx,wy,wz),db[i]["pyramid"]["pyramid_height"],db[i]["pyramid"]["pyramid_width"])
-        
-        wx_plane = plane_pol[0]
-        wy_plane = plane_pol[1]
-        wz_plane = plane_pol[2]
-
+        wx_plane,wy_plane,wz_plane = PolarizeInPlane((wx,wy,wz),db[i]["pyramid"]["pyramid_height"],db[i]["pyramid"]["pyramid_width"])
+       
         #Linear combine the 3-groups E,H fields 
         summed_ff_3g = linear_combine_fields(fval_x_dipole,fval_y_dipole,fval_z_dipole,wx_plane,wy_plane,wz_plane,ff_pts)
 
         #Calculate the resulting poynting field from the 3 group
         poynting_field_3g = calculate_poynting_field(summed_ff_3g,ff_pts,nfreq)
+
         #add the poynting field from the 3-group to the total field
         poynting_total_field = add_poynting_fields(poynting_total_field,poynting_field_3g, ff_pts)
+
 
         #Add the poynting vector values 
 
@@ -196,7 +205,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #PLOTTER FUNCTIONS
     #dipole plot
     ax = plt.axes(projection='3d')
-    print('dipol pos',dipole_positions)
+    #print('dipol pos',dipole_positions)
     x_spos,y_spos,z_spos = zip(*dipole_positions)
     xspos = []
     yspos = []
@@ -280,7 +289,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     plt.plot(x,z[24])
     plt.xlabel('x-coordinates')
     plt.ylabel('Normalized flux (y=0)')
-    print('z24',z[24])
+    #print('z24',z[24])
     plt.show()
 
  

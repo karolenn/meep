@@ -91,43 +91,11 @@ def myPoyntingFlux(ff,nfreq):
 
 
 
-#this function linearly adds E,H fields with weights wx, wy, wz which corresponds due to linearity to the pyramids polarization, so (wx=1,wy=0,wz=0) is x polarized dipole
-#TODO:We might need to convert this to a faster method with increasing ffpts
-def linear_combine_fields(f1,f2,f3,wx,wy,wz,f_pts):
-    tmp = []
-    #f is a list of lists of length ff_pts
-    for ffpt_i in range(f_pts):
-        tmp.append([wx*px + wy*py + wz*pz for px, py, pz in zip(f1[ffpt_i], f2[ffpt_i], f3[ffpt_i])])
-    return tmp
 
-def add_poynting_fields(P_ff1,P_ff2,ff_pts):
-    tmp = []
-    for ffpt_i in range(ff_pts):
-        tmp.append([a + b for a, b in zip(P_ff1[ffpt_i], P_ff2[ffpt_i])])
-    return tmp
-
-
-
-#Calculate the poynting scalar field for a 3-group of pyramids
-#works for 1 pyramid
-def calculate_poynting_field(summed_ff,ff_pts,nfreq):
-    tmp = []
-    ff_at_pt = []
-    for ffpt_i in range(ff_pts):
-        ff_at_pt = summed_ff[ffpt_i]
-   #     print('ff_at_pt',ff_at_pt)
-        poynting_vector_at_pt=[]
-        i=0
-        for freq in range(nfreq):
-            Pr = myPoyntingFlux(ff_at_pt,i)
-            poynting_vector_at_pt.append(Pr)
-        #    print('vec',poynting_vector_at_pt)
-            i = i + 6 #to keep track of the correct index in the far-field array for frequencies, (freq=1) Ex1,Ey1,..,Hx1,..Hz1,Ex2,...,Hz2,..
-        tmp.append(poynting_vector_at_pt)
-    return tmp
 
 ###Draw a point in 3d space from a uniform distribution
-def get_next(limit_x, limit_y, limit_z):
+#renamed from get_next to draw_uniform
+def draw_uniform(limit_x, limit_y, limit_z):
     x = uniform(limit_x["from"], limit_x["to"])
     y = uniform(limit_y["from"], limit_y["to"])
     z = uniform(limit_z["from"], limit_z["to"])
@@ -196,7 +164,7 @@ def generate_rand_pt(limit_x, limit_y, limit_z, radius, satisfied, max_time, alr
 			print('selected point in generate_rand_pt',selected)
 			print('choice point in generate_rand_pt',choice)
 			break
-		x, y, z = get_next(limit_x, limit_y, limit_z)
+		x, y, z = draw_uniform(limit_x, limit_y, limit_z)
 		if valid(x,y,z, selected, radius):
 			choice.append((x, y, z))
 	return choice
@@ -303,7 +271,7 @@ def rand_pt_minmax(data):
 		limit_y = {"from": miny, "to":maxy }
 		list_rand_pts=[]
 		for i in range(satisfied):
-			randX, randY, randZ = get_next(dict01,dict01,dict01)
+			randX, randY, randZ = draw_uniform(dict01,dict01,dict01)
 			list_rand_pts.append((randX,randY))
 		dist_to_closest_pt = 990
 		current_best_pt = [0,0]
