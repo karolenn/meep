@@ -1,13 +1,14 @@
 from random import uniform, randint
 from .functions import myPoyntingFlux
 from collections import deque
+import math as math
 
 
 
 
 ###Functionality for the Qwrapper in order to simulate quantum well emission
 
-#this function linearly adds E,H fields with weights wx, wy, wz which corresponds due to linearity to the pyramids polarization, so (wx=1,wy=0,wz=0) is x polarized dipole
+#this function linearly adds E,H fields with weights wx, wy, wz for a 3-group which corresponds due to linearity to the pyramids polarization, so (wx=1,wy=0,wz=0) is x polarized dipole
 #TODO:We might need to convert this to a faster method with increasing ffpts
 def linear_combine_fields(f1,f2,f3,wx,wy,wz,f_pts):
     tmp = []
@@ -24,7 +25,7 @@ def add_poynting_fields(P_ff1,P_ff2,ff_pts):
 
 
 
-#Calculate the poynting scalar field for a 3-group of pyramids
+#Calculate the poynting scalar field for a 3-group 
 #works for 1 pyramid
 def calculate_poynting_field(summed_ff,ff_pts,nfreq):
     tmp = []
@@ -46,5 +47,34 @@ def rotate_field(field,rotation,ff_pts):
     #n = 0 for no rotation, n=1 60 degrees,.., n=5 300 degrees.
     n = randint(0,5)
 
-    for i in n*ff_pts
-    field.append(field.pop)
+def rotate_coordinate(x,y,z,rotation_integer):
+    n = rotation_integer
+  #  print('--')
+  #  print(x,y)
+    rotation_pos_x = x*math.cos(n*math.pi/3)-math.sin(n*math.pi/3)*y
+    rotation_pos_y = x*math.sin(n*math.pi/3)+math.cos(n*math.pi/3)*y
+  #  print(rotation_pos_x,rotation_pos_y)
+   # print('--')
+
+    return rotation_pos_x,rotation_pos_y,z
+
+#rotate x,y position for a list of coords [[x1,y1,z1],[x2,y2,z2],...,[xi,yi,zi]]
+def rotate_coordinate_list(list_of_coords,rotation_integer):
+
+    len_of_list = len(list_of_coords)
+
+    n = rotation_integer
+
+    rotated_list = []
+    for i in range(len_of_list):
+        x = list_of_coords[i][0]
+        y = list_of_coords[i][1]
+        z = list_of_coords[i][2]
+        x_rot = x*math.cos(n*math.pi/3)-math.sin(n*math.pi/3)*y
+        y_rot = x*math.sin(n*math.pi/3)+math.cos(n*math.pi/3)*y
+        z = z
+        rotated_list.append([x,y,z])
+
+    return rotated_list
+
+

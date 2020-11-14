@@ -4,7 +4,7 @@ from functionality.QWrapper_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
 import math as math
-from random import uniform
+from random import uniform, randint
     #keeps track on number of emission positions and dipole arrangement per position
 
 
@@ -16,16 +16,8 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         print("could not open db/initial_results/{}.json".format(sim_name))
         exit(0)
 
-    #array to save resulting E,H far-fields in
-    all_ffields = []
-
-    #Withdraw all the far fields from all the pyramids in active db
-    #in db fields are stored in polar it is converted to complex here as well
-    for pyramid in db:
-        all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
-
     #load simulation parameters
-    number_of_pyramids=len(all_ffields)
+    number_of_pyramids=len(db)
     ff_pts = db[0]["simulate"]["ff_pts"]
     theta = math.pi/db[0]["simulate"]["ff_angle"]
     #TODO: Redesign this ugly hack in the fibbonacci sampling algorithm
@@ -36,6 +28,15 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     range_npts=int((theta/math.pi)*npts) 
     ff_pts = range_npts
     nfreq=db[0]["pyramid"]["number_of_freqs"]
+
+    #array to save resulting E,H far-fields in
+    all_ffields = []
+
+    #Withdraw all the far fields from all the pyramids in active db
+    #in db fields are stored in polar it is converted to complex here as well
+    for pyramid in db:
+        all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
+
 
     #Withdraw the E,H fields from polarization x,y,z
     #every triple is actually one dipole emission, but 1 pyramid emits from x, 1 from y, 1 from z, so they need to be added together, here called a "3-group"
@@ -54,18 +55,51 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     ff_flux_int2 = []
     total_flux_int = [0]*nfreq
     total_flux_int2 = []
+
+
     dipole_positions = []
-    
+    dipole_positions_rotated = []
+
+    #
+    all_field_pos = []
 
     r=2*math.pow(db[0]["pyramid"]["pyramid_height"],2)*db[0]["pyramid"]["frequency_center"]*2*10
     S = 2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
+    print('Initializing quantum well calculations, number of 3-group is:',number_of_pyramids/3)
     print('r,theta,range_npts',r,theta,range_npts)
     print('S',S)
+
+
+    #save the initial far-field coordinates. The assumption is now that all the 3-groups have the same far-field sampling coordinates!
+    initial_ff_coords = []
+    far_field = db[0]["result"]["far_fields"]
+    for n in range(ff_pts):
+        ff_sampling_coord = far_field[n]["pos"]
+        initial_ff_coords.append(ff_sampling_coord)
+
+    #far-field coordinates for all 3-groups after rotation
+    poynting_field_coords = []
+
+    #rotation integers for all 3-groups
+    rotation_integers = []
+
     #Loop through each "3-group"
     for i in range(0,number_of_pyramids,3):
 
+        
+        #select dipole position for corresponding 3-group 
+        current_dipole_position = db[i]["pyramid"]["source_position"]
 
-        dipole_positions.append(db[i]["pyramid"]["source_position"])
+        #randomize rotation (that is, randomize wall that dipole is located on)
+        rotation_for_3g = randint(0,5)
+        rotation_integers.append(rotation_for_3g)
+
+        #rotation the far-field coordinates for the corresponding 3-group
+        poynting_field_coords.append(rotate_coordinate_list(initial_ff_coords,rotation_for_3g))
+
+        #save current dipole position. Current dipole position and the rotation integer can recreate the rotated dipole position.
+        dipole_positions.append(current_dipole_position)
+
         #select position and field from all_ffields from pyramid with dipole x,y,z respectively.
         ff_x_dipole = all_ffields[i+0]
         ff_y_dipole = all_ffields[i+1]
@@ -144,6 +178,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
       #  print(f"pyramid group {i_}, result: total flux: {round(total_flux_int2[i_][freq],4)}, far field: {round(ff_flux_int2[i_][freq],6)}, ratio: {current_total_ratio}")
 
     "TEST CODE FOR VERIFICATION"
+  #  print(all_field_pos)
     print('ff db sum')
     sum_ff=[0]*nfreq
     sum_tot=[0]*nfreq
@@ -205,15 +240,26 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #PLOTTER FUNCTIONS
     #dipole plot
     ax = plt.axes(projection='3d')
-    #print('dipol pos',dipole_positions)
+    print('dipol pos list length',len(dipole_positions))
     x_spos,y_spos,z_spos = zip(*dipole_positions)
+    X_ = []
+    Y_ = []
+    Z_ = []
     xspos = []
     yspos = []
     zspos = []
     for n in range(len(x_spos)):
-        xspos.append((inner_pyramid_height*z_spos[n]*math.cos(math.pi/6))/math.tan(62*math.pi/180))
-        yspos.append(y_spos[n]*math.tan(math.pi/6)*(inner_pyramid_height*z_spos[n]*math.cos(math.pi/6))/math.tan(62*math.pi/180))
-        zspos.append(sz/2-sh-inner_pyramid_height+inner_pyramid_height*z_spos[n])
+        x = (inner_pyramid_height*z_spos[n]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+        y = y_spos[n]*math.tan(math.pi/6)*(inner_pyramid_height*z_spos[n]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+        z = sz/2-sh-inner_pyramid_height+inner_pyramid_height*z_spos[n]
+
+        #rotate dipole position
+        x,y,z = rotate_coordinate(x,y,z,rotation_integers[n])
+
+        xspos.append(x)
+        yspos.append(y)
+        zspos.append(z)
+
     ax.scatter(xspos,yspos,zspos)
     plt.show()
 
