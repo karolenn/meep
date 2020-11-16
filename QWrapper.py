@@ -83,6 +83,9 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #rotation integers for all 3-groups
     rotation_integers = []
 
+    #poynting field values for rotated coords
+    poynting_total_field_rotated = []
+
     #Loop through each "3-group"
     for i in range(0,number_of_pyramids,3):
 
@@ -125,7 +128,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
         #add the poynting field from the 3-group to the total field
         poynting_total_field = add_poynting_fields(poynting_total_field,poynting_field_3g, ff_pts)
-
+        poynting_total_field_rotated.append(poynting_field_3g)
 
         #Add the poynting vector values 
 
@@ -177,6 +180,15 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
             print('LEE:',ff_flux_3group[freq]/(db[i+0]["result"]["total_flux"][freq]*wx_plane*wx_plane+db[i+1]["result"]["total_flux"][freq]*wy_plane*wy_plane+db[i+2]["result"]["total_flux"][freq]*wz_plane*wz_plane))
       #  print(f"pyramid group {i_}, result: total flux: {round(total_flux_int2[i_][freq],4)}, far field: {round(ff_flux_int2[i_][freq],6)}, ratio: {current_total_ratio}")
 
+    "calculate ff_flux for rotated poynting field"
+    ff_flux_tot_rot = [0]*nfreq
+    for j in range(int(number_of_pyramids/3)):
+        for n in range(ff_pts):
+            for k in range(nfreq):
+                ff_flux_tot_rot[k] += S*poynting_total_field_rotated[j][n][k]
+    #for n in range(ff_pts):
+
+    print('ff flux tot rot:',ff_flux_tot_rot)
     "TEST CODE FOR VERIFICATION"
   #  print(all_field_pos)
     print('ff db sum')
@@ -263,19 +275,28 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     ax.scatter(xspos,yspos,zspos)
     plt.show()
 
+
     #field freq to plot
     ff_pts_norm = []
-    for n in range(ff_pts):
-        ff_pts_norm.append(poynting_total_field[n][freq])
+    for i in range(int(number_of_pyramids/3)):
+        for n in range(ff_pts):
+            ff_pts_norm.append(poynting_total_field_rotated[i][n][freq])
     max_val = max(ff_pts_norm)
 
-    for n in range(ff_pts):
-        ff_pts_norm[n] = ff_pts_norm[n]/max_val
+   # for n in range(ff_pts):
+    #    ff_pts_norm[n] = ff_pts_norm[n]/max_val
     #print(ff_pts_norm)
 
     ff_coords = []
-    for k in range(len(all_ffields[0])):
-        ff_coords.append(all_ffields[0][k]["pos"])
+    #""   for k in range(len(all_ffields[0])):
+    #      ff_coords.append(all_ffields[0][k]["pos"])
+    print('len',len(poynting_field_coords))
+    print('len2',len(poynting_field_coords[1]))
+   # print(poynting_field_coords[1])
+    for i in range(int(number_of_pyramids/3)):
+        for n in range(ff_pts):
+            ff_coords.append(poynting_field_coords[i][n])
+
     #print(ff_coords)
     x_coord = []
     phi = []
@@ -299,15 +320,22 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         theta.append(theta_)
 
 
+    ax.scatter(x_coord,y_coord,ff_pts_norm)
+    plt.show()
     from scipy.interpolate import Rbf
 
-    RBF = Rbf(x_coord,y_coord,ff_pts_norm)
+   # RBF = Rbf(x_coord,y_coord,ff_pts_norm,epsilon = 2)
 
     x = np.linspace(min(x_coord),max(x_coord))
     y = np.linspace(min(y_coord),max(y_coord))
 
-    rbf_data = RBF(x,y)
-
+   # rbf_data = RBF(x,y)
+    print('ff pts norm',len(ff_pts_norm))
+    print('stats')
+    import statistics as stats
+    print(stats.mean(ff_pts_norm))
+    print(stats.median(ff_pts_norm))
+    print(stats.stdev(ff_pts_norm))
     #select cross sections
     x_cr = []
     y_cr = []
@@ -320,23 +348,26 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
  
     x_cr,ff_pts_cr = zip(*sorted(zip(x_cr,ff_pts_cr)))
 
+    print('xcord len',len(x_coord))
     ax = plt.axes(projection='3d')
     ax.plot_trisurf(x_coord, y_coord, ff_pts_norm,
                 cmap='viridis', edgecolor='none')
-    ax.set_zlabel(r'$Normalized flux')
+    ax.set_zlabel(r'$ flux')
     ax.set_title(r'$\lambda = 500 nm$')
     ax.set_xlabel('x-coordinates')
     ax.set_ylabel('y-coordinates')
-    X, Y = np.meshgrid(x, y)
-    z = RBF(X, Y)
+  #  X, Y = np.meshgrid(x, y)
+   # z = RBF(X, Y)
 
     plt.show()
 
-    plt.plot(x,z[24])
-    plt.xlabel('x-coordinates')
-    plt.ylabel('Normalized flux (y=0)')
+    plt.hist(ff_pts_norm,100)
+    plt.show()
+   # plt.plot(x,z[24])
+   # plt.xlabel('x-coordinates')
+    #plt.ylabel('Normalized flux (y=0)')
     #print('z24',z[24])
-    plt.show()
+
 
  
 if __name__ == "__main__":

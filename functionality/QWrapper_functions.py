@@ -73,8 +73,7 @@ def rotate_coordinate_list(list_of_coords,rotation_integer):
         x_rot = x*math.cos(n*math.pi/3)-math.sin(n*math.pi/3)*y
         y_rot = x*math.sin(n*math.pi/3)+math.cos(n*math.pi/3)*y
         z = z
-        rotated_list.append([x,y,z])
-
+        rotated_list.append([x_rot,y_rot,z])
     return rotated_list
 
 
