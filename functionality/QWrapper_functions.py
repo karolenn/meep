@@ -19,10 +19,22 @@ def linear_combine_fields(f1,f2,f3,wx,wy,wz,f_pts):
 
 def add_poynting_fields(P_ff1,P_ff2,ff_pts):
     tmp = []
+    #print('p1',P_ff1)
+    #print('p2',P_ff2)
     for ffpt_i in range(ff_pts):
         tmp.append([a + b for a, b in zip(P_ff1[ffpt_i], P_ff2[ffpt_i])])
     return tmp
 
+def add_poynting_fields_rotated(P_ff1,P_ff2,ff_pts,rotation_integer,nfreq):
+    tmp = initialize_poynting_far_field_rotated(ff_pts,nfreq)
+    print('here')
+    print('rotint',rotation_integer)
+    if P_ff1[rotation_integer] == []:
+        print('ye')
+        print(P_ff1)
+        print('rot int',rotation_integer)
+    tmp[rotation_integer] = add_poynting_fields(P_ff1[rotation_integer],P_ff2,ff_pts)
+    return tmp
 
 
 #Calculate the poynting scalar field for a 3-group 
@@ -76,4 +88,38 @@ def rotate_coordinate_list(list_of_coords,rotation_integer):
         rotated_list.append([x_rot,y_rot,z])
     return rotated_list
 
+#initialize poynting field coords
+def initialize_poynting_far_field_rotated(ff_pts,nfreq):
+    return [[[0]*nfreq]*ff_pts]*6
+
+
+
+
+
+
+def unpack_poynting_coords_rotated(initial_coords):
+    x = []
+    y = []
+    z = []
+    for n in range(len(list_of_coords)):
+        for i in range(len(list_of_coords[0])):
+            x.append(list_of_coords[n][i][0])
+            y.append(list_of_coords[n][i][1])
+            z.append(list_of_coords[n][i][2])
+    return x,y,z
+
+def create_far_field_coords(initial_ff_coords):
+    x = []
+    y = []
+    z = []
+    for k in range(len(initial_ff_coords)):
+        for n in range(6):
+            x_ = initial_ff_coords[k][0]
+            y_ = initial_ff_coords[k][1]
+            z_ = initial_ff_coords[k][2]
+            x_rot, y_rot, z_rot = rotate_coordinate(x_,y_,z_,n)
+            x.append(x_rot)
+            y.append(y_rot)
+            z.append(z_rot)
+    return x,y,z
 
