@@ -5,7 +5,7 @@ import time
 from random import uniform 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from .functions import get_next
+from .functions import draw_uniform
 from .functions import valid
 from math import tan, pi
 
@@ -59,7 +59,7 @@ def generate_rand_dist(limit_x, limit_y, limit_z, radius, satisfied, max_time = 
 		if len(selected) >= satisfied:
 		#	print('selected',selected)
 			break
-		x, y, z = get_next(limit_x, limit_y, limit_z)
+		x, y, z = draw_uniform(limit_x, limit_y, limit_z)
 		if valid(x,y,z, selected, radius):
 			selected.append((round(x,2), round(y,2), round(z,2)))
 	return selected

@@ -412,7 +412,7 @@ class SimStruct():
 					npts=npts*2.5
 					offset=0.95/npts
 				elif theta==math.pi/6:
-					npts=npts*3
+					#npts=npts*3
 					offset=0.8/npts
 				elif theta==math.pi/7:
 					npts=npts*3
@@ -425,9 +425,11 @@ class SimStruct():
 					offset=0.4/npts
 				else:
 					offset=2/npts
-				fibspherepts(r,theta,npts,xPts,yPts,zPts,offset)
+				#fibspherepts(r,theta,npts,xPts,yPts,zPts,offset)
+				sphericalpts(r,theta,phi,npts,xPts,yPts,zPts)
 				
-				range_npts=int((theta/math.pi)*npts)
+				#range_npts=int((theta/math.pi)*npts)
+				range_npts = int(npts**2)
 				#npts=range_npts
 
 				if ff_calc == "Both":
@@ -455,6 +457,7 @@ class SimStruct():
 				if ff_calc == "Below":
 					for n in range(range_npts):
 						ff=sim.get_farfield(nearfieldBelow, mp.Vector3(xPts[n],yPts[n],-1*zPts[n]))
+						fields.append({"pos":(xPts[n],yPts[n],zPts[n]),"field":ff})
 						i=0
 						for k in range(nfreq):
 							"Calculate the poynting vector in x,y,z direction"
@@ -519,25 +522,26 @@ class SimStruct():
 				# #print(X)
 				# #print(Y)
 				# #print(Z)
-				# ax.set_zlim(-100,100)
-				# ax.set_ylim(-100,100)
+				#ax.set_xlim(-100,100)
+				#ax.set_zlim(-100,100)
+				#ax.set_ylim(-100,100)
 
-				ax.scatter(xPts,yPts,zPts)
-			#	u = np.linspace(0, 2 * np.pi, 100)
-			#	v = np.linspace(0, np.pi, 100)
-			#	r_ = np.asarray(R)
-			#	x = np.outer(np.cos(u), np.sin(v))
-			#	y = np.outer(np.sin(u), np.sin(v))
-			#	z = R*np.outer(np.ones(np.size(u)), np.cos(v))
-			#	print('lenx',len(x),'leny',len(y),'lenz',len(z))
-			#	r = np.sqrt(xPts**2+yPts**2+zPts**2)
-			#	plot(r)
-			#	ax.plot_surface(x,y,z,cmap='plasma')
-			#	ax.quiver(0,0,0,0,0,1,length=1.2,color='brown',normalize='true')
-			#	ax.text(0,0,1.3, '$\mathcal{P}$',size=20, zdir=None)
-			#	ax.set_zlim(-1,1)
-			#	ax.axis('off')
-			#	ax.plot_trisurf(list(x),list(y),list(z),cmap='plasma')
+				#ax.scatter(xPts,yPts,zPts)
+				u = np.linspace(0, 2 * np.pi, 120)
+				v = np.linspace(0, np.pi/6, 120)
+				r_ = np.asarray(R)
+				x = np.outer(np.cos(u), np.sin(v))
+				y = np.outer(np.sin(u), np.sin(v))
+				z = R*np.outer(np.ones(np.size(u)), np.cos(v))
+				print('lenx',len(x),'leny',len(y),'lenz',len(z))
+				#r = np.sqrt(xPts**2+yPts**2+zPts**2)
+				#plot(r)
+				ax.plot_surface(x,y,z,cmap='plasma')
+				#ax.quiver(0,0,0,0,0,1,length=1.2,color='brown',normalize='true')
+				#ax.text(0,0,1.3, '$\mathcal{P}$',size=20, zdir=None)
+				#ax.set_zlim(-1,1)
+				#ax.axis('off')
+				#ax.plot_trisurf(list(x),list(y),list(z),cmap='plasma')
 				plt.show()
 			for n in range(len(flux_tot_out)):
 				flux_tot_out[n]=round(flux_tot_out[n],11)

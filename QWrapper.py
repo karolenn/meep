@@ -18,6 +18,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
     #load simulation parameters
     number_of_pyramids=len(db)
+    number_of_pyramids = 2
     ff_pts = db[0]["simulate"]["ff_pts"]
     theta = math.pi/db[0]["simulate"]["ff_angle"]
     #TODO: Redesign this ugly hack in the fibbonacci sampling algorithm
@@ -97,7 +98,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     print(len(poynting_total_field_rotated2[5]))
     print(len(poynting_total_field_rotated2[5][0]))
     #Loop through each "3-group"
-    for i in range(0,number_of_pyramids,3):
+    for i in range(0,int(number_of_pyramids),3):
 
         
         #select dipole position for corresponding 3-group 
@@ -245,8 +246,19 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     print('lenn',len(ff_values))
     #plot emissi,on lobe
     ax3 = plt.axes(projection='3d')
-    ax3.plot_trisurf(x, y, ff_values,
-                cmap='viridis', edgecolor='none')
+    #ax3.plot_trisurf(x, y, ff_values,cmap='viridis', edgecolor='none')
+
+
+    X = []
+    Y = []
+    Z = []
+    for n in range(len(x)):
+        X.append(x[n]*ff_values[n])
+        Y.append(y[n]*ff_values[n])
+        Z.append(z[n]*ff_values[n])
+
+    ax3.plot_trisurf(X,Y,Z,cmap='jet',edgecolor='none')
+    
     ax3.set_zlabel(r'$ flux')
     ax3.set_title(r'$\lambda = 500 nm$')
     ax3.set_xlabel('x-coordinates')
@@ -371,7 +383,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     plt.show()
     from scipy.interpolate import Rbf
 
-    RBF = Rbf(x_coord,y_coord,ff_pts_norm,epsilon = 2)
+  #  RBF = Rbf(x_coord,y_coord,ff_pts_norm,epsilon = 2)
 
     x = np.linspace(min(x_coord),max(x_coord))
     y = np.linspace(min(y_coord),max(y_coord))
@@ -380,7 +392,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #generate a list of all possible poynting field cooordinates
     
 
-    rbf_data = RBF(x,y)
+   # rbf_data = RBF(x,y)
     print('ff pts norm',len(ff_pts_norm))
     print('stats')
     import statistics as stats
@@ -401,8 +413,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
     print('xcord len',len(x_coord))
     ax = plt.axes(projection='3d')
-    ax.plot_trisurf(x_coord, y_coord, ff_pts_norm,
-                cmap='viridis', edgecolor='none')
+    ax.plot_trisurf(x_coord, y_coord, ff_pts_norm,cmap='viridis', edgecolor='none')
     ax.set_zlabel(r'$ flux')
     ax.set_title(r'$\lambda = 500 nm$')
     ax.set_xlabel('x-coordinates')
