@@ -12,6 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from collections import defaultdict
 from random import uniform
 from functionality.api import read
+from copy import deepcopy
 import sys
 import time
 
@@ -36,16 +37,41 @@ def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):
 	return(xPts,yPts,zPts,npts)
 	
 ###create point by using spherical coordinate sampling
-def sphericalpts(r,theta,phi,npts,xPts,yPts,zPts):
-	for n in range(npts):
-		angleTheta=(n/npts)*theta
-		for m in range(npts):
-			anglePhi=(m/npts)*phi
+def sphericalpts(r,theta,phi,theta_pts,phi_pts):
+	#initialize list with (0,0,r) points which we don't want to sample more than once (which happens if theta=0 and phi=(0,..,2pi))
+	xPts = [0]
+	yPts = [0]
+	zPts = [-r]
+	#the value of angles to loop through
+	theta_angles = np.linspace(0+theta/theta_pts,theta,theta_pts)
+	phi_angles = np.linspace(0,phi-phi/phi_pts,phi_pts)
+	print(theta_angles)
+	print(phi_angles)
+	for m in range(theta_pts):
+		angleTheta=theta_angles[m]
+		for n in range(phi_pts):
+			anglePhi=phi_angles[n]
 			xPts.append(r*math.sin(angleTheta)*math.cos(anglePhi))
 			yPts.append(r*math.sin(angleTheta)*math.sin(anglePhi))
 			zPts.append(-r*math.cos(angleTheta))
+	return xPts,yPts,zPts
 
-	return(xPts,yPts,zPts)
+#rotate list assistant for spherical points. We need to rotate list depending on phi and sample points on phi
+#rotation integer is = {0,..,5}. 0 no rotation, 5 is 5*60 degrees. 
+def rotate_list(list,npts,rotation_integer):
+	#save the first element 
+	first_element = list[0]
+	#take every item except first element since that should correspond to point (0,0,r) that should not be rotated
+	tmp =deepcopy(list[1:])
+	#npts*2 is assumed to be the number of phi sample points per given theta
+	phi_pts = 2*npts
+	#scale rotation with respect to how many sample points of phi
+	rot_points = int(rotation_integer*phi_pts/6)
+	for _ in range(rot_points):
+		tmp.append(tmp.pop(0))
+	#append first item at beginning
+	tmp.insert(0,first_element)
+	return tmp
 
 
 #Change the polarization from completely random in space to polarized parallel to the pyramid wall

@@ -49,8 +49,8 @@ if __name__ == "__main__":
 	data = sim_to_json(config, result,qw)
 	#print('pyramid data:',data)
 	write_result("db/initial_results/{}.json".format(sys.argv[1]), data)
-	for k,v in data["result"].items():
-		print(k, v)
+	#for k,v in data["result"].items():
+	#	print(k, v)
 	
 	# if (len(sys.argv)) != 7:
 	# 	print("Not enough arguments")

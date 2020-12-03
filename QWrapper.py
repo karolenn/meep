@@ -1,5 +1,5 @@
 from functionality.api import read, db_to_array, polar_to_complex_conv, complex_to_polar_conv
-from functionality.functions import myPoyntingFlux,PolarizeInPlane, draw_uniform
+from functionality.functions import myPoyntingFlux,PolarizeInPlane, draw_uniform,rotate_list
 from functionality.QWrapper_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,16 +18,10 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
     #load simulation parameters
     number_of_pyramids=len(db)
-    number_of_pyramids = 2
-    ff_pts = db[0]["simulate"]["ff_pts"]
+    #add +1 for the (0,0,r) point
+    ff_pts = db[0]["simulate"]["ff_pts"]+1
+    range_npts = ff_pts
     theta = math.pi/db[0]["simulate"]["ff_angle"]
-    #TODO: Redesign this ugly hack in the fibbonacci sampling algorithm
-    if theta == math.pi/6:
-        npts = ff_pts*3
-    else:
-        npts = ff_pts
-    range_npts=int((theta/math.pi)*npts) 
-    ff_pts = range_npts
     nfreq=db[0]["pyramid"]["number_of_freqs"]
 
     #array to save resulting E,H far-fields in
@@ -85,18 +79,10 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     rotation_integers = []
 
     #poynting field values for rotated coords
-    poynting_total_field_rotated = []
+    poynting_total_field_rotated = [[0]*nfreq]*ff_pts
 
     #Initialize poynting field coordinates
     poynting_total_field_rotated2 = initialize_poynting_far_field_rotated(ff_pts,nfreq)
-    print(len(poynting_total_field))
-    print(len(poynting_total_field_rotated2[0]))
-    print(len(poynting_total_field_rotated2[1]))
-    print(len(poynting_total_field_rotated2[2]))
-    print(len(poynting_total_field_rotated2[3]))
-    print(len(poynting_total_field_rotated2[4]))
-    print(len(poynting_total_field_rotated2[5]))
-    print(len(poynting_total_field_rotated2[5][0]))
     #Loop through each "3-group"
     for i in range(0,int(number_of_pyramids),3):
 
@@ -107,6 +93,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         #randomize rotation (that is, randomize wall that dipole is located on)
         rotation_for_3g = randint(0,5)
         rotation_integers.append(rotation_for_3g)
+        #rotation is counter-clockwise
 
         #rotation the far-field coordinates for the corresponding 3-group
         poynting_field_coords.append(rotate_coordinate_list(initial_ff_coords,rotation_for_3g))
@@ -136,12 +123,13 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
         #Calculate the resulting poynting field from the 3 group
         poynting_field_3g = calculate_poynting_field(summed_ff_3g,ff_pts,nfreq)
-
+        print('poynting 3g',poynting_field_3g)
         #add the poynting field from the 3-group to the total field
         poynting_total_field = add_poynting_fields(poynting_total_field,poynting_field_3g, ff_pts)
-        poynting_total_field_rotated.append(poynting_field_3g)
+        poynting_field_3g_rotated = rotate_list(poynting_field_3g,ff_pts,rotation_for_3g)
+        poynting_total_field_rotated = add_poynting_fields(poynting_total_field_rotated,poynting_field_3g_rotated, ff_pts)
 
-        poynting_total_field_rotated2[rotation_for_3g] = add_poynting_fields(poynting_total_field_rotated2[rotation_for_3g],poynting_field_3g,ff_pts)
+        #poynting_total_field_rotated2[rotation_for_3g] = add_poynting_fields(poynting_total_field_rotated2[rotation_for_3g],poynting_field_3g,ff_pts)
         #Add the poynting vector values 
 
         #ff_flux internal is set to 0 for each new three group. But the total quantum well energy values are added to the internal list each iteration
@@ -194,10 +182,9 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
     "calculate ff_flux for rotated poynting field"
     ff_flux_tot_rot = [0]*nfreq
-    for j in range(int(number_of_pyramids/3)):
-        for n in range(ff_pts):
-            for k in range(nfreq):
-                ff_flux_tot_rot[k] += S*poynting_total_field_rotated[j][n][k]
+    for n in range(ff_pts):
+        for k in range(nfreq):
+            ff_flux_tot_rot[k] += S*poynting_total_field_rotated[n][k]
     #for n in range(ff_pts):
 
     print('ff flux tot rot:',ff_flux_tot_rot)
@@ -221,34 +208,37 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
         print('final freq',k,'ff_angle',round(ff_flux[k],4),'tot',round(total_flux[k],4),'ratio',round(100*ff_flux[k]/total_flux[k],2),'%')
 
     #plot poynting coordinates
+    print('init ff card',initial_ff_coords)
     x,y,z = create_far_field_coords(initial_ff_coords)
     print(len(x))
     ax2 = plt.axes(projection='3d')
     ax2.scatter(x,y,z)
-    X = []
-    Y = []
-    Z = []
+    x = []
+    y = []
+    z = []
+    #unpack initial ff_coords
     for k in range(len(initial_ff_coords)):
-        X.append(initial_ff_coords[k][0])
-        Y.append(initial_ff_coords[k][1])
-        Z.append(initial_ff_coords[k][2])
-    ax2.scatter(X,Y,Z)
+        x.append(initial_ff_coords[k][0])
+        y.append(initial_ff_coords[k][1])
+        z.append(initial_ff_coords[k][2])
+    ax2.scatter(x,y,z)
     plt.show()
 
     ff_values = []
-    print('rang',len(poynting_total_field_rotated2))
-    print('field',poynting_total_field_rotated2)
-    for i in range(6):
-        for n in range(len(poynting_total_field_rotated2[i])):
-            val = poynting_total_field_rotated2[i][n][freq]
-            ff_values.append(val)
-    print('ff al',ff_values)
-    print('lenn',len(ff_values))
+    #print('rang',len(poynting_total_field_rotated2))
+    #print('field',poynting_total_field_rotated2)
+    #for i in range(6):
+    for n in range(ff_pts):
+        val = poynting_total_field_rotated[n][freq]
+        ff_values.append(val)
+    #print('ff al',ff_values)
+    #print('lenn',len(ff_values))
     #plot emissi,on lobe
     ax3 = plt.axes(projection='3d')
     #ax3.plot_trisurf(x, y, ff_values,cmap='viridis', edgecolor='none')
 
-
+    print('XX',len(x))
+    print(ff_values)
     X = []
     Y = []
     Z = []

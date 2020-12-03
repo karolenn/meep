@@ -390,46 +390,49 @@ class SimStruct():
 			theta=ff_angle
 			phi=math.pi*2
 			#"How many points on the ff-sphere"
-			global xPts
-			xPts=[]
+			#global xPts
+			#xPts=[]
 
-			global yPts
-			yPts=[]
+			#global yPts
+			#yPts=[]
 
-			global zPts
-			zPts=[]
+			#global zPts
+			#zPts=[]
 
 			Pr_Array=[]
 
 			if myIntegration == True:
 				#how to pick ff-points, this uses fibbonaci-sphere distribution
-				if theta==math.pi/3:
-					offset=1.5/npts
-				elif theta==math.pi/4:
-					npts=npts*2
-					offset=1.15/npts
-				elif theta==math.pi/5:
-					npts=npts*2.5
-					offset=0.95/npts
-				elif theta==math.pi/6:
-					#npts=npts*3
-					offset=0.8/npts
-				elif theta==math.pi/7:
-					npts=npts*3
-					offset=0.7/npts
-				elif theta==math.pi/8:
-					npts=npts*3
-					offset=0.6/npts
-				elif theta==math.pi/12:
-					npts=npts*3
-					offset=0.4/npts
-				else:
-					offset=2/npts
+				if False:
+					if theta==math.pi/3:
+						offset=1.5/npts
+					elif theta==math.pi/4:
+						npts=npts*2
+						offset=1.15/npts
+					elif theta==math.pi/5:
+						npts=npts*2.5
+						offset=0.95/npts
+					elif theta==math.pi/6:
+						#npts=npts*3
+						offset=0.8/npts
+					elif theta==math.pi/7:
+						npts=npts*3
+						offset=0.7/npts
+					elif theta==math.pi/8:
+						npts=npts*3
+						offset=0.6/npts
+					elif theta==math.pi/12:
+						npts=npts*3
+						offset=0.4/npts
+					else:
+						offset=2/npts
 				#fibspherepts(r,theta,npts,xPts,yPts,zPts,offset)
-				sphericalpts(r,theta,phi,npts,xPts,yPts,zPts)
+				theta_pts = npts
+				phi_pts = npts*2
+				xPts,yPts,zPts = sphericalpts(r,theta,phi,theta_pts,phi_pts)
 				
 				#range_npts=int((theta/math.pi)*npts)
-				range_npts = int(npts**2)
+				range_npts = int(theta_pts*phi_pts+1)
 				#npts=range_npts
 
 				if ff_calc == "Both":
