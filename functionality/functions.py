@@ -54,6 +54,9 @@ def sphericalpts(r,theta,phi,theta_pts,phi_pts):
 			xPts.append(r*math.sin(angleTheta)*math.cos(anglePhi))
 			yPts.append(r*math.sin(angleTheta)*math.sin(anglePhi))
 			zPts.append(-r*math.cos(angleTheta))
+	#print(xPts)
+	#print(yPts)
+	#print(zPts)
 	return xPts,yPts,zPts
 
 #rotate list assistant for spherical points. We need to rotate list depending on phi and sample points on phi
@@ -73,6 +76,18 @@ def rotate_list(list,npts,rotation_integer):
 	tmp.insert(0,first_element)
 	return tmp
 
+def rotate_list2(list,npts,rotation_integer):
+	tot = 2*npts*npts
+	tmp = [0]*(tot-1)
+	phi_pts = 2*npts
+	rot_points = int(rotation_integer*phi_pts/6)
+	for i in range(0,len(list),phi_pts):
+		listRing = deepcopy(list[i:i+phi_pts])
+		for _ in range(rot_points):
+			listRing.append(listRing.pop(0))
+		tmp[i:i+phi_pts] = listRing
+	tmp.insert(0,list[0])
+	return tmp
 
 #Change the polarization from completely random in space to polarized parallel to the pyramid wall
 #and normalized the polarization

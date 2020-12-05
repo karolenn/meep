@@ -1,5 +1,6 @@
 from random import uniform, randint
 from .functions import myPoyntingFlux
+import matplotlib.pyplot as plt
 from collections import deque
 import math as math
 
@@ -123,3 +124,130 @@ def create_far_field_coords(initial_ff_coords):
             z.append(z_rot)
     return x,y,z
 
+#unpack [[x1,y1,z1],....,[xn,yn,zn]] list into [x1,..,xn] and [y1,..,yn] and [z1,..,zn]
+def unpack_3_list(list):
+    tmp1=[]
+    tmp2=[]
+    tmp3=[]
+    
+    for k in range(len(list)):
+        tmp1.append(list[k][0])
+        tmp2.append(list[k][1])
+        tmp3.append(list[k][2])
+
+    return tmp1,tmp2,tmp3
+
+#map x,y,z variables to x,y,z coordinates in meep-space which corresponds to a position on the pyramid wall 
+def map_to_pyramid_coords(x,y,z,pyramid_height,simulation_ratio,substrate_ratio):
+    inner_pyramid_height = pyramid_height - 0.1
+    sh = substrate_ratio*pyramid_height
+    sz=pyramid_height*simulation_ratio
+        #TODO: Create function that does this mapping
+    x_tmp = (inner_pyramid_height*z*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+    y_tmp = y*math.tan(math.pi/6)*(inner_pyramid_height*z*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+    z_tmp = sz/2-sh-inner_pyramid_height+inner_pyramid_height*z
+    return x_tmp,y_tmp,z_tmp
+
+
+def plot_dipoles_on_pyramids(dipole_positions,rotation_integers,pyramid_height,simulation_ratio,substrate_ratio):
+
+    x_spos,y_spos,z_spos = zip(*dipole_positions)
+    ax = plt.axes(projection='3d')
+    xspos = []
+    yspos = []
+    zspos = []
+    for n in range(len(x_spos)):
+        #TODO: Create function that does this mapping
+        x,y,z = map_to_pyramid_coords(x_spos[n],y_spos[n],z_spos[n],pyramid_height,simulation_ratio,substrate_ratio)
+
+        #rotate dipole position
+        x,y,z = rotate_coordinate(x,y,z,rotation_integers[n])
+
+        xspos.append(x)
+        yspos.append(y)
+        zspos.append(z)
+    ax.set_xlabel('x-coordinates')
+    ax.set_ylabel('y-coordinates')
+    ax.scatter(xspos,yspos,zspos)
+    plt.title('Dipole positions on pyramid')
+    plt.show()
+
+def plot_LEE_convergence(ff_flux,total_flux):
+
+    ratio_1 = []
+    ratio_2 = []
+    ratio_3 = []
+    ratio_4 = []
+    ratio_5 = []
+    index = []
+    for n in range(len(ff_flux)):
+        ratio_1.append(100*ff_flux[n][0]/total_flux[n][0])
+        ratio_2.append(100*ff_flux[n][1]/total_flux[n][1])
+        ratio_3.append(100*ff_flux[n][2]/total_flux[n][2])
+        ratio_4.append(100*ff_flux[n][3]/total_flux[n][3])
+        ratio_5.append(100*ff_flux[n][4]/total_flux[n][4])
+        index.append(n)
+
+
+    #plt.plot(index,ratio_1,color='red',label='714 nm')
+    plt.plot(index,ratio_2,color='orange',label='588 nm')#588 orange
+    plt.plot(index,ratio_3,color='g',label='500 nm')#500 g
+    plt.plot(index,ratio_4,color='b',label='435 nm')
+    #plt.plot(index,ratio_5,color='m',label=' 385 nm')
+    plt.legend(loc='best')
+    plt.title('LEE convergence')
+    plt.grid()
+    plt.ylabel('LEE (%)')
+    plt.xlabel('Number of dipoles')
+    plt.show()
+
+def plot_poynting_coordinates(initial_ff_coords):
+
+    #plot poynting coordinates
+    ax2 = plt.axes(projection='3d')
+    #unpack initial ff_coords
+  
+    x_ff,y_ff,z_ff = unpack_3_list(initial_ff_coords)
+    ax2.scatter(x_ff,y_ff,z_ff)
+    ax2.set_xlabel('x-coordinates')
+    ax2.set_ylabel('y-coordinates')
+    plt.title('Poynting sampling coordinates')
+    plt.show()
+
+def plot_emission_lobe(initial_ff_coords,poynting_total_field,freq):
+
+    x_ff,y_ff,z_ff = unpack_3_list(initial_ff_coords)
+    #save all poynting field values (rotated) in the far-field as a list for a given frequency
+    ff_values = []
+    for n in range(ff_pts):
+        val = poynting_total_field[n][freq]
+        ff_values.append(val)
+
+    #plot emission lobe
+    ax3 = plt.axes(projection='3d')
+ 
+    X = []
+    Y = []
+    Z = []
+    for n in range(len(x_ff)):
+        X.append(x_ff[n]*ff_values[n])
+        Y.append(y_ff[n]*ff_values[n])
+        Z.append(z_ff[n]*ff_values[n])
+
+        ax3.plot_trisurf(X,Y,Z,cmap='jet',edgecolor='none')
+    
+    ax3.set_zlabel(r'$ flux')
+    ax3.set_title(r'Emission Lobe $\lambda = 500 nm$')
+    ax3.set_xlabel('x-coordinates')
+    ax3.set_ylabel('y-coordinates')
+    plt.show()
+
+def plot_farfield(initial_ff_coords,ff_vals):
+    x,y,z=unpack_3_list(initial_ff_coords)
+    ax = plt.axes(projection='3d')
+    ax.plot_trisurf(x,y, ff_vals,cmap='viridis', edgecolor='none')
+    ax.set_zlabel(r'$ flux')
+    ax.set_title(r'$\lambda = 500 nm$')
+    ax.set_xlabel('x-coordinates')
+    ax.set_ylabel('y-coordinates')
+    plt.show()

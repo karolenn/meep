@@ -11,7 +11,7 @@ from math import tan, pi
 ###spec_generator creates a .json file in db/sim_spec that is a template for initial_runs & main.py to run.
 
 ###Name of the sim_spec.json file
-sim_spec_filename = 'qw60_007b'
+sim_spec_filename = 'qw60_009b'
 
 
 ###We now have 3 ways to create different pyramids to be simulated. 'eq dist', 'eq dist with fixed angle between base and top' and 'rand' way
@@ -75,7 +75,7 @@ def minmaxrand(template,sim_spec_filename):
 
 
 def generate_qw(template,sim_spec_filename):
-    nr_of_dipoles = 20
+    nr_of_dipoles = 80
     polarization = [(1,0,0),(0,1,0),(0,0,1)]
     pyramid_list = []
     for j in range(nr_of_dipoles):
@@ -100,13 +100,13 @@ if __name__ == "__main__":
             "simulation_time": 60,
             "dpml": 0.1,
             "padding": 0.025,
-            "ff_pts": 30,
+            "ff_pts": 60,
             "ff_calc": "Below",
             "ff_cover": False,
             "use_symmetries": False,
             "calculate_flux": True,
             "ff_calculations": True,
-            "ff_angle": 4,
+            "ff_angle": 6,
             "simulation_ratio": "6/5",
             "substrate_ratio": "1/10",
             "quantum_well": True,
@@ -119,8 +119,8 @@ if __name__ == "__main__":
             "truncation": 0,
             "source_direction": (0,0,0),
             "frequency_center": 2,
-            "frequency_width": 0.8,
-            "number_of_freqs": 5,
+            "frequency_width": 0.2,
+            "number_of_freqs": 2,
             "cutoff": 4
         },
         "result": {}

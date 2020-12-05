@@ -378,6 +378,7 @@ class SimStruct():
 
 		#"Calculate the poynting flux given the far field values of E, H."
 		myIntegration = True
+		FibonacciSampling = False
 		nfreq=self.number_of_freqs
 		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
 		if ff_calculations:
@@ -403,7 +404,7 @@ class SimStruct():
 
 			if myIntegration == True:
 				#how to pick ff-points, this uses fibbonaci-sphere distribution
-				if False:
+				if FibonacciSampling == True:
 					if theta==math.pi/3:
 						offset=1.5/npts
 					elif theta==math.pi/4:
@@ -433,8 +434,9 @@ class SimStruct():
 				
 				#range_npts=int((theta/math.pi)*npts)
 				range_npts = int(theta_pts*phi_pts+1)
+				print('theta pts, ph pts, range_npts',theta_pts,phi_pts,range_npts)
 				#npts=range_npts
-
+				print('xyz',len(xPts),len(yPts),len(zPts))
 				if ff_calc == "Both":
 					#Pr_ArrayA for above, B for below
 					Pr_ArrayA=[]
@@ -570,7 +572,9 @@ class SimStruct():
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)				
 				elapsed_time = round((time.time()-start)/60,1)
-			#	print(fields)
+				#print(fields)
+				print('len fields',len(fields))
+				#print(fields["pos"])
 				if quantum_well:
 					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), fields, elapsed_time
 				else:

@@ -91,8 +91,9 @@ def sphericalpts4(r,theta,phi,theta_pts,phi_pts):
 #print('y',y)
 #print('z',z)
 phi_pts = 12
-theta_pts = 1
-rot_points = int(2*phi_pts/6)
+theta_pts = 3
+rotation_int = 1
+rot_points = int(rotation_int*phi_pts/6)
 xPts,yPts,zPts = sphericalpts4(r,theta,phi,theta_pts,phi_pts)
 if True:
 	print('xpts',len(xPts))
@@ -112,7 +113,27 @@ tot = int(phi_pts*theta_pts+1)
 xPts2=deepcopy(xPts[1:])
 yPts2=deepcopy(yPts[1:])
 zPts2=deepcopy(zPts[1:])
-
+#we need to split up [x1,..,xn] to [x1,..,xi],[xi+1,xj] based on number of phi pts per theta
+#split x,y,z, into corresponding theta
+x_tmp = [0]*(tot-1)
+y_tmp = [0]*(tot-1)
+z_tmp = [0]*(tot-1)
+for i in range(0,len(xPts2),phi_pts):
+	print('i',i)
+	xPtsRing = deepcopy(xPts2[i:i+phi_pts])
+	yPtsRing = deepcopy(yPts2[i:i+phi_pts])
+	zPtsRing = deepcopy(zPts2[i:i+phi_pts])
+	for _ in range(rot_points):
+		xPtsRing.append(xPtsRing.pop(0))
+		yPtsRing.append(yPtsRing.pop(0))
+		zPtsRing.append(zPtsRing.pop(0))
+	x_tmp[i:i+phi_pts] = xPtsRing
+	y_tmp[i:i+phi_pts] = yPtsRing
+	z_tmp[i:i+phi_pts] = zPtsRing
+x_tmp.insert(0,xPts[0])
+y_tmp.insert(0,yPts[0])
+z_tmp.insert(0,zPts[0])
+print('xtmp',x_tmp)
 for _ in range(rot_points):
 	xPts2.append(xPts2.pop(0))
 	yPts2.append(yPts2.pop(0))
@@ -123,10 +144,10 @@ zPts2.insert(0,zPts[0])
 if True:
 	print('tot',tot)
 	print('-')
-	print('lenx2',len(xPts2))
+	print('lenx2',len(x_tmp))
 	print('x2',xPts2)
-	print('y2',yPts2)
-	print('z2',zPts2)
+	#print('y2',yPts2)
+	#print('z2',zPts2)
 	print(xPts==xPts2)
 
 #xPts2,yPts2,zPts2 = sphericalpts2(r,theta,phi,npts)
@@ -136,9 +157,11 @@ if True:
 #ax = Axes3D(fig)
 plt.axis('on')
 
-ax.scatter3D(xPts2,yPts2,zPts2,marker='v',color='orange')
+ax.scatter3D(x_tmp,y_tmp,z_tmp,marker='v',color='orange')
 for n in range(tot):
 	ax.text(xPts[n],yPts[n],zPts[n],n)
 for n in range(tot):
-	ax.text(xPts2[n],yPts2[n],zPts2[n],n,color='r',size=10)
+	ax.text(x_tmp[n],y_tmp[n],z_tmp[n]+5,n,color='r',size=10)
+plt.xlabel('x-axis')
+plt.ylabel('y-axis')
 plt.show()
