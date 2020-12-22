@@ -42,8 +42,10 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
     #Withdraw all the far fields from all the pyramids in active db
     #in db fields are stored in polar it is converted to complex here as well
+    total_time = 0
     for pyramid in db:
         all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
+        total_time += pyramid["result"]["Elapsed time (min)"]
 
 
     #Withdraw the E,H fields from polarization x,y,z
@@ -69,6 +71,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     r=2*math.pow(db[0]["pyramid"]["pyramid_height"],2)*db[0]["pyramid"]["frequency_center"]*2*10
     S = 2*math.pi*pow(r,2)*(1-math.cos(theta))/range_npts
     print('Initializing quantum well calculations, number of 3-group is:',int(number_of_pyramids/3))
+    print('Time to perform the simulations was:',round(total_time,0),' (min)')
     print('r,theta,range_npts',r,theta,range_npts)
     print('S',S)
 
