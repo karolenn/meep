@@ -23,8 +23,10 @@ import time
 
 		 
 ###Create points using the fibbonacci sphere algorithm
-###empty array xPts is passed to the function for some obscure reason I cant remember
-def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):
+def fibspherepts(r,theta,npts,offset):
+	xPts = []
+	yPts = []
+	zPts = []
 	range_npts=int((theta/math.pi)*npts)
 	increment = math.pi*(3 - math.sqrt(5))
 
@@ -34,7 +36,7 @@ def fibspherepts(r,theta,npts,xPts,yPts,zPts,offset):
 		phi = (n % npts)*increment
 		xPts.append(R*math.cos(phi))
 		yPts.append(R*math.sin(phi))
-	return(xPts,yPts,zPts,npts)
+	return(xPts,yPts,zPts)
 	
 ###create point by using spherical coordinate sampling
 def sphericalpts(r,theta,phi,theta_pts,phi_pts):

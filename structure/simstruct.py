@@ -29,6 +29,7 @@ class SimStruct():
 		calculate_flux = config["calculate_flux"]
 		ff_calculations = config["ff_calculations"]
 		ff_angle = math.pi/config["ff_angle"]
+		FibonacciSampling = config["fibb_sampling"]
 		simulation_ratio = eval(config["simulation_ratio"])
 		substrate_ratio = eval(config["substrate_ratio"])
 		quantum_well = config["quantum_well"]
@@ -292,7 +293,7 @@ class SimStruct():
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
-				geometry=geometry,
+				#geometry=geometry,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
@@ -300,7 +301,7 @@ class SimStruct():
 				#subpixel_maxeval=1000,
 				dimensions=3,
 				#default_material=TiO2,
-				material_function=isInsidexy2,
+				#material_function=isInsidexy2,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)
@@ -378,7 +379,6 @@ class SimStruct():
 
 		#"Calculate the poynting flux given the far field values of E, H."
 		myIntegration = True
-		FibonacciSampling = False
 		nfreq=self.number_of_freqs
 		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
 		if ff_calculations:
@@ -426,17 +426,17 @@ class SimStruct():
 						npts=npts*3
 						offset=0.4/npts
 					else:
-						offset=2/npts
-				#fibspherepts(r,theta,npts,xPts,yPts,zPts,offset)
-				theta_pts = npts
-				phi_pts = npts*2
-				xPts,yPts,zPts = sphericalpts(r,theta,phi,theta_pts,phi_pts)
-				
-				#range_npts=int((theta/math.pi)*npts)
-				range_npts = int(theta_pts*phi_pts+1)
-				print('theta pts, ph pts, range_npts',theta_pts,phi_pts,range_npts)
-				#npts=range_npts
-				print('xyz',len(xPts),len(yPts),len(zPts))
+						offset=0.2/npts
+					xPts,yPts,zPts = fibspherepts(r,theta,npts,offset)
+					range_npts = int((theta/math.pi)*npts)
+				else:
+					#check out Lebedev quadrature
+					#if not fibb sampling then spherical sampling
+					theta_pts = npts
+					phi_pts = npts*2
+					xPts,yPts,zPts = sphericalpts(r,theta,phi,theta_pts,phi_pts)
+					range_npts = int(theta_pts*phi_pts + 1)
+
 				if ff_calc == "Both":
 					#Pr_ArrayA for above, B for below
 					Pr_ArrayA=[]

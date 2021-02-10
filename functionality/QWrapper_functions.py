@@ -219,22 +219,28 @@ def plot_emission_lobe(initial_ff_coords,poynting_total_field,freq):
     x_ff,y_ff,z_ff = unpack_3_list(initial_ff_coords)
     #save all poynting field values (rotated) in the far-field as a list for a given frequency
     ff_values = []
+    ff_pts = len(x_ff)
     for n in range(ff_pts):
         val = poynting_total_field[n][freq]
         ff_values.append(val)
-
+    max_val = max(ff_values)
+    ff_values_norm = []
+    for n in range(ff_pts):
+        tmp = ff_values[n]/max_val
+        ff_values_norm.append(tmp)
     #plot emission lobe
     ax3 = plt.axes(projection='3d')
  
     X = []
     Y = []
     Z = []
+    #the problem is that the x,y,z coords does not match the ff_values, hence the "noise"
     for n in range(len(x_ff)):
-        X.append(x_ff[n]*ff_values[n])
-        Y.append(y_ff[n]*ff_values[n])
-        Z.append(z_ff[n]*ff_values[n])
+        X.append(x_ff[n]*ff_values_norm[n])
+        Y.append(y_ff[n]*ff_values_norm[n])
+        Z.append(abs(z_ff[n]*ff_values_norm[n]))
 
-        ax3.plot_trisurf(X,Y,Z,cmap='jet',edgecolor='none')
+    ax3.plot_trisurf(X,Y,Z,cmap='jet',edgecolor='none')
     
     ax3.set_zlabel(r'$ flux')
     ax3.set_title(r'Emission Lobe $\lambda = 500 nm$')

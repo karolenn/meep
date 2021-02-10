@@ -12,6 +12,8 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
 
     #load simulation data
     db = read("db/initial_results/{}.json".format(sim_name))
+    #print('bo0',db[0])
+    #print('bn',db[int(len(db)-1)])
     if db == None:
         print("could not open db/initial_results/{}.json".format(sim_name))
         exit(0)
@@ -43,6 +45,7 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     #Withdraw all the far fields from all the pyramids in active db
     #in db fields are stored in polar it is converted to complex here as well
     total_time = 0
+    q = 1
     for pyramid in db:
         all_ffields.append(polar_to_complex_conv(pyramid["result"]["far_fields"]))
         total_time += pyramid["result"]["Elapsed time (min)"]
@@ -178,6 +181,9 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     for k in range(nfreq):
         print('final freq',k,'ff_angle',round(ff_flux[k],4),'tot',round(total_flux[k],4),'ratio',round(100*ff_flux[k]/total_flux[k],2),'%')
 
+    #plot emission lobe
+    plot_emission_lobe(initial_ff_coords,poynting_total_field_rotated,2)
+
     #Plot LEE convergence
     plot_LEE_convergence(ff_flux_int2,total_flux_int2)
 
@@ -211,7 +217,8 @@ def Qwell_wrapper(sim_name,number_of_dipoles):
     plot_farfield(initial_ff_coords,ff_pts_norm)
     #plt.show()
 
-    plt.hist(ff_pts_norm,100)
+    plt.hist(ff_pts_rot,100)
+    plt.show()
     #plt.show()
     #ax4 = plt.axes(projection='3d')
     #ax4.plot_trisurf(x,y, ff_pts_norm2,cmap='viridis', edgecolor='none')
