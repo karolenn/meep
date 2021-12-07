@@ -7,9 +7,9 @@ from functionality.api import polar_to_complex_conv,sim_to_json,write_result
 
 config = {
        "simulate": {
-            "resolution": 60,
-            "use_fixed_time": False,
-            "simulation_time": 60,
+            "resolution": 240,
+            "use_fixed_time": True,
+            "simulation_time": 5,
             "dpml": 0.1,
             "padding": 0.025,
             "ff_pts": 20,
