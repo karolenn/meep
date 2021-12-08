@@ -46,11 +46,11 @@ class SimStruct():
 
 #Symmetries for the simulation	
 		def create_symmetry(self):
-			if self.source_direction ==	mp.Ex:
+			if self.source_direction ==	mp.Ex or self.source_direction == (1,0,0):
 				symmetry=[mp.Mirror(mp.Y),mp.Mirror(mp.X,phase=-1)]
-			elif self.source_direction == mp.Ey:
+			elif self.source_direction == mp.Ey or self.source_direction == (0,1,0):
 				symmetry=[mp.Mirror(mp.X),mp.Mirror(mp.Y,phase=-1)]
-			elif self.source_direction == mp.Ez:
+			elif self.source_direction == mp.Ez  or self.source_direction == (0,0,1):
 				symmetry =[mp.Mirror(mp.X),mp.Mirror(mp.Y)]
 			else:
 				symmetry = []
@@ -265,15 +265,24 @@ class SimStruct():
 		inner_pyramid_height = self.pyramid_height - 0.1
 
 		#"Source position"
-		abs_source_position_x = (inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
-		abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
-		abs_source_position_z=sz/2-sh-inner_pyramid_height*(1-self.truncation)+inner_pyramid_height*(self.source_position[2])*(1-self.truncation)
-		print('spos:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
-
+		if self.source_on_wall == True:
+			#if source is placed on wall we need to convert position to MEEP coordinates
+			abs_source_position_x = (inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+			abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
+			abs_source_position_z=sz/2-sh-inner_pyramid_height*(1-self.truncation)+inner_pyramid_height*(self.source_position[2])*(1-self.truncation)
+			print('spos with source_on_wall:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
+		else:
+			#else it is assumed source is placed on top of pyramid
+			#TODO: implement function that can take of case with both truncated and non-truncated pyramid AND move source in x,y on truncated source
+			abs_source_position_x = 0
+			abs_source_position_y = 0
+			abs_source_position_z = sz/2-sh-inner_pyramid_height*(1-self.truncation)+inner_pyramid_height*(self.source_position[2])*(1-self.truncation)
+			print('spos with source_on_top:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 		#Sets the polarization of the dipole to be in the plane, that is the pyramid wall
 
 		#TODO: Move to pyramid.py
 		if polarization_in_plane == True: 
+			#change source direction to be parallell with pyramid wall.
 			self.source_direction = PolarizeInPlane(self.source_direction,self.pyramid_height,self.pyramid_width)
 			print('new source dir',self.source_direction)
 
@@ -293,7 +302,7 @@ class SimStruct():
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
-				#geometry=geometry,
+				geometry=geometry,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
@@ -301,7 +310,7 @@ class SimStruct():
 				#subpixel_maxeval=1000,
 				dimensions=3,
 				#default_material=TiO2,
-				#material_function=isInsidexy2,
+				material_function=isInsidexy2,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)

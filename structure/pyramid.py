@@ -21,6 +21,7 @@ class Pyramid(SimStruct):
 #Parameters for the pyramid
 	def setup(self, config, debug = False):
 		self.source_position = config["source_position"] 
+		self.source_on_wall = config["source_on_wall"]
 		self.pyramid_height = config["pyramid_height"] 
 		self.pyramid_width = config["pyramid_width"] 
 		self.frequency_center = config["frequency_center"] 
