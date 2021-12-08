@@ -32,7 +32,7 @@ class SimStruct():
 		FibonacciSampling = config["fibb_sampling"]
 		simulation_ratio = eval(config["simulation_ratio"])
 		substrate_ratio = eval(config["substrate_ratio"])
-		quantum_well = config["quantum_well"]
+		output_ff = config["output_ff"]
 		polarization_in_plane = config["polarization_in_plane"]
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
@@ -584,7 +584,7 @@ class SimStruct():
 				#print(fields)
 				print('len fields',len(fields))
 				#print(fields["pos"])
-				if quantum_well:
+				if output_ff:
 					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), fields, elapsed_time
 				else:
 					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time

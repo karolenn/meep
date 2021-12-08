@@ -55,7 +55,7 @@ def sim_to_json(config,result,qw=False):
   #  len_results = len(result)
   #  result = dict(zip(result),zip(str(result)))
     config["result"] = result
-    if qw:
+    if output_ff:
         flux_tot_out, P_tot_ff, flux_tot_ff_ratio, fields, elapsed_time = result
         #JSON cant handle complex number so it is converted to polar coords. I want to save E,H fields so this seems to be a plausible workaround
         fields = complex_to_polar_conv(fields)

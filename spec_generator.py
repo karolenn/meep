@@ -109,7 +109,7 @@ if __name__ == "__main__":
             "ff_angle": 6,
             "simulation_ratio": "6/5",
             "substrate_ratio": "1/10",
-            "quantum_well": True,
+            "output_ff": True,
             "polarization_in_plane": False
         },
         "pyramid": {
