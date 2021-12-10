@@ -52,7 +52,7 @@ print(config)
 print(result[0],result[1],result[2])
 #print(result[3])
 print('Simulation finished at:',datetime.datetime.now())
-qw = config["simulate"]["quantum_well"]
-data = sim_to_json(config, result,qw)
+output_ff = config["simulate"]["output_ff"]
+data = sim_to_json(config, result,output_ff)
 #print('pyramid data:',data)
 write_result("db/test_simulate.json", data)

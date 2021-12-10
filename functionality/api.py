@@ -51,7 +51,7 @@ def polar_to_complex_conv(list_dict):
 
 
 #TODO: rewrite to be able to handle arbitrary results
-def sim_to_json(config,result,qw=False):
+def sim_to_json(config,result,output_ff =False):
   #  len_results = len(result)
   #  result = dict(zip(result),zip(str(result)))
     config["result"] = result
