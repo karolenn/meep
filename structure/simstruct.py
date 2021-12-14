@@ -9,6 +9,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import math as math
 import time
 
+if True:
+	from meep.materials import Al, GaN, Au
+
 ###PARAMETERS FOR THE SIMULATION and PYRAMID##############################################
 
 
@@ -177,7 +180,7 @@ class SimStruct():
 
 		#"Material parameters"
 		TiO2=mp.Medium(epsilon=3.26**2)
-		GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
+		#GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
 #		GaN = TiO2
@@ -189,13 +192,14 @@ class SimStruct():
 		geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
 					size=mp.Vector3(2*sx+2*dpml,2*sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
-		
 
-		
-		#Truncation block of air to truncate the pyramid. NEEDS TO BE REWRITTEN
-	#	geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh-self.pyramid_height),
-	#				size=mp.Vector3(self.pyramid_width,self.pyramid_width,self.truncation*self.pyramid_height*2),
-	#				material=air))
+		if (self.CL_thickness > 0):
+			#TODO: Make pyramid angle an input in sim_spec 
+			#increase size of pyramid to account for metal coating. Easier calculating material function this way.
+			self.pyramid_width = self.pyramid_width + self.CL_thickness 
+			self.pyramid_height = self.pyramid_height + self.CL_thickness
+		if (self.truncation_width > 0):
+			self.pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)
 
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
@@ -206,27 +210,6 @@ class SimStruct():
 
 		# "Function for creating pyramid"
 
-		# "isInsidexy checks if a point is inside the pyramid or not. If true, sets epsilon to 5.76, if false, sets it to 1. "
-		# "the function loops over the height of the pyramid in z-direction. It transform the test point to vertice 2. It then performs 3 test to check if the point"
-		# "is inside a hexagonal area or not. Decreasing/increasing h over the span of z then forms a pyramid. Courtesy to playchilla.com for logic test if a point is inside a hexagon or not."
-		# "loops over the height of the pyramid in z-direction. "
-		def isInsidexy(vec):
-			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
-
-				#h=pyramid_width/2+vec.z*(pyramid_width/(2*(sz/2-sh)))
-				h=self.pyramid_width/(2*self.pyramid_height)*vec.z-(self.pyramid_width/(2*self.pyramid_height))*(sz/2-sh-self.pyramid_height)
-				v=h*math.tan(math.pi/6)	
-				center=mp.Vector3(h,v,0)
-				q2x = math.fabs(vec.x - center.x+h) #transform the test point locally and to quadrant 2m nm
-				q2y = math.fabs(vec.y - center.y+v) # transform the test point locally and to quadrant 2
-				if (q2x > h) or (q2y > v*2):
-					return air
-				if  ((2*v*h - v*q2x - h*q2y) >= 0): #finally the dot product can be reduced to this due to the hexagon symmetry
-					return GaN
-				else:
-					return air 
-			else:
-				return air
 		#paints out a hexagon with the help of 4 straight lines in the big if statement
 		#here, v is measured from center to vertice. h is measured from center to edge.
 		def isInsidexy2(vec):
@@ -240,19 +223,24 @@ class SimStruct():
 					return air
 			else:
 				return air
-		#isInsidexy2.do_averaging = True
-		#paints out on forth of a hexagon
-		def isInsidexy3(vec):
+
+		#function to create truncated pyramid with metal coating on top
+		def truncPyramidWithCoating(vec):
+			#TODO: Optimize function
 			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
-				v=(self.pyramid_width/self.pyramid_height)*vec.z+(self.pyramid_width/self.pyramid_height)*(sh+self.pyramid_height-sz/2)
-				h=math.cos(pi/6)*v
-				if (vec.x>=0 and vex.x<=h and y<=-1/(2*math.cos(math.pi6))*vec.x+v):
-					return GaN
+				v=(self.pyramid_width/(2*self.pyramid_height))*vec.z+(self.pyramid_width/(2*self.pyramid_height))*(sh+self.pyramid_height-sz/2)
+				h=math.cos(math.pi/6)*v
+				k=1/(2*math.cos(math.pi/6))
+				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
+					v_ = v - self.CL_thickness
+					h_ = h - self.CL_thickness
+					if (-h_<=vec.x<=h_ and vec.y <= k*vec.x+v_ and vec.y <= -k*vec.x+v_ and vec.y >= k*vec.x-v_ and vec.y >= -k*vec.x-v_):
+						return GaN
+					return Au
 				else:
 					return air
 			else:
 				return air
-
 		###PML_LAYERS###################################################################
 
 		pml_layer=[mp.PML(dpml)]
@@ -260,23 +248,27 @@ class SimStruct():
 		###SOURCE#######################################################################
 
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
-		#Assuming a 100 nm capping layer, (that is included in the total pyramid height and width)
-		#I can assume the inner pyramid to be pyramid height - 100 nm and pyramid with - 2*100 nm
-		inner_pyramid_height = self.pyramid_height - 0.1
+		#Assuming a (MC_thickness) nm capping layer, (that is included in the total pyramid height and width)
+		#I can assume the inner pyramid to be pyramid height - 100 nm and pyramid width - 2*100 nm
+		inner_pyramid_height = self.pyramid_height - self.CL_thickness
 
 		#"Source position"
 		if self.source_on_wall == True:
+			if self.truncation_width > 0:
+				inner_pyramid_height = self.pyramid_height*(1-self.truncation_width/self.truncation_width)-self.CL_thickness
 			#if source is placed on wall we need to convert position to MEEP coordinates
 			abs_source_position_x = (inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
 			abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
-			abs_source_position_z=sz/2-sh-inner_pyramid_height*(1-self.truncation)+inner_pyramid_height*(self.source_position[2])*(1-self.truncation)
+			abs_source_position_z=sz/2-sh-inner_pyramid_height+inner_pyramid_height*(self.source_position[2])
 			print('spos with source_on_wall:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 		else:
 			#else it is assumed source is placed on top of pyramid
 			#TODO: implement function that can take of case with both truncated and non-truncated pyramid AND move source in x,y on truncated source
+			if self.truncation_width > 0:
+				inner_pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)-self.CL_thickness
 			abs_source_position_x = 0
 			abs_source_position_y = 0
-			abs_source_position_z = sz/2-sh-inner_pyramid_height*(1-self.truncation)+inner_pyramid_height*(self.source_position[2])*(1-self.truncation)
+			abs_source_position_z = sz/2-sh-inner_pyramid_height+inner_pyramid_height*(self.source_position[2])
 			print('spos with source_on_top:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 		#Sets the polarization of the dipole to be in the plane, that is the pyramid wall
 
@@ -310,7 +302,7 @@ class SimStruct():
 				#subpixel_maxeval=1000,
 				dimensions=3,
 				#default_material=TiO2,
-				material_function=isInsidexy2,
+				material_function=truncPyramidWithCoating,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)
@@ -355,12 +347,14 @@ class SimStruct():
 				nearfieldBelow=sim.add_near2far(self.frequency_center,self.frequency_width,self.number_of_freqs,nfrB1 ,nfrB2, nfrB3, nfrB4, nfrB6)
 		###RUN##########################################################################
 		#"Run the simulation"
-		if False:
+		if True:
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0*abs_source_position_y,0),size=mp.Vector3(0,sy+2*dpml,sz+2*dpml)))
-			plt.show()
+			#plt.show()
+			plt.savefig('foo.png')
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0*abs_source_position_x,0,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
 			
-			plt.show()
+			#plt.show()
+			plt.savefig('foo2.png')
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,sz/2-sh-0.01),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			plt.show()

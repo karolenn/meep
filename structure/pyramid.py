@@ -30,7 +30,8 @@ class Pyramid(SimStruct):
 		self.cutoff = config["cutoff"]
 		self.debug = debug
 		self.source_direction = config["source_direction"]
-		self.truncation = config["truncation"]
+		self.truncation_width = config["truncation_width"]
+		self.CL_thickness = config["CL_thickness"]
 
 
 
@@ -46,8 +47,8 @@ if __name__ == "__main__":
 	pyramid = Pyramid()
 	pyramid.setup(config["pyramid"])
 	result = pyramid.simulate(config["simulate"])
-	qw = config["simulate"]["quantum_well"]
-	data = sim_to_json(config, result,qw)
+	output_ff = config["simulate"]["output_ff"]
+	data = sim_to_json(config, result,output_ff)
 	#print('pyramid data:',data)
 	write_result("db/initial_results/{}.json".format(sys.argv[1]), data)
 	#for k,v in data["result"].items():
