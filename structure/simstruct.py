@@ -10,7 +10,7 @@ import math as math
 import time
 
 if True:
-	from meep.materials import Al, GaN, Au
+	from meep.materials import Al, GaN, Au, Ag, Si3N4
 
 ###PARAMETERS FOR THE SIMULATION and PYRAMID##############################################
 
@@ -183,7 +183,7 @@ class SimStruct():
 		#GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
-#		GaN = TiO2
+		CL_material = Au
 #		SubstrateEps = TiO2
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
@@ -193,13 +193,21 @@ class SimStruct():
 					size=mp.Vector3(2*sx+2*dpml,2*sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
 
+		if (self.truncation_width > 0):
+			#self.pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)
+			truncation_height = (self.truncation_width/2)*math.tan((math.pi*62)/180)
+		else:
+			truncation_height = 0
+
 		if (self.CL_thickness > 0):
+			coating = True
 			#TODO: Make pyramid angle an input in sim_spec 
 			#increase size of pyramid to account for metal coating. Easier calculating material function this way.
-			self.pyramid_width = self.pyramid_width + self.CL_thickness 
-			self.pyramid_height = self.pyramid_height + self.CL_thickness
-		if (self.truncation_width > 0):
-			self.pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)
+			pyramid_width_tot = self.pyramid_width + self.CL_thickness 
+			pyramid_height_tot = self.pyramid_height + self.CL_thickness
+			truncation_height_tot = truncation_height + self.CL_thickness
+		else:
+			coating = False
 
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
@@ -224,19 +232,40 @@ class SimStruct():
 			else:
 				return air
 
-		#function to create truncated pyramid with metal coating on top
-		def truncPyramidWithCoating(vec):
-			#TODO: Optimize function
-			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height):
+		def truncPyramid(vec):
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height+truncation_height):
 				v=(self.pyramid_width/(2*self.pyramid_height))*vec.z+(self.pyramid_width/(2*self.pyramid_height))*(sh+self.pyramid_height-sz/2)
 				h=math.cos(math.pi/6)*v
 				k=1/(2*math.cos(math.pi/6))
 				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
-					v_ = v - self.CL_thickness
-					h_ = h - self.CL_thickness
-					if (-h_<=vec.x<=h_ and vec.y <= k*vec.x+v_ and vec.y <= -k*vec.x+v_ and vec.y >= k*vec.x-v_ and vec.y >= -k*vec.x-v_):
-						return GaN
-					return Au
+					return GaN
+				else:
+					return air
+			else:
+				return air			
+		def CoatPyramid(vec):
+			if ():
+				do
+			else:
+				truncPyramid(vec)
+
+		#function to create truncated pyramid with metal coating on top
+		def truncPyramidWithCoating(vec):
+			#TODO: Optimize function
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot):
+				v=(pyramid_width_tot/(2*pyramid_height_tot))*vec.z+(pyramid_width_tot/(2*pyramid_height_tot))*(sh+pyramid_height_tot-sz/2)
+				h=math.cos(math.pi/6)*v
+				k=1/(2*math.cos(math.pi/6))
+				v_inner = v - self.CL_thickness
+				h_inner = h - self.CL_thickness
+				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
+					if (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height+truncation_height):
+						if (-h_inner<=vec.x<=h_inner and vec.y <= k*vec.x+v_inner and vec.y <= -k*vec.x+v_inner and vec.y >= k*vec.x-v_inner and vec.y >= -k*vec.x-v_inner):
+							#inner pyramid, inside capping layer
+							return GaN
+						else:
+							return CL_material
+					return CL_material
 				else:
 					return air
 			else:
@@ -302,6 +331,7 @@ class SimStruct():
 				#subpixel_maxeval=1000,
 				dimensions=3,
 				#default_material=TiO2,
+				extra_materials=[CL_material],
 				material_function=truncPyramidWithCoating,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
