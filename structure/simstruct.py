@@ -392,6 +392,7 @@ class SimStruct():
 				detector_pol = mp.Ez
 			#TODO: exchange self.source_direction to maxmimum dipole ampltitude
 			sim.run(
+			#mp.to_appended("ex", mp.at_every(0.6, mp.output_efield_x)),	
 			#mp.at_beginning(mp.output_epsilon),
 			until_after_sources=mp.stop_when_fields_decayed(2,detector_pol,mp.Vector3(0,0,abs_source_position_z+0.2),1e-3))
 

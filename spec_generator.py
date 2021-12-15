@@ -11,7 +11,7 @@ from math import tan, pi
 ###spec_generator creates a .json file in db/sim_spec that is a template for initial_runs & main.py to run.
 
 ###Name of the sim_spec.json file
-sim_spec_filename = 'qw60_011b'
+sim_spec_filename = 'DE_new_res_check'
 
 
 ###We now have 3 ways to create different pyramids to be simulated. 'eq dist', 'eq dist with fixed angle between base and top' and 'rand' way
@@ -94,39 +94,42 @@ if __name__ == "__main__":
 
 
     template={
-        "simulate": {
-            "resolution": 60,
+       "simulate": {
+            "resolution": 80,
             "use_fixed_time": False,
-            "simulation_time": 60,
+            "simulation_time": 5,
             "dpml": 0.1,
             "padding": 0.025,
-            "ff_pts": 30,
+            "ff_pts": 800,
             "ff_calc": "Below",
             "ff_cover": False,
-            "use_symmetries": False,
+            "use_symmetries": True,
             "calculate_flux": True,
             "ff_calculations": True,
             "ff_angle": 6,
+            "fibb_sampling": True,
             "simulation_ratio": "6/5",
             "substrate_ratio": "1/10",
             "output_ff": True,
             "polarization_in_plane": False
         },
         "pyramid": {
-            "source_position": (0,0.2,0.3451462262234885),
+            "source_position": (0,0,0.02),
             "pyramid_height": 0.814,
             "pyramid_width": 1,
-            "truncation": 0,
-            "source_direction": (0,0,0),
-            "frequency_center": 2,
-            "frequency_width": 0.8,
-            "number_of_freqs": 5,
+            "truncation_width": 0.1,
+            "CL_thickness": 0.1,
+            "source_direction": (1,0,0),
+            "source_on_wall": False,
+            "frequency_center": 2.3,
+            "frequency_width": 0.3,
+            "number_of_freqs": 1,
             "cutoff": 4
         },
         "result": {}
-    }
+    }  
 
-    generate_qw(template,sim_spec_filename)
+    fixedangle(template,sim_spec_filename)
 
 
 ##This is the template file for generating a new simulation specification db. 
