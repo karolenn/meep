@@ -183,7 +183,7 @@ class SimStruct():
 		#GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
-		CL_material = Au
+		CL_material = Ag
 #		SubstrateEps = TiO2
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
@@ -194,7 +194,7 @@ class SimStruct():
 					material=SubstrateEps))
 
 		if (self.truncation_width > 0):
-			#self.pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)
+			#calculate height of truncation. i.e height of the pyramid that gets removed when truncated.
 			truncation_height = (self.truncation_width/2)*math.tan((math.pi*62)/180)
 			print('trunc h,w', truncation_height, self.truncation_width)
 		else:
@@ -204,9 +204,9 @@ class SimStruct():
 			coating = True
 			#TODO: Make pyramid angle an input in sim_spec 
 			#increase size of pyramid to account for metal coating. Easier calculating material function this way.
-			pyramid_width_tot = self.pyramid_width + self.CL_thickness 
-			pyramid_height_tot = self.pyramid_height + self.CL_thickness
-			truncation_height_tot = truncation_height + self.CL_thickness
+			pyramid_width_tot = self.pyramid_width + 2*self.CL_thickness 
+			pyramid_height_tot = self.pyramid_height + self.CL_thickness*math.tan((math.pi*62)/180)
+			truncation_height_tot = truncation_height + self.CL_thickness*math.tan((math.pi*62)/180)-self.CL_thickness
 		else:
 			coating = False
 
@@ -233,24 +233,6 @@ class SimStruct():
 			else:
 				return air
 
-		def truncPyramid(vec):
-			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height+truncation_height):
-				v=(self.pyramid_width/(2*self.pyramid_height))*vec.z+(self.pyramid_width/(2*self.pyramid_height))*(sh+self.pyramid_height-sz/2)
-				h=math.cos(math.pi/6)*v
-				k=1/(2*math.cos(math.pi/6))
-				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
-					return GaN
-				else:
-					return air
-			else:
-				return air			
-		def CoatPyramid(vec):
-			if ():
-				do
-			else:
-				truncPyramid(vec)
-
-
 		#GaN = mp.Medium(epsilon=20)
 		#CL_material = mp.Medium(epsilon=10)
 		#function to create truncated pyramid with metal coating on top
@@ -263,7 +245,7 @@ class SimStruct():
 				v_inner = v - self.CL_thickness
 				h_inner = h - self.CL_thickness
 				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
-					while (vec.z >= sz/2-sh-self.pyramid_height+truncation_height+self.CL_thickness):
+					while (vec.z >= sz/2-sh-self.pyramid_height+truncation_height):
 						if (-h_inner<=vec.x<=h_inner and vec.y <= k*vec.x+v_inner and vec.y <= -k*vec.x+v_inner and vec.y >= k*vec.x-v_inner and vec.y >= -k*vec.x-v_inner):
 							#inner pyramid, inside capping layer
 							return GaN
@@ -288,20 +270,22 @@ class SimStruct():
 		#"Source position"
 		if self.source_on_wall == True:
 			if self.truncation_width > 0:
-				inner_pyramid_height = self.pyramid_height*(1-self.truncation_width/self.truncation_width)-self.CL_thickness
+				inner_pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)
 			#if source is placed on wall we need to convert position to MEEP coordinates
 			abs_source_position_x = (inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
 			abs_source_position_y = self.source_position[1]*math.tan(math.pi/6)*(inner_pyramid_height*self.source_position[2]*math.cos(math.pi/6))/math.tan(62*math.pi/180)
-			abs_source_position_z=sz/2-sh-inner_pyramid_height+inner_pyramid_height*(self.source_position[2])
+			#abs_source_position_z=sz/2-sh-inner_pyramid_height+inner_pyramid_height*(self.source_position[2])
+			abs_source_position_z = sz/2-sh-inner_pyramid_height + self.source_position[2]
 			print('spos with source_on_wall:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 		else:
 			#else it is assumed source is placed on top of pyramid
 			#TODO: implement function that can take of case with both truncated and non-truncated pyramid AND move source in x,y on truncated source
 			if self.truncation_width > 0:
-				inner_pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)-self.CL_thickness
+				inner_pyramid_height = self.pyramid_height-truncation_height
 			abs_source_position_x = 0
 			abs_source_position_y = 0
-			abs_source_position_z = sz/2-sh-inner_pyramid_height+inner_pyramid_height*(self.source_position[2])
+			print('inn pyr, ph, th, sz/2, sh, szpos', inner_pyramid_height, self.pyramid_height, truncation_height, sz/2, sh, self.source_position[2])
+			abs_source_position_z = sz/2-sh-inner_pyramid_height+self.source_position[2]
 			print('spos with source_on_top:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
 		#Sets the polarization of the dipole to be in the plane, that is the pyramid wall
 
@@ -316,15 +300,15 @@ class SimStruct():
 				amplitude=self.source_direction[0],
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z))]
 				
-		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-				component=mp.Ey,
-				amplitude=self.source_direction[1],
-				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+		#source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+		#		component=mp.Ey,
+		#		amplitude=self.source_direction[1],
+		#		center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 
-		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-				component=mp.Ez,
-				amplitude=self.source_direction[2],
-				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+		#source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+		#		component=mp.Ez,
+		#		amplitude=self.source_direction[2],
+		#		center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				#geometry=geometry,
@@ -384,14 +368,14 @@ class SimStruct():
 		if True:
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0*abs_source_position_y,0),size=mp.Vector3(0,sy+2*dpml,sz+2*dpml)))
 			#plt.show()
-			plt.savefig('foo.png')
+			plt.savefig('foo.pdf')
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0*abs_source_position_x,0,0),size=mp.Vector3(sx+2*dpml,0,sz+2*dpml)))
 			
 			#plt.show()
-			plt.savefig('foo2.png')
+			plt.savefig('foo2.pdf')
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,sz/2-sh-0.01),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
-			plt.savefig('foo3.png')
+			plt.savefig('foo3.pdf')
 		if use_fixed_time:
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
