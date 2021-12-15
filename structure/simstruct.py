@@ -196,6 +196,7 @@ class SimStruct():
 		if (self.truncation_width > 0):
 			#self.pyramid_height = self.pyramid_height*(1-self.truncation_width/self.pyramid_width)
 			truncation_height = (self.truncation_width/2)*math.tan((math.pi*62)/180)
+			print('trunc h,w', truncation_height, self.truncation_width)
 		else:
 			truncation_height = 0
 
@@ -249,6 +250,9 @@ class SimStruct():
 			else:
 				truncPyramid(vec)
 
+
+		#GaN = mp.Medium(epsilon=20)
+		#CL_material = mp.Medium(epsilon=10)
 		#function to create truncated pyramid with metal coating on top
 		def truncPyramidWithCoating(vec):
 			#TODO: Optimize function
@@ -259,7 +263,7 @@ class SimStruct():
 				v_inner = v - self.CL_thickness
 				h_inner = h - self.CL_thickness
 				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
-					if (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height+truncation_height):
+					while (vec.z >= sz/2-sh-self.pyramid_height+truncation_height+self.CL_thickness):
 						if (-h_inner<=vec.x<=h_inner and vec.y <= k*vec.x+v_inner and vec.y <= -k*vec.x+v_inner and vec.y >= k*vec.x-v_inner and vec.y >= -k*vec.x-v_inner):
 							#inner pyramid, inside capping layer
 							return GaN
@@ -279,7 +283,7 @@ class SimStruct():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 		#Assuming a (MC_thickness) nm capping layer, (that is included in the total pyramid height and width)
 		#I can assume the inner pyramid to be pyramid height - 100 nm and pyramid width - 2*100 nm
-		inner_pyramid_height = self.pyramid_height - self.CL_thickness
+		inner_pyramid_height = pyramid_height_tot - self.CL_thickness
 
 		#"Source position"
 		if self.source_on_wall == True:
@@ -323,7 +327,7 @@ class SimStruct():
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
-				geometry=geometry,
+				#geometry=geometry,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
@@ -387,7 +391,7 @@ class SimStruct():
 			plt.savefig('foo2.png')
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,sz/2-sh-0.01),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
-			plt.show()
+			plt.savefig('foo3.png')
 		if use_fixed_time:
 			sim.run(
 		#	mp.at_beginning(mp.output_epsilon),
@@ -404,7 +408,7 @@ class SimStruct():
 				detector_pol = mp.Ez
 			#TODO: exchange self.source_direction to maxmimum dipole ampltitude
 			sim.run(
-		#	mp.at_beginning(mp.output_epsilon),
+			#mp.at_beginning(mp.output_epsilon),
 			until_after_sources=mp.stop_when_fields_decayed(2,detector_pol,mp.Vector3(0,0,abs_source_position_z+0.2),1e-3))
 
 
