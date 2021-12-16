@@ -30,6 +30,7 @@ class SimStruct():
 		ff_calc = config["ff_calc"]
 		use_symmetries = config["use_symmetries"]
 		calculate_flux = config["calculate_flux"]
+		calculate_source_flux = config["calculate_source_flux"]
 		ff_calculations = config["ff_calculations"]
 		ff_angle = math.pi/config["ff_angle"]
 		FibonacciSampling = config["fibb_sampling"]
@@ -46,6 +47,7 @@ class SimStruct():
 		sh=substrate_height
 		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
+
 
 #Symmetries for the simulation	
 		def create_symmetry(self):
@@ -174,8 +176,6 @@ class SimStruct():
 			nearfieldregions.append(nfrBelow)
 			return nearfieldregions
 
-					
-
 		###GEOMETRY FOR THE SIMULATION#################################################
 
 		#"Material parameters"
@@ -183,7 +183,7 @@ class SimStruct():
 		#GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
-		CL_material = Ag
+		CL_material = Au
 #		SubstrateEps = TiO2
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
@@ -325,17 +325,63 @@ class SimStruct():
 				split_chunks_evenly=False,
 				resolution=resolution)
 
+		###SOURCE REGION###################################################
+		pixels = 2
+		def define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels):
+				distance = pixels*1/resolution
+				source_region = []
+				source_region.append(mp.FluxRegion(					#region x to calculate flux from
+					center=mp.Vector3(abs_source_position_x+distance,abs_source_position_y,abs_source_position_z),
+					size=mp.Vector3(0,2*pixels*1/resolution,2*pixels*1/resolution),
+					direction=mp.X))
+
+				source_region.append(mp.FluxRegion(					# region -x to calculate flux from
+					center=mp.Vector3(abs_source_position_x-distance,abs_source_position_y,abs_source_position_z),
+					size=mp.Vector3(0,2*pixels*1/resolution,2*pixels*1/resolution),
+					direction=mp.X,
+					weight=-1))
+
+				source_region.append(mp.FluxRegion(					#region y to calculate flux from
+					center=mp.Vector3(abs_source_position_x,abs_source_position_y+distance,abs_source_position_z),
+					size=mp.Vector3(2*pixels*1/resolution,0,2*pixels*1/resolution),
+					direction=mp.Y))
+
+				source_region.append(mp.FluxRegion(					#region -y to calculate flux from
+					center=mp.Vector3(abs_source_position_x,abs_source_position_y-distance,abs_source_position_z),
+					size=mp.Vector3(2*pixels*1/resolution,0,2*pixels*1/resolution),
+					direction=mp.Y,
+					weight=-1))
+
+				source_region.append(mp.FluxRegion(					#z-bottom region to calculate flux from
+					center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z+distance),
+					size=mp.Vector3(2*pixels*1/resolution,2*pixels*1/resolution,0),
+					direction=mp.Z))
+
+				source_region.append(mp.FluxRegion(					#z-top region to calculate flux from
+					center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z-distance),
+					size=mp.Vector3(2*pixels*1/resolution,2*pixels*1/resolution,0),
+					direction=mp.Z,
+					weight=-1))
+				return source_region						
+
+
 		###REGIONS######################################################################
 
 		#"These regions define the borders of the cell with distance 'padding' between the flux region and the dpml region to avoid calculation errors."
 		if calculate_flux:
 			flux_regions = define_flux_regions(sx,sy,sz,padding)
 			fr1,fr2, fr3, fr4, fr5, fr6 = flux_regions
+			flux_total=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr5, fr6)	#calculate flux for flux regions		
+
+		if calculate_source_flux:
+			sr1, sr2, sr3, sr4, sr5, sr6 = define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels)
+			flux_source=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs, sr1, sr2, sr3, sr4, sr5, sr6)
 
 		###FIELD CALCULATIONS###########################################################
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
-			flux_total=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr5, fr6 )	#calculate flux for flux regions
+
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
+
 
 		###FAR FIELD REGION#############################################################
 
@@ -524,6 +570,9 @@ class SimStruct():
 			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
 			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
 			print('freqs',mp.get_flux_freqs(flux_total))
+			if calculate_source_flux:
+				source_flux_out = mp.get_fluxes(flux_source)
+
 			if False:
 				fig = plt.figure()
 				ax = fig.gca(projection='3d')
@@ -599,6 +648,9 @@ class SimStruct():
 				#print(fields["pos"])
 				if output_ff:
 					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), fields, elapsed_time
+				elif calculate_source_flux:
+					print('im here')
+					return flux_tot_out, source_flux_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
 				else:
 					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
 

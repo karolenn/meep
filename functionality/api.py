@@ -51,7 +51,7 @@ def polar_to_complex_conv(list_dict):
 
 
 #TODO: rewrite to be able to handle arbitrary results
-def sim_to_json(config,result,output_ff =False):
+def sim_to_json(config,result,output_ff =False, calculate_source_flux=False):
   #  len_results = len(result)
   #  result = dict(zip(result),zip(str(result)))
     config["result"] = result
@@ -61,6 +61,10 @@ def sim_to_json(config,result,output_ff =False):
         fields = complex_to_polar_conv(fields)
         result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "far_fields":fields, "Elapsed time (min)":elapsed_time }
         config["result"] = result
+    elif calculate_source_flux:
+        flux_tot_out, source_flux_out, P_tot_ff, flux_tot_ff_ratio, elapsed_time = result
+        result = {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (min)":elapsed_time }
+        config["result"] = result        
     else:
         flux_tot_out, P_tot_ff, flux_tot_ff_ratio, elapsed_time = result
         result = {"total_flux":flux_tot_out , "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "Elapsed time (min)":elapsed_time }
