@@ -48,6 +48,12 @@ class SimStruct():
 		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
 
+		if self.CL_material == "Au":
+			CL_material = Au
+		elif self.CL_material == "Ag":
+			CL_material = Ag
+		else:
+			CL_material = GaN
 
 #Symmetries for the simulation	
 		def create_symmetry(self):
