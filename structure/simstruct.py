@@ -189,7 +189,6 @@ class SimStruct():
 		#GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
 		air = mp.Medium(epsilon=1)					#air dielectric value
 		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
-		CL_material = Au
 #		SubstrateEps = TiO2
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
@@ -333,6 +332,7 @@ class SimStruct():
 
 		###SOURCE REGION###################################################
 		pixels = 2
+		print('pixels', pixels)
 		def define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels):
 				distance = pixels*1/resolution
 				source_region = []
@@ -428,8 +428,21 @@ class SimStruct():
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,sz/2-sh-0.01),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			plt.savefig('foo3.pdf')
+			top_pyr =  sz/2-sh-pyramid_height_tot+truncation_height_tot
+			point1 = mp.Vector3(0,0,top_pyr+0.05)
+			eps1 = sim.get_epsilon_point(point1, 2.3)
+
+			point2 = mp.Vector3(0,0,top_pyr-0.05)
+			eps2 = sim.get_epsilon_point(point2, 2.3)
+
+			point3 = mp.Vector3(0,0,top_pyr-0.1)
+			eps3 = sim.get_epsilon_point(point3, 2.3)
+
+			print('eps:',eps1,eps2,eps3)
+
 		if use_fixed_time:
 			sim.run(
+			mp.dft_ldos(self.frequency_center, self.frequency_width, self.number_of_freqs),
 		#	mp.at_beginning(mp.output_epsilon),
 			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 			until=simulation_time)
@@ -444,6 +457,7 @@ class SimStruct():
 				detector_pol = mp.Ez
 			#TODO: exchange self.source_direction to maxmimum dipole ampltitude
 			sim.run(
+			mp.dft_ldos(self.frequency_center, self.frequency_width, self.number_of_freqs),
 			#mp.to_appended("ex", mp.at_every(0.6, mp.output_efield_x)),	
 			#mp.at_beginning(mp.output_epsilon),
 			until_after_sources=mp.stop_when_fields_decayed(2,detector_pol,mp.Vector3(0,0,abs_source_position_z+0.2),1e-3))
@@ -651,6 +665,8 @@ class SimStruct():
 				elapsed_time = round((time.time()-start)/60,1)
 				#print(fields)
 				print('len fields',len(fields))
+				print('LDOS', sim.ldos_data)
+				print('LDOS0',sim.ldos_data[0])
 				#print(fields["pos"])
 				if output_ff:
 					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), fields, elapsed_time
