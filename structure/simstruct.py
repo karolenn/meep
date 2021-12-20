@@ -54,6 +54,7 @@ class SimStruct():
 			CL_material = Ag
 		else:
 			CL_material = GaN
+		print('CL MATERIAL:', CL_material, self.CL_material)
 
 #Symmetries for the simulation	
 		def create_symmetry(self):
@@ -184,12 +185,9 @@ class SimStruct():
 
 		###GEOMETRY FOR THE SIMULATION#################################################
 
-		#"Material parameters"
-		TiO2=mp.Medium(epsilon=3.26**2)
-		#GaN = mp.Medium(epsilon=5.76)					#GaN n^2=epsilon, n=~2.4 
+		#"Material parameters" 
 		air = mp.Medium(epsilon=1)					#air dielectric value
-		SubstrateEps = mp.Medium(epsilon=5.76)				#substrate epsilon
-#		SubstrateEps = TiO2
+		SubstrateEps = GaN				#substrate epsilon
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
 		geometry=[]
@@ -207,7 +205,7 @@ class SimStruct():
 
 		if (self.CL_thickness > 0):
 			coating = True
-			#TODO: Make pyramid angle an input in sim_spec 
+			#TODO: Make pyramid angle an input in sim_spec.TODO: for th_tot, is it correct to take - CL_thickness (?)
 			#increase size of pyramid to account for metal coating. Easier calculating material function this way.
 			pyramid_width_tot = self.pyramid_width + 2*self.CL_thickness 
 			pyramid_height_tot = self.pyramid_height + self.CL_thickness*math.tan((math.pi*62)/180)
@@ -291,7 +289,9 @@ class SimStruct():
 			abs_source_position_y = 0
 			print('inn pyr, ph, th, sz/2, sh, szpos', inner_pyramid_height, self.pyramid_height, truncation_height, sz/2, sh, self.source_position[2])
 			abs_source_position_z = sz/2-sh-inner_pyramid_height+self.source_position[2]
-			print('spos with source_on_top:',abs_source_position_x,abs_source_position_y,abs_source_position_z)	
+			print('spos with source_on_top:',abs_source_position_x,abs_source_position_y,abs_source_position_z)
+			if True:
+				abs_source_position_z = abs_source_position_z + 1/(2*resolution) #add 0.5 pixel to truncate source 1 pixel down
 		#Sets the polarization of the dipole to be in the plane, that is the pyramid wall
 
 		#TODO: Move to pyramid.py
@@ -323,7 +323,7 @@ class SimStruct():
 				#subpixel_tol=1e-4,
 				#subpixel_maxeval=1000,
 				dimensions=3,
-				#default_material=TiO2,
+				#default_material=GaN,
 				extra_materials=[CL_material],
 				material_function=truncPyramidWithCoating,
 				boundary_layers=pml_layer,
@@ -331,7 +331,7 @@ class SimStruct():
 				resolution=resolution)
 
 		###SOURCE REGION###################################################
-		pixels = 2
+		pixels = 3
 		print('pixels', pixels)
 		def define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels):
 				distance = pixels*1/resolution
@@ -429,15 +429,16 @@ class SimStruct():
 			#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,sz/2-sh-0.01),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			plt.savefig('foo3.pdf')
 			top_pyr =  sz/2-sh-pyramid_height_tot+truncation_height_tot
-			point1 = mp.Vector3(0,0,top_pyr+0.05)
+			point1 = mp.Vector3(0,0,top_pyr+0.2)
 			eps1 = sim.get_epsilon_point(point1, 2.3)
 
-			point2 = mp.Vector3(0,0,top_pyr-0.05)
+			point2 = mp.Vector3(0,0,top_pyr-0.2)
 			eps2 = sim.get_epsilon_point(point2, 2.3)
 
-			point3 = mp.Vector3(0,0,top_pyr-0.1)
+			point3 = mp.Vector3(0,0,-0.4)
 			eps3 = sim.get_epsilon_point(point3, 2.3)
 
+			print('pts',point1, point2, point3)
 			print('eps:',eps1,eps2,eps3)
 
 		if use_fixed_time:
