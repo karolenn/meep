@@ -7,7 +7,7 @@ from functionality.api import polar_to_complex_conv,sim_to_json,write_result
 
 config = {
        "simulate": {
-            "resolution": 160,
+            "resolution": 85,
             "use_fixed_time": False,
             "simulation_time": 500,
             "dpml": 0.1,
@@ -27,7 +27,7 @@ config = {
             "polarization_in_plane": False
         },
         "pyramid": {
-            "source_position": [0,0,0.02],
+            "source_position": [0,0,0.04],
             "pyramid_height": 0.814,
             "pyramid_width": 1,
             "truncation_width": 0.1,

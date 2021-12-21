@@ -331,7 +331,7 @@ class SimStruct():
 				resolution=resolution)
 
 		###SOURCE REGION###################################################
-		pixels = 3
+		pixels = 2
 		print('pixels', pixels)
 		def define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels):
 				distance = pixels*1/resolution
