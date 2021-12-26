@@ -8,7 +8,7 @@ from functionality.api import polar_to_complex_conv,sim_to_json,write_result
 
 config = {
        "simulate": {
-            "resolution": 900,
+            "resolution": 480,
             "use_fixed_time": False,
             "simulation_time": 500,
             "dpml": 0.01,
@@ -19,12 +19,15 @@ config = {
             "use_symmetries": True,
             "calculate_flux": True,
             "calculate_source_flux": True,
+            "source_flux_pixel_size": 2,
             "ff_calculations": False,
             "ff_angle": 6,
             "fibb_sampling": True,
             "simulation_ratio": "1",
             "substrate_ratio": "2/10",
             "output_ff": False,
+            "geometry": None,
+            "material_function": None,
             "polarization_in_plane": False
         },
         "pyramid": {
@@ -37,8 +40,8 @@ config = {
             "source_direction": [0,0,1],
             "source_on_wall": False,
             "frequency_center": 2.5,
-            "frequency_width": 0.3,
-            "number_of_freqs": 1,
+            "frequency_width": 1.33,
+            "number_of_freqs": 8,
             "cutoff": 4
         },
         "result": {}

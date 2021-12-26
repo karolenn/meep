@@ -10,7 +10,7 @@ import math as math
 import time
 
 if True:
-	from meep.materials import Al, GaN, Au, Ag, Si3N4
+	from meep.materials import Al, GaN, Au, Ag, Si3N4, Ag_visible
 
 ###PARAMETERS FOR THE SIMULATION and PYRAMID##############################################
 
@@ -31,6 +31,7 @@ class SimStruct_silverball():
 		use_symmetries = config["use_symmetries"]
 		calculate_flux = config["calculate_flux"]
 		calculate_source_flux = config["calculate_source_flux"]
+		pixels = config["source_flux_pixel_size"]
 		ff_calculations = config["ff_calculations"]
 		ff_angle = math.pi/config["ff_angle"]
 		FibonacciSampling = config["fibb_sampling"]
@@ -38,6 +39,8 @@ class SimStruct_silverball():
 		substrate_ratio = eval(config["substrate_ratio"])
 		output_ff = config["output_ff"]
 		polarization_in_plane = config["polarization_in_plane"]
+		geometry = config["geometry"]
+		material_function = config["material_function"]
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
@@ -191,19 +194,23 @@ class SimStruct_silverball():
 		SubstrateEps = GaN				#substrate epsilon
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
-		geometry=[]
+		geometries=[]
 		#Substrate
 		radius_ = 0.035
 		distance = 0.03
-		geometry.append(mp.Sphere(center=mp.Vector3(0,0,distance/2 + radius_),
+		geometries.append(mp.Sphere(center=mp.Vector3(0,0,distance/2 + radius_),
 					radius = radius_,
 					material=CL_material))
 		
-		geometry.append(mp.Sphere(center=mp.Vector3(0,0,-1*distance/2 + -1*radius_),
+		geometries.append(mp.Sphere(center=mp.Vector3(0,0,-distance/2  -radius_),
 					radius = radius_,
 					material=CL_material))
 
-
+		if geometry == None:
+			geometries = None
+		
+		if material_function == None:
+			material_function = None
 
 		###SYMMETRIES#########################################################
 		#"Symmetry logic."
@@ -243,7 +250,7 @@ class SimStruct_silverball():
 		#		center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
-				geometry=geometry,
+				geometry=geometries,
 				symmetries=symmetry,
 				sources=source,
 				#eps_averaging=True,
@@ -257,7 +264,6 @@ class SimStruct_silverball():
 				resolution=resolution)
 
 		###SOURCE REGION###################################################
-		pixels = 2
 		print('pixels', pixels)
 		def define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels):
 				distance = pixels*1/resolution
