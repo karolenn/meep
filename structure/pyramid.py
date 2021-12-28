@@ -49,9 +49,9 @@ if __name__ == "__main__":
 	result = pyramid.simulate(config["simulate"])
 	output_ff = config["simulate"]["output_ff"]
 	calculate_source_flux = config["simulate"]["calculate_source_flux"]
-	data = sim_to_json(config, result,output_ff, calculate_source_flux)
-	#print('pyramid data:',data)
-	write_result("db/initial_results/{}.json".format(sys.argv[1]), data)
+	#data = sim_to_json(config, result,output_ff, calculate_source_flux)
+	config["result"] = result
+	write_result("db/initial_results/{}.json".format(sys.argv[1]), config)
 	#for k,v in data["result"].items():
 	#	print(k, v)
 	

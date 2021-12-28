@@ -38,6 +38,7 @@ class SimStruct():
 		substrate_ratio = eval(config["substrate_ratio"])
 		output_ff = config["output_ff"]
 		polarization_in_plane = config["polarization_in_plane"]
+		geometry = config["geometry"]
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
@@ -190,9 +191,9 @@ class SimStruct():
 		SubstrateEps = GaN				#substrate epsilon
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
-		geometry=[]
+		geometries=[]
 		#Substrate
-		geometry.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
+		geometries.append(mp.Block(center=mp.Vector3(0,0,sz/2-sh/2+dpml/2),
 					size=mp.Vector3(2*sx+2*dpml,2*sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
 
@@ -316,7 +317,7 @@ class SimStruct():
 		#		center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
-				#geometry=geometry,
+				geometry=geometries,
 				symmetries=symmetry,
 				sources=source,
 				eps_averaging=True,
@@ -479,16 +480,6 @@ class SimStruct():
 			Pz=0
 			theta=ff_angle
 			phi=math.pi*2
-			#"How many points on the ff-sphere"
-			#global xPts
-			#xPts=[]
-
-			#global yPts
-			#yPts=[]
-
-			#global zPts
-			#zPts=[]
-
 			Pr_Array=[]
 
 			if myIntegration == True:
@@ -594,55 +585,10 @@ class SimStruct():
 			if calculate_source_flux:
 				source_flux_out = mp.get_fluxes(flux_source)
 
-			if False:
-				fig = plt.figure()
-				ax = fig.gca(projection='3d')
-				Pr_Max=max(Pr_Array)
-				R = [n/Pr_Max  for n in Pr_Array]
-				print(R)
-	#			R=1
-				pts = len(Pr_Array)
-				theta,phi = np.linspace(0,np.pi,pts), np.linspace(0,2*np.pi,pts)
-				THETA,PHI = np.meshgrid(theta,phi)
-				#print(xPts)
-				# print(yPts)
-				# print(zPts)
-				X=np.zeros(pts**2)
-				Y=np.zeros(pts**2)
-				Z=np.zeros(pts**2)
-				print('R pts',pts)
-				print('sample pts',len(xPts))
-				for n in range(pts):
-					xPts[n] = R[n]*xPts[n]
-					yPts[n] = R[n]*yPts[n]
-					zPts[n] = R[n]*zPts[n]
-				# #print(X)
-				# #print(Y)
-				# #print(Z)
-				#ax.set_xlim(-100,100)
-				#ax.set_zlim(-100,100)
-				#ax.set_ylim(-100,100)
+			elapsed_time = round((time.time()-start)/60,1)
 
-				#ax.scatter(xPts,yPts,zPts)
-				u = np.linspace(0, 2 * np.pi, 120)
-				v = np.linspace(0, np.pi/6, 120)
-				r_ = np.asarray(R)
-				x = np.outer(np.cos(u), np.sin(v))
-				y = np.outer(np.sin(u), np.sin(v))
-				z = R*np.outer(np.ones(np.size(u)), np.cos(v))
-				print('lenx',len(x),'leny',len(y),'lenz',len(z))
-				#r = np.sqrt(xPts**2+yPts**2+zPts**2)
-				#plot(r)
-				ax.plot_surface(x,y,z,cmap='plasma')
-				#ax.quiver(0,0,0,0,0,1,length=1.2,color='brown',normalize='true')
-				#ax.text(0,0,1.3, '$\mathcal{P}$',size=20, zdir=None)
-				#ax.set_zlim(-1,1)
-				#ax.axis('off')
-				#ax.plot_trisurf(list(x),list(y),list(z),cmap='plasma')
-				plt.show()
 			for n in range(len(flux_tot_out)):
 				flux_tot_out[n]=round(flux_tot_out[n],11)
-			#	P_tot_ff[n]=round(P_tot_ff[n],9)
 			##Some processing to calculate the flux ratios per frequency
 			if ff_calculations:
 				for n in range(len(flux_tot_out)):
@@ -662,28 +608,19 @@ class SimStruct():
 						flux_tot_ff_ratioA[i] =round(P_tot_ffA[i]/flux_tot_out[i],11)		
 						flux_tot_ff_ratioB[i] =round(P_tot_ffB[i]/flux_tot_out[i],11)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
-					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)				
-				elapsed_time = round((time.time()-start)/60,1)
-				#print(fields)
-				print('len fields',len(fields))
-				print('LDOS', sim.ldos_data)
-				print('LDOS0',sim.ldos_data[0])
-				#print(fields["pos"])
+					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)
+
+				output_fields = None
 				if output_ff:
-					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), fields, elapsed_time
-				elif calculate_source_flux:
-					print('im here')
-					return flux_tot_out, source_flux_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
-				else:
-					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
+					output_fields = fields
+
+
+				
+				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio, "LDOS":sim.ldos_data, "fields":output_fields, "Elapsed time (min)":elapsed_time }
 
 			else:
 			#	self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
-				return flux_tot_out, None , None
-
-
-
-
+				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":None , "flux_ratio":None , "LDOS":sim.ldos_data,"fields":output_fields, "Elapsed time (min)":elapsed_time }
 
 	###OUTPUT DATA##################################################################
 
@@ -696,21 +633,3 @@ if __name__ == "__main__":
 	if config == None:
 		print("could not open tmp/tmp.json for simulation")
 		exit(0)
-
-	
-	# if (len(sys.argv)) != 7:
-	# 	print("Not enough arguments")
-	# 	exit(0)
-
-	# "1 unit distance is meep is thought of as 1 micrometer here."
-
-	# "Structure Geometry"
-	# resolution= int(sys.argv[1])					#resolution of the pyramid. Measured as number of pixels / unit distance
-	# simulation_time=int(sys.argv[2])				#simulation time for the sim. #Multiply by a and divide by c to get time in fs.
-	# source_position=float(sys.argv[3])					#pos of source measured	measured as fraction of tot. pyramid height from top. 
-	# pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
-	# pyramid_width=float(sys.argv[5])					#width measured from edge to edge 2.6
-	# dpml=float(sys.argv[6])
-	# pyramid = Pyramid()
-	# pyramid.simulate(resolution, simulation_time, source_position, pyramid_height, pyramid_width, dpml)
-	
