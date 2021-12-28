@@ -56,6 +56,8 @@ class SimStruct_silverball():
 			CL_material = Au
 		elif self.CL_material == "Ag":
 			CL_material = Ag
+		elif self.CL_material == "Ag_visible":
+			CL_material = Ag_visible
 		else:
 			CL_material = GaN
 		print('CL MATERIAL:', CL_material, self.CL_material)
@@ -196,18 +198,16 @@ class SimStruct_silverball():
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
 		geometries=[]
 		#Substrate
-		radius_ = 0.035
-		distance = 0.03
-		geometries.append(mp.Sphere(center=mp.Vector3(0,0,distance/2 + radius_),
-					radius = radius_,
+		geometries.append(mp.Sphere(center=mp.Vector3(0,0,self.distance/2 + self.radius),
+					radius = self.radius,
 					material=CL_material))
 		
-		geometries.append(mp.Sphere(center=mp.Vector3(0,0,-distance/2  -radius_),
-					radius = radius_,
+		geometries.append(mp.Sphere(center=mp.Vector3(0,0,-self.distance/2  -self.radius),
+					radius = self.radius,
 					material=CL_material))
 
 		if geometry == None:
-			geometries = None
+			geometries = []
 		
 		if material_function == None:
 			material_function = None
@@ -258,6 +258,7 @@ class SimStruct_silverball():
 				#subpixel_maxeval=1000,
 				dimensions=3,
 				#default_material=GaN,
+				Courant = 0.1,
 				extra_materials=[CL_material],
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
@@ -269,34 +270,34 @@ class SimStruct_silverball():
 				distance = pixels*1/resolution
 				source_region = []
 				source_region.append(mp.FluxRegion(					#region x to calculate flux from
-					center=mp.Vector3(abs_source_position_x+distance,abs_source_position_y,abs_source_position_z),
+					center=mp.Vector3(abs_source_position_x + distance, abs_source_position_y, abs_source_position_z),
 					size=mp.Vector3(0,2*pixels*1/resolution,2*pixels*1/resolution),
 					direction=mp.X))
 
 				source_region.append(mp.FluxRegion(					# region -x to calculate flux from
-					center=mp.Vector3(abs_source_position_x-distance,abs_source_position_y,abs_source_position_z),
+					center=mp.Vector3(abs_source_position_x - distance, abs_source_position_y, abs_source_position_z),
 					size=mp.Vector3(0,2*pixels*1/resolution,2*pixels*1/resolution),
 					direction=mp.X,
 					weight=-1))
 
 				source_region.append(mp.FluxRegion(					#region y to calculate flux from
-					center=mp.Vector3(abs_source_position_x,abs_source_position_y+distance,abs_source_position_z),
+					center=mp.Vector3(abs_source_position_x, abs_source_position_y + distance, abs_source_position_z),
 					size=mp.Vector3(2*pixels*1/resolution,0,2*pixels*1/resolution),
 					direction=mp.Y))
 
 				source_region.append(mp.FluxRegion(					#region -y to calculate flux from
-					center=mp.Vector3(abs_source_position_x,abs_source_position_y-distance,abs_source_position_z),
+					center=mp.Vector3(abs_source_position_x, abs_source_position_y - distance, abs_source_position_z),
 					size=mp.Vector3(2*pixels*1/resolution,0,2*pixels*1/resolution),
 					direction=mp.Y,
 					weight=-1))
 
 				source_region.append(mp.FluxRegion(					#z-bottom region to calculate flux from
-					center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z+distance),
+					center=mp.Vector3(abs_source_position_x, abs_source_position_y, abs_source_position_z + distance),
 					size=mp.Vector3(2*pixels*1/resolution,2*pixels*1/resolution,0),
 					direction=mp.Z))
 
 				source_region.append(mp.FluxRegion(					#z-top region to calculate flux from
-					center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z-distance),
+					center=mp.Vector3(abs_source_position_x, abs_source_position_y, abs_source_position_z - distance),
 					size=mp.Vector3(2*pixels*1/resolution,2*pixels*1/resolution,0),
 					direction=mp.Z,
 					weight=-1))
@@ -505,7 +506,8 @@ class SimStruct_silverball():
 			flux_tot_value = np.zeros(self.number_of_freqs)						#total flux out from box
 			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
 			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
-			print('freqs',mp.get_flux_freqs(flux_total))
+			freqs_out = mp.get_flux_freqs(flux_total)
+			print('freqs',freqs_out)
 			if calculate_source_flux:
 				source_flux_out = mp.get_fluxes(flux_source)
 
@@ -513,6 +515,9 @@ class SimStruct_silverball():
 			elapsed_time = round((time.time()-start)/60,1)
 			print('LDOS', sim.ldos_data)
 			print('LDOS0',sim.ldos_data[0])
+
+			for i in range(len(flux_tot_out)):
+				print(flux_tot_out[i]*100/source_flux_out[i], 'LE percentage for lambda: ',1/freqs_out[i])
 
 			if False:
 				fig = plt.figure()
@@ -583,23 +588,11 @@ class SimStruct_silverball():
 						flux_tot_ff_ratioB[i] =round(P_tot_ffB[i]/flux_tot_out[i],11)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)				
-				#print(fields["pos"])
-				if output_ff == False:
-					output_ff = 0
-				if output_ff:
-					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), fields, elapsed_time
-				elif calculate_source_flux:
-					return flux_tot_out, source_flux_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
-				else:
-					return flux_tot_out, list(P_tot_ff), list(flux_tot_ff_ratio), elapsed_time
+
+				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio , "LDOS":sim.ldos_data, "Elapsed time (min)":elapsed_time }
 
 			else:
-			#	self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
-
-				if calculate_source_flux:
-					return flux_tot_out, source_flux_out, None, None, elapsed_time
-				else:
-					return flux_tot_out, None , None
+				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":None , "flux_ratio":None , "LDOS":sim.ldos_data, "Elapsed time (min)":elapsed_time }
 
 	###OUTPUT DATA##################################################################
 

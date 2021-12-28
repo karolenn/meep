@@ -33,6 +33,8 @@ class Balls(SimStruct_silverball):
 		self.truncation_width = config["truncation_width"]
 		self.CL_thickness = config["CL_thickness"]
 		self.CL_material = config["CL_material"]
+		self.distance = config["distance"]
+		self.radius = config["radius"]
 
 
 
