@@ -41,8 +41,8 @@ config_pyramid = {
             "CL_material":"Ag",
             "source_direction": [1,0,0],
             "source_on_wall": False,
-            "frequency_center": 2.5,
-            "frequency_width": 1.33,
+            "frequency_center": 1.85,
+            "frequency_width": 0.76,
             "number_of_freqs": 8,
             "cutoff": 4
         },

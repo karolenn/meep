@@ -314,11 +314,11 @@ class SimStruct():
 			self.source_direction = PolarizeInPlane(self.source_direction,self.pyramid_height,self.pyramid_width)
 			print('new source dir',self.source_direction)
 
-		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+		source=[mp.Source(mp.GaussianSource(frequency=self.frequency_center, fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 				component=mp.Ex,
 				amplitude=self.source_direction[0],
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z))]
-				
+			
 		#source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
 		#		component=mp.Ey,
 		#		amplitude=self.source_direction[1],
@@ -392,7 +392,7 @@ class SimStruct():
 			flux_regions = define_flux_regions(sx,sy,sz,padding)
 			fr1,fr2, fr3, fr4, fr5, fr6 = flux_regions
 			flux_total=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr5, fr6)	#calculate flux for flux regions		
-
+		print('freqs',mp.get_flux_freqs(flux_total))
 		if calculate_source_flux:
 			sr1, sr2, sr3, sr4, sr5, sr6 = define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels)
 			flux_source=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs, sr1, sr2, sr3, sr4, sr5, sr6)
@@ -472,7 +472,7 @@ class SimStruct():
 			mp.dft_ldos(self.frequency_center, self.frequency_width, self.number_of_freqs),
 			#mp.to_appended("ex", mp.at_every(0.6, mp.output_efield_x)),	
 			#mp.at_beginning(mp.output_epsilon),
-			until_after_sources=mp.stop_when_fields_decayed(2,detector_pol,mp.Vector3(0,0,abs_source_position_z+0.2),1e-3))
+			until_after_sources=mp.stop_when_fields_decayed(2,detector_pol,mp.Vector3(0,0,abs_source_position_z+0.2),1e-5))
 
 
 		###OUTPUT CALCULATIONS##########################################################
@@ -601,6 +601,11 @@ class SimStruct():
 			for n in range(len(flux_tot_out)):
 				flux_tot_out[n]=round(flux_tot_out[n],11)
 			##Some processing to calculate the flux ratios per frequency
+
+			for i in range(len(flux_tot_out)):
+				print(flux_tot_out[i]*100/source_flux_out[i], 'LE percentage for lambda: ',1/freqs_out[i])
+
+
 			if ff_calculations:
 				for n in range(len(flux_tot_out)):
 					P_tot_ff[n]=round(P_tot_ff[n],11)
