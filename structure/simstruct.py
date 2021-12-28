@@ -39,6 +39,7 @@ class SimStruct():
 		output_ff = config["output_ff"]
 		polarization_in_plane = config["polarization_in_plane"]
 		geometry = config["geometry"]
+		material_functions = config["material_function"]
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
@@ -68,6 +69,13 @@ class SimStruct():
 			else:
 				symmetry = []
 			return symmetry
+
+		###SYMMETRIES#########################################################
+		#"Symmetry logic."
+		if use_symmetries:
+			symmetry = create_symmetry(self)
+		else:
+			symmetry = []
 
 #Flux regions to calculate the total flux emitted from the simulation
 		def define_flux_regions(sx, sy, sz, padding):
@@ -197,6 +205,9 @@ class SimStruct():
 					size=mp.Vector3(2*sx+2*dpml,2*sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
 
+		if geometry == None:
+			geometries = []
+
 		if (self.truncation_width > 0):
 			#calculate height of truncation. i.e height of the pyramid that gets removed when truncated.
 			truncation_height = (self.truncation_width/2)*math.tan((math.pi*62)/180)
@@ -213,13 +224,6 @@ class SimStruct():
 			truncation_height_tot = truncation_height + self.CL_thickness*math.tan((math.pi*62)/180)-self.CL_thickness
 		else:
 			coating = False
-
-		###SYMMETRIES#########################################################
-		#"Symmetry logic."
-		if use_symmetries:
-			symmetry = create_symmetry(self)
-		else:
-			symmetry = []
 
 		# "Function for creating pyramid"
 
@@ -260,6 +264,15 @@ class SimStruct():
 					return air
 			else:
 				return air
+
+		materialFunction = None
+		if material_functions == "truncPyramidWithCoating":
+			materialFunction = truncPyramidWithCoating
+		elif material_functions == "isInsidexy2":
+			materialFunction = isInsidexy2
+		else:
+			materialFunction = None
+		print('materialfunction: ',materialFunction)
 		###PML_LAYERS###################################################################
 
 		pml_layer=[mp.PML(dpml)]
@@ -326,7 +339,7 @@ class SimStruct():
 				dimensions=3,
 				#default_material=GaN,
 				extra_materials=[CL_material],
-				material_function=truncPyramidWithCoating,
+				material_function=materialFunction,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
 				resolution=resolution)
@@ -386,10 +399,7 @@ class SimStruct():
 
 		###FIELD CALCULATIONS###########################################################
 			#"Tells meep with the function 'add_flux' to collect and calculate the flux in the corresponding regions and put them in a flux data object"
-
 			#flux_data_tot=sim.get_flux_data(flux_total)					#get flux data for later reloading
-
-
 		###FAR FIELD REGION#############################################################
 
 		#"The simulation calculates the far field flux from the regions 1-5 below. It correspons to the air above and at the side of the pyramids. The edge of the simulation cell that touches the substrate is not added to this region. Far-field calculations can not handle different materials."
@@ -577,7 +587,6 @@ class SimStruct():
 
 			##CALCULATE FLUX OUT FROM BOX###########################################
 		if calculate_flux:
-			#"Initialize variables to be used, pf stands for 'per frequency'"
 			flux_tot_value = np.zeros(self.number_of_freqs)						#total flux out from box
 			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
 			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
@@ -587,15 +596,15 @@ class SimStruct():
 
 			elapsed_time = round((time.time()-start)/60,1)
 
+			output_fields = None
+
 			for n in range(len(flux_tot_out)):
 				flux_tot_out[n]=round(flux_tot_out[n],11)
 			##Some processing to calculate the flux ratios per frequency
 			if ff_calculations:
 				for n in range(len(flux_tot_out)):
-				#	flux_tot_out[n]=round(flux_tot_out[n],9)
 					P_tot_ff[n]=round(P_tot_ff[n],11)
 				for i in range(self.number_of_freqs):	
-
 					flux_tot_ff_ratio[i] =round(P_tot_ff[i]/flux_tot_out[i],11)		
 				if ff_calc == "Both":
 					P_tot_ff = []
@@ -610,16 +619,13 @@ class SimStruct():
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioA)
 					flux_tot_ff_ratio.append(flux_tot_ff_ratioB)
 
-				output_fields = None
+
 				if output_ff:
 					output_fields = fields
-
-
 				
 				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio, "LDOS":sim.ldos_data, "fields":output_fields, "Elapsed time (min)":elapsed_time }
 
 			else:
-			#	self.print('Total Flux:',flux_tot_out,'ff_flux:',None,'simulation_time:',simulation_time,'dpml:',dpml,'res:',resolution,'r:',r,'res_ff:',None , 'source_position:',self.source_position)
 				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":None , "flux_ratio":None , "LDOS":sim.ldos_data,"fields":output_fields, "Elapsed time (min)":elapsed_time }
 
 	###OUTPUT DATA##################################################################
