@@ -12,9 +12,9 @@ config_pyramid = {
        "simulate": {
             "resolution": 100,
             "use_fixed_time": False,
-            "simulation_time": 50,
-            "dpml": 0.3,
-            "padding": 0.075,
+            "simulation_time": 2,
+            "dpml": 0.1,
+            "padding": 0.025,
             "ff_pts": 800,
             "ff_calc": "Below",
             "ff_cover": False,
@@ -22,14 +22,14 @@ config_pyramid = {
             "calculate_flux": True,
             "calculate_source_flux": True,
             "source_flux_pixel_size": 2,
-            "ff_calculations": False,
+            "ff_calculations": True,
             "ff_angle": 6,
             "fibb_sampling": True,
             "simulation_ratio": "7/5",
             "substrate_ratio": "2/10",
             "output_ff": False,
             "geometry": None,
-            "material_function": None,
+            "material_function": "truncPyramidWithCoating",
             "polarization_in_plane": False
         },
         "pyramid": {
@@ -39,11 +39,11 @@ config_pyramid = {
             "truncation_width": 0.1,
             "CL_thickness": 0.1,
             "CL_material":"Ag",
-            "source_direction": [1,0,0],
+            "source_direction": [0,1,0],
             "source_on_wall": False,
             "frequency_center": 1.85,
             "frequency_width": 0.76,
-            "number_of_freqs": 8,
+            "number_of_freqs": 2,
             "cutoff": 4
         },
         "result": {}

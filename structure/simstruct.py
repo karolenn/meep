@@ -196,7 +196,8 @@ class SimStruct():
 
 		#"Material parameters" 
 		air = mp.Medium(epsilon=1)					#air dielectric value
-		SubstrateEps = GaN				#substrate epsilon
+		SiC = mp.Medium(epsilon=2.56**2)
+		SubstrateEps = SiC				#substrate epsilon
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
 		geometries=[]
@@ -391,7 +392,8 @@ class SimStruct():
 		if calculate_flux:
 			flux_regions = define_flux_regions(sx,sy,sz,padding)
 			fr1,fr2, fr3, fr4, fr5, fr6 = flux_regions
-			flux_total=sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr5, fr6)	#calculate flux for flux regions		
+			flux_bottom = sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr5)
+			flux_total = sim.add_flux(self.frequency_center, self.frequency_width,self.number_of_freqs,fr1,fr2, fr3, fr4, fr6)	#calculate flux for flux regions		
 		print('freqs',mp.get_flux_freqs(flux_total))
 		if calculate_source_flux:
 			sr1, sr2, sr3, sr4, sr5, sr6 = define_flux_source_regions(abs_source_position_x,abs_source_position_y,abs_source_position_z,resolution, pixels)
@@ -483,7 +485,7 @@ class SimStruct():
 		r=2*math.pow(self.pyramid_height,2)*self.frequency_center*2*10 				# 10 times the Fraunhofer-distance
 		if ff_calculations:
 			fields = []
-			P_tot_ff = np.zeros(self.number_of_freqs)						
+			P_tot_ff = [0]*self.number_of_freqs						
 			npts=ff_pts							#number of far-field points
 			Px=0
 			Py=0
@@ -587,11 +589,12 @@ class SimStruct():
 
 			##CALCULATE FLUX OUT FROM BOX###########################################
 		if calculate_flux:
-			flux_tot_value = np.zeros(self.number_of_freqs)						#total flux out from box
-			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
-			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
+			flux_tot_value = [0]*self.number_of_freqs						#total flux out from box
+			flux_tot_ff_ratio = [0]*self.number_of_freqs					
+			flux_tot_out = list(np.add(mp.get_fluxes(flux_total),mp.get_fluxes(flux_bottom)))		#save total flux data
+			flux_tot_bottom = mp.get_fluxes(flux_bottom)
 			freqs_out = mp.get_flux_freqs(flux_total)
-			print('freqs',freqs_out)
+			print('freqs',freqs_out, 'tot_out', flux_tot_out, 'bottom',flux_tot_bottom)
 			if calculate_source_flux:
 				source_flux_out = mp.get_fluxes(flux_source)
 
@@ -629,10 +632,10 @@ class SimStruct():
 				if output_ff:
 					output_fields = fields
 				
-				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio, "LDOS":sim.ldos_data, "fields":output_fields, "Elapsed time (min)":elapsed_time }
+				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":P_tot_ff , "flux_ratio":flux_tot_ff_ratio, "LDOS":sim.ldos_data, "fields":output_fields,"flux_bottom": flux_tot_bottom, "Elapsed time (min)":elapsed_time }
 
 			else:
-				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":None , "flux_ratio":None , "LDOS":sim.ldos_data,"fields":output_fields, "Elapsed time (min)":elapsed_time }
+				return {"total_flux":flux_tot_out , "source_flux": source_flux_out, "ff_at_angle":None , "flux_ratio":None , "LDOS":sim.ldos_data,"fields":output_fields,"flux_bottom": flux_tot_bottom, "Elapsed time (min)":elapsed_time }
 
 	###OUTPUT DATA##################################################################
 
