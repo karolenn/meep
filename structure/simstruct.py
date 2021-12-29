@@ -319,15 +319,15 @@ class SimStruct():
 				amplitude=self.source_direction[0],
 				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z))]
 			
-		#source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-		#		component=mp.Ey,
-		#		amplitude=self.source_direction[1],
-		#		center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+				component=mp.Ey,
+				amplitude=self.source_direction[1],
+				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 
-		#source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
-		#		component=mp.Ez,
-		#		amplitude=self.source_direction[2],
-		#		center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
+		source.append(mp.Source(mp.GaussianSource(frequency=self.frequency_center,fwidth=self.frequency_width, cutoff=self.cutoff),	#gaussian current-source
+				component=mp.Ez,
+				amplitude=self.source_direction[2],
+				center=mp.Vector3(abs_source_position_x,abs_source_position_y,abs_source_position_z)))
 		#MEEP simulation constructor
 		sim=mp.Simulation(cell_size=cell,
 				geometry=geometries,
@@ -337,7 +337,7 @@ class SimStruct():
 				#subpixel_tol=1e-4,
 				#subpixel_maxeval=1000,
 				dimensions=3,
-				#default_material=GaN,
+				default_material=GaN,
 				extra_materials=[CL_material],
 				material_function=materialFunction,
 				boundary_layers=pml_layer,
@@ -590,7 +590,8 @@ class SimStruct():
 			flux_tot_value = np.zeros(self.number_of_freqs)						#total flux out from box
 			flux_tot_ff_ratio = np.zeros(self.number_of_freqs)						
 			flux_tot_out = mp.get_fluxes(flux_total)		#save total flux data
-			print('freqs',mp.get_flux_freqs(flux_total))
+			freqs_out = mp.get_flux_freqs(flux_total)
+			print('freqs',freqs_out)
 			if calculate_source_flux:
 				source_flux_out = mp.get_fluxes(flux_source)
 

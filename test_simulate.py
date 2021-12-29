@@ -10,11 +10,11 @@ simulation = "pyramid"
 
 config_pyramid = {
        "simulate": {
-            "resolution": 80,
+            "resolution": 100,
             "use_fixed_time": False,
             "simulation_time": 50,
-            "dpml": 0.1,
-            "padding": 0.025,
+            "dpml": 0.3,
+            "padding": 0.075,
             "ff_pts": 800,
             "ff_calc": "Below",
             "ff_cover": False,
@@ -29,7 +29,7 @@ config_pyramid = {
             "substrate_ratio": "2/10",
             "output_ff": False,
             "geometry": None,
-            "material_function": "truncPyramidWithCoating",
+            "material_function": None,
             "polarization_in_plane": False
         },
         "pyramid": {
