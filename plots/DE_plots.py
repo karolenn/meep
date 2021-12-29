@@ -22,7 +22,7 @@ def plot_LE(sim_name):
 
     lambda_wl = []
     for n in range(len(freqs)):
-        lambda_wl.append(round(1000/freqs[n],2)) 
+        lambda_wl.append(round(1000/freqs[n],1)) 
 
     nfreq = db[0]["pyramid"]["number_of_freqs"]
 
@@ -43,18 +43,19 @@ def plot_LE(sim_name):
             source_flux = db[i]["result"]["source_flux"][k]
             total_flux = db[i]["result"]["total_flux"][k]
             print('s,t', source_flux, total_flux, total_flux / source_flux)
-            tmp[i] = 100*total_flux / source_flux
+            tmp[i] = 100 - 100*total_flux / source_flux
 
         RE[k] = tmp
 
+    print(' ')
     #calculate Purcell
     for k in range(nfreq):
         tmp = [0]*len_db
         for i in range(len_db):
             source_flux = db[i]["result"]["source_flux"][k]
             flux_GaN = total_flux_GaN[k]
-            print('s,t', source_flux, flux_GaN, source_flux / flux_GaN)
-            tmp[i] = 100*source_flux / flux_GaN
+            print('s,g', source_flux, flux_GaN, source_flux / flux_GaN)
+            tmp[i] = 100 * source_flux / flux_GaN
 
         Purcell[k] = tmp
 
@@ -62,14 +63,15 @@ def plot_LE(sim_name):
     for n in range(len(RE)):
         print('plot sp', source_pos)
         print('RE', RE[n])
-        plt.title('1 micrometer wide base pyramid. total flux / source flux')
+        plt.title('1 micrometer wide base pyramid. 1 - total flux / source flux')
         plt.plot(source_pos, RE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
-        plt.ylabel('LEE (new) (%)')
+        plt.ylabel('Absorption (%)')
         plt.xlabel('source position (nm)')
+        plt.grid(visible=True)
         plt.legend(loc='best')
 
     plt.show()
-    plt.savefig('LEE.pdf')
+    plt.savefig('Absorption.png')
     plt.clf()
 
     for n in range(len(Purcell)):
@@ -77,11 +79,24 @@ def plot_LE(sim_name):
         plt.plot(source_pos, Purcell[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('Purcell factor (%)')
         plt.xlabel('source position (nm)')
+        plt.grid(visible=True)
         plt.legend(loc='best')
 
-    plt.savefig('Purcell.pdf')
+    plt.savefig('Purcell.png')
     #print(total_flux_results)
     #print(source_flux_results)
     print(source_pos)
+
+    extraction_eff = [0]*len(Purcell)
+
+    for n in range(len(Purcell)):
+        plt.title('1 micrometer wide base pyramid. source flux (pyramid) / source flux (GaN)')
+        plt.plot(source_pos, Purcell[n]*RE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
+        plt.ylabel('Super (%)')
+        plt.xlabel('source position (nm)')
+        plt.grid(visible=True)
+        plt.legend(loc='best')
+
+    plt.savefig('Purcell.png')
 
 plot_LE(sim_name)
