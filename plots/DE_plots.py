@@ -2,7 +2,7 @@ from functionality.api import *
 from functionality.functions import *
 import matplotlib.pyplot as plt
 
-sim_name = "DE_first_result"
+sim_name = "DE_first_result_substrate"
 
 def plot_LE(sim_name):
     db = read("../db/initial_results/{}.json".format(sim_name))
@@ -60,6 +60,32 @@ def plot_LE(sim_name):
 
         Purcell[k] = tmp
 
+    #calculate light extraction ff
+    LE = [0]*len_db
+    LE = [LE]*nfreq
+    for k in range(nfreq):
+        tmp = [0]*len_db
+        for i in range(len_db):
+            source_flux = db[i]["result"]["source_flux"][k]
+            ff_angle = db[i]["result"]["ff_at_angle"][k]
+            print('s,t', source_flux, total_flux, total_flux / source_flux)
+            tmp[i] = 100*ff_angle / source_flux
+
+        LE[k] = tmp
+    #calculate light below
+
+    #calculate light extraction ff
+    LE_bottom = [0]*len_db
+    LE_bottom = [LE_bottom]*nfreq
+    for k in range(nfreq):
+        tmp = [0]*len_db
+        for i in range(len_db):
+            source_flux = db[i]["result"]["source_flux"][k]
+            flux_bottom = db[i]["result"]["flux_bottom"][k]
+            tmp[i] = 100*flux_bottom / source_flux
+
+        LE_bottom[k] = tmp
+
     colors = ['darkred','red', 'darkorange','limegreen','aquamarine','teal','navy', 'blue']
     for n in range(len(RE)):
         print('plot sp', source_pos)
@@ -73,6 +99,34 @@ def plot_LE(sim_name):
 
     plt.show()
     plt.savefig('Absorption.png')
+    plt.clf()
+
+    for n in range(len(LE)):
+        print('plot sp', source_pos)
+        print('LE', LE[n])
+        plt.title('1 micrometer wide base pyramid. flux far_field / source flux')
+        plt.plot(source_pos, LE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
+        plt.ylabel('far field LE (%)')
+        plt.xlabel('source position (nm)')
+        plt.grid(visible=True)
+        plt.legend(loc='best')
+
+    plt.show()
+    plt.savefig('LE.png')
+    plt.clf()
+
+    for n in range(len(LE_bottom)):
+        print('plot sp', source_pos)
+        print('LE bottom of simulation', LE[n])
+        plt.title('1 micrometer wide base pyramid. flux bottom / source flux')
+        plt.plot(source_pos, LE_bottom[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
+        plt.ylabel('bottom LE (%)')
+        plt.xlabel('source position (nm)')
+        plt.grid(visible=True)
+        plt.legend(loc='best')
+
+    plt.show()
+    plt.savefig('LE_bottom.png')
     plt.clf()
 
     for n in range(len(Purcell)):

@@ -196,7 +196,7 @@ class SimStruct():
 
 		#"Material parameters" 
 		air = mp.Medium(epsilon=1)					#air dielectric value
-		SiC = mp.Medium(epsilon=2.56**2)
+		SiC = mp.Medium(epsilon=2.6465**2)
 		SubstrateEps = SiC				#substrate epsilon
 
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
@@ -206,8 +206,9 @@ class SimStruct():
 					size=mp.Vector3(2*sx+2*dpml,2*sy+2*dpml,sh+dpml),
 					material=SubstrateEps))
 
-		if geometry == None:
+		if geometry == False:
 			geometries = []
+		print('Using geometries: ', geometries, 'argument: ', geometry)
 
 		if (self.truncation_width > 0):
 			#calculate height of truncation. i.e height of the pyramid that gets removed when truncated.
