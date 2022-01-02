@@ -9,10 +9,10 @@ from functionality.api import polar_to_complex_conv,sim_to_json,write_result
 simulation = "pyramid"
 
 config_pyramid = {
-       "simulate": {
+        "simulate": {
             "resolution": 100,
             "use_fixed_time": False,
-            "simulation_time": 2,
+            "simulation_time": 50,
             "dpml": 0.1,
             "padding": 0.025,
             "ff_pts": 800,
@@ -28,22 +28,22 @@ config_pyramid = {
             "simulation_ratio": "7/5",
             "substrate_ratio": "2/10",
             "output_ff": False,
-            "geometry": None,
+            "geometry": False,
             "material_function": "truncPyramidWithCoating",
             "polarization_in_plane": False
         },
         "pyramid": {
-            "source_position": [0,0,0.06],
-            "pyramid_height": 0.814,
+            "source_position": [0,0,0.03],
+            "pyramid_height": 0.94,
             "pyramid_width": 1,
             "truncation_width": 0.1,
             "CL_thickness": 0.1,
             "CL_material":"Ag",
-            "source_direction": [0,1,0],
+            "source_direction": [1,0,0],
             "source_on_wall": False,
             "frequency_center": 1.85,
             "frequency_width": 0.76,
-            "number_of_freqs": 2,
+            "number_of_freqs": 8,
             "cutoff": 4
         },
         "result": {}

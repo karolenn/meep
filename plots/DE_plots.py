@@ -2,7 +2,8 @@ from functionality.api import *
 from functionality.functions import *
 import matplotlib.pyplot as plt
 
-sim_name = "DE_first_result_substrate"
+sim_name = "DE_xpol_small"
+#sim_name = "DE_first_result_3"
 
 def plot_LE(sim_name):
     db = read("../db/initial_results/{}.json".format(sim_name))
@@ -43,7 +44,7 @@ def plot_LE(sim_name):
         for i in range(len_db):
             source_flux = db[i]["result"]["source_flux"][k]
             total_flux = db[i]["result"]["total_flux"][k]
-            print('s,t', source_flux, total_flux, total_flux / source_flux)
+            #print('s,t', source_flux, total_flux, total_flux / source_flux)
             tmp[i] = 100 - 100*total_flux / source_flux
 
         RE[k] = tmp
@@ -55,7 +56,7 @@ def plot_LE(sim_name):
         for i in range(len_db):
             source_flux = db[i]["result"]["source_flux"][k]
             flux_GaN = total_flux_GaN[k]
-            print('s,g', source_flux, flux_GaN, source_flux / flux_GaN)
+            #print('s,g', source_flux, flux_GaN, source_flux / flux_GaN)
             tmp[i] = 100 * source_flux / flux_GaN
 
         Purcell[k] = tmp
@@ -65,16 +66,23 @@ def plot_LE(sim_name):
     LE = [LE]*nfreq
     for k in range(nfreq):
         tmp = [0]*len_db
+        ff_angle = 0
         for i in range(len_db):
             source_flux = db[i]["result"]["source_flux"][k]
-            ff_angle = db[i]["result"]["ff_at_angle"][k]
-            print('s,t', source_flux, total_flux, total_flux / source_flux)
+            try:
+                ff_angle = db[i]["result"]["ff_at_angle"][k]
+                print('here')
+            except:
+                ff_angle = 0
+                print('now her')
+            #print('s,t', source_flux, total_flux, total_flux / source_flux)
+            print(ff_angle, source_flux)
             tmp[i] = 100*ff_angle / source_flux
 
         LE[k] = tmp
     #calculate light below
 
-    #calculate light extraction ff
+    #calculate light extraction bottom
     LE_bottom = [0]*len_db
     LE_bottom = [LE_bottom]*nfreq
     for k in range(nfreq):
@@ -88,8 +96,8 @@ def plot_LE(sim_name):
 
     colors = ['darkred','red', 'darkorange','limegreen','aquamarine','teal','navy', 'blue']
     for n in range(len(RE)):
-        print('plot sp', source_pos)
-        print('RE', RE[n])
+        #print('plot sp', source_pos)
+        #print('RE', RE[n])
         plt.title('1 micrometer wide base pyramid. 1 - total flux / source flux')
         plt.plot(source_pos, RE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('Absorption (%)')
@@ -102,8 +110,8 @@ def plot_LE(sim_name):
     plt.clf()
 
     for n in range(len(LE)):
-        print('plot sp', source_pos)
-        print('LE', LE[n])
+        #print('plot sp', source_pos)
+        #print('LE', LE[n])
         plt.title('1 micrometer wide base pyramid. flux far_field / source flux')
         plt.plot(source_pos, LE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('far field LE (%)')
@@ -116,8 +124,8 @@ def plot_LE(sim_name):
     plt.clf()
 
     for n in range(len(LE_bottom)):
-        print('plot sp', source_pos)
-        print('LE bottom of simulation', LE[n])
+        #print('plot sp', source_pos)
+        #print('LE bottom of simulation', LE[n])
         plt.title('1 micrometer wide base pyramid. flux bottom / source flux')
         plt.plot(source_pos, LE_bottom[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('bottom LE (%)')
