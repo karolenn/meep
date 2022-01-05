@@ -18,6 +18,7 @@ import time
 
 
 
+
 ###FUNCTIONS##########################################################
 
 
@@ -117,6 +118,7 @@ def PolarizeInPlane(source_direction,pyramid_height,pyramid_width):
 
 ###Get the cross product of the poynting flux on the semi-sphere surface. Get the radial magnitude and return it to later numerically integrate it 
 ###ff is a point in the far-field containing E,H field for frequency="nfreq"
+###input farfield in terms of list [Ex_1freq,Ex2freq,Exnfreq,Ey1freq,..,Hznfreq] where this corresponds to ff at one point
 def myPoyntingFlux(ff,nfreq):
 	i=nfreq
 	P=0 #The poynting flux at point (xPts,yPts,zPts)
@@ -133,8 +135,45 @@ def myPoyntingFlux(ff,nfreq):
 	return(Pr)
 
 
+#given a list of far field values, return the poynting flux in radial direction
+#[[Ex1_f1,Ey1_f1,..,Hz1_f1,..,Hz1_fn],..,[Exn_f1,..,Hzn_fn]] -> [[Pr1_f1,..,Pr1_fn],..,[Prn_f1,..,Prn_fn]]
+def calculate_poynting_values(ff_values):
+	npts = len(ff_values)
+	#ff_values[0] has nfreq*E,H components = nfreq*6 (ex,ey,ez,hx,hy,hz)
+	nfreq = int(len(ff_values[0])/6)
+	print(npts,nfreq)
+	radial_flux = []
+	for n in range(npts):
+		i = 0
+		radial_flux_tmp = []
+		ff_value = ff_values[n]
+		for k in range(nfreq):
+			Pr = myPoyntingFlux(ff_value,i)
+			radial_flux_tmp.append(Pr)
+			i = i + 6
+		radial_flux.append(radial_flux_tmp)
 
 
+
+	return radial_flux
+
+#given a list of poynting flux in radial direction, return a list of the flux for a given freq#
+#[[Pr1_f1,..,Pr1_fn],..,[Prn_f1,..,Prn_fn]] -> [Pr1_f1,Pr2_f1,..,Prn_f1]
+def get_poynting_per_frequency(radial_flux, freq):
+	npts = len(radial_flux)
+	tmp = [0]*npts
+	for n in range(npts):
+		tmp[n] = radial_flux[n][freq]
+	return tmp
+
+#integrate (or Riemann sum actually) a list of poynting vectors to get the flux
+#[Pr1_f1,...,Prm_f1] -> flux_f1
+def get_flux(poyntingvalues, ff_angle, npts, radius):
+	surface_element = 2*math.pi*pow(radius,2)*(1-math.cos(ff_angle))/npts
+	flux = 0
+	for n in range(len(poyntingvalues)):
+		flux += poyntingvalues[n]*surface_element
+	return flux
 
 ###Draw a point in 3d space from a uniform distribution
 #renamed from get_next to draw_uniform

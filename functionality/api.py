@@ -1,5 +1,7 @@
 import json
 import numpy as np
+import itertools
+
 #from functionality.functions import complex_to_polar_conv
 # Loading the file and returns it if found else returns None
 def read(db):
@@ -27,6 +29,42 @@ def write_result(db, info):
     else:
         data = [info]
     write(db, data)
+
+#extract data from the first pyramid in a db.json object
+def extract_data_from_db(db):
+    db = read("../db/{}.json".format(db))
+    ff = db[0]["result"]["fields"]
+    ff = polar_to_complex_conv(ff)
+    npts = len(ff)
+    nfreq = db[0]["pyramid"]["number_of_freqs"]
+    ff_angle = db[0]["simulate"]["ff_angle"]
+    ph = db[0]["pyramid"]["pyramid_height"]
+    fcen = db[0]["pyramid"]["frequency_center"]
+    return ff, npts, nfreq, ff_angle, ph, fcen
+
+#given a list [[2,3,4],[6,7]] -> [2,3,4,6,7]
+def unpack_list(list_tmp):
+	list_flat = list(itertools.chain(*list_tmp))
+	return list_flat
+
+#extract field values from a ff object
+#[{'pos':[x,y,z],'field':[Ex_f1,Ey_f1,...,Hz_fn]},,{..},{'pos':[xn,yn,zn],'field':[Exn_f1,..,Hzn_fn]}] -> [[Ex1_f1,,..,Hz1_fn],..,[Exn_f1,..,Hzn_fn]]
+def return_field_values_from_ff(ff):
+    npts = len(ff)
+    ff_values = []
+    for n in range(npts):
+        ff_values.append(ff[n]["field"])
+    return ff_values
+
+#extract field values from a ff object
+#[{'pos':[x,y,z],'field':[Ex_f1,Ey_f1,...,Hz_fn]},,{..},{'pos':[xn,yn,zn],'field':[Exn_f1,..,Hzn_fn]}] -> [[x,y,z],..,[xn,yn,zn]]
+def return_position_values_from_ff(ff):
+    npts = len(ff)
+    ff_pos = []
+    for n in range(npts):
+        ff_pos.append(ff[n]["pos"])
+    return ff_pos  
+
 
 #Convert far-fields form complex numbers to polar "numbers" because JSON sucks (can't store complex numbers)
 #TODO:this should be stored in functions.py but importing from there would create circular importing

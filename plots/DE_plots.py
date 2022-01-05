@@ -1,8 +1,9 @@
 from functionality.api import *
 from functionality.functions import *
+from functionality.QWrapper_functions import unpack_3_list
 import matplotlib.pyplot as plt
-
-sim_name = "DE_xpol_small"
+import math
+sim_name = "DE_xpol_big"
 #sim_name = "DE_first_result_3"
 
 def plot_LE(sim_name):
@@ -20,6 +21,11 @@ def plot_LE(sim_name):
     total_flux_GaN = [0.00011428871, 0.0250669074, 0.8222765772, 5.30342497776, 6.72770614219, 1.68183821152, 0.08313836489, 0.00077824323]
     s_flux_GaN = [0.0001591884196414295, 0.025045174820939542, 0.8212780288510312, 5.293335569705324, 6.714833870606542, 1.6796636762639658, 0.08292949836437485, 0.0008176334840038225]
     LDOS_GaN = [8.573990952416164, 7.996704390999339, 8.983391563270619, 10.180754634708808, 11.487315627492945, 12.895229874597154, 14.45193173631105, 16.494400901543397]
+
+    total_flux_GaN_big = [7.09345e-05, 0.02491539364, 0.81795362469, 5.27149694554, 6.68203329739, 1.66905158049, 0.08237088817, 0.00074259653]
+    s_flux_GaN_big = [0.00013138826970230657, 0.02498465339208524, 0.8158905262374332, 5.252010400265657, 6.665232389201147, 1.6627468348347554, 0.08240902192610353, 0.0007895323656438263]
+    LDOS_GaN_big = [7.266880424385067, 7.854357146929161, 8.9417050360065, 10.15248309213125, 11.45512090423561, 12.852138409663931, 14.359943808947058, 16.130830123408547]
+
     freqs = [1.4700000000000002, 1.5785714285714287, 1.6871428571428573, 1.7957142857142858, 1.9042857142857144, 2.012857142857143, 2.1214285714285714, 2.23]
 
     lambda_wl = []
@@ -55,7 +61,7 @@ def plot_LE(sim_name):
         tmp = [0]*len_db
         for i in range(len_db):
             source_flux = db[i]["result"]["source_flux"][k]
-            flux_GaN = total_flux_GaN[k]
+            flux_GaN = total_flux_GaN_big[k]
             #print('s,g', source_flux, flux_GaN, source_flux / flux_GaN)
             tmp[i] = 100 * source_flux / flux_GaN
 
@@ -98,7 +104,7 @@ def plot_LE(sim_name):
     for n in range(len(RE)):
         #print('plot sp', source_pos)
         #print('RE', RE[n])
-        plt.title('1 micrometer wide base pyramid. 1 - total flux / source flux')
+        plt.title('3 μm wide pyramid. 1 - total flux / source flux.')
         plt.plot(source_pos, RE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('Absorption (%)')
         plt.xlabel('source position (nm)')
@@ -112,7 +118,7 @@ def plot_LE(sim_name):
     for n in range(len(LE)):
         #print('plot sp', source_pos)
         #print('LE', LE[n])
-        plt.title('1 micrometer wide base pyramid. flux far_field / source flux')
+        plt.title('3 μm wide pyramid. flux far_field / source flux.')
         plt.plot(source_pos, LE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('far field LE (%)')
         plt.xlabel('source position (nm)')
@@ -126,7 +132,7 @@ def plot_LE(sim_name):
     for n in range(len(LE_bottom)):
         #print('plot sp', source_pos)
         #print('LE bottom of simulation', LE[n])
-        plt.title('1 micrometer wide base pyramid. flux bottom / source flux')
+        plt.title('3 μm wide pyramid. flux bottom / source flux.')
         plt.plot(source_pos, LE_bottom[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('bottom LE (%)')
         plt.xlabel('source position (nm)')
@@ -138,7 +144,7 @@ def plot_LE(sim_name):
     plt.clf()
 
     for n in range(len(Purcell)):
-        plt.title('1 micrometer wide base pyramid. source flux (pyramid) / source flux (GaN)')
+        plt.title('3 μm wide pyramid. source flux (pyramid) / source flux (GaN).')
         plt.plot(source_pos, Purcell[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('Purcell factor (%)')
         plt.xlabel('source position (nm)')
@@ -148,18 +154,33 @@ def plot_LE(sim_name):
     plt.savefig('Purcell.png')
     #print(total_flux_results)
     #print(source_flux_results)
-    print(source_pos)
 
-    extraction_eff = [0]*len(Purcell)
+def plot_far_field():
+    db = read("../db/test_simulate.json")
+    far_field, npts, nfreq, ff_angle, ph, fcen = extract_data_from_db('test_simulate')
+    ff_values = return_field_values_from_ff(far_field)
+    ff_pos = return_position_values_from_ff(far_field)
 
-    for n in range(len(Purcell)):
-        plt.title('1 micrometer wide base pyramid. source flux (pyramid) / source flux (GaN)')
-        plt.plot(source_pos, Purcell[n]*RE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
-        plt.ylabel('Super (%)')
-        plt.xlabel('source position (nm)')
-        plt.grid(visible=True)
-        plt.legend(loc='best')
+    Pr_array = calculate_poynting_values(ff_values)
 
-    plt.savefig('Purcell.png')
 
-plot_LE(sim_name)
+
+
+    radius = 2*math.pow(ph,2)*fcen*2*10
+
+    x,y,z = unpack_3_list(ff_pos)
+    Pr_array_freq = get_poynting_per_frequency(Pr_array, 1)
+
+    flux = get_flux(Pr_array_freq,math.pi/3,npts,radius)
+
+
+    elements = int(1*npts/nfreq)
+    X,Y = np.meshgrid(x,y)
+    Pr_mesh = np.meshgrid(Pr_array_freq,Pr_array_freq)
+    plt.hexbin(x,y,Pr_array_freq)
+    plt.savefig('flux2.png')
+
+
+#plot_LE(sim_name)
+
+plot_far_field()

@@ -2,7 +2,7 @@ from structure.pyramid import Pyramid
 from structure.silverball import Balls
 import sys
 import datetime
-from functionality.api import polar_to_complex_conv,sim_to_json,write_result
+from functionality.api import polar_to_complex_conv,sim_to_json,write_result, complex_to_polar_conv
 
 #FOR RUNNING ONE SIMULATION WITH THE CONFIG BELOW
 
@@ -10,12 +10,12 @@ simulation = "pyramid"
 
 config_pyramid = {
         "simulate": {
-            "resolution": 100,
-            "use_fixed_time": False,
-            "simulation_time": 50,
-            "dpml": 0.1,
+            "resolution":70,
+            "use_fixed_time": True,
+            "simulation_time": 2,
+            "dpml": 0.01,
             "padding": 0.025,
-            "ff_pts": 800,
+            "ff_pts": 2,
             "ff_calc": "Below",
             "ff_cover": False,
             "use_symmetries": True,
@@ -23,17 +23,17 @@ config_pyramid = {
             "calculate_source_flux": True,
             "source_flux_pixel_size": 2,
             "ff_calculations": True,
-            "ff_angle": 6,
-            "fibb_sampling": True,
+            "ff_angle": 3,
+            "fibb_sampling": False,
             "simulation_ratio": "7/5",
             "substrate_ratio": "2/10",
-            "output_ff": False,
+            "output_ff": True,
             "geometry": False,
             "material_function": "truncPyramidWithCoating",
             "polarization_in_plane": False
         },
         "pyramid": {
-            "source_position": [0,0,0.03],
+            "source_position": [0,0,0.13],
             "pyramid_height": 0.94,
             "pyramid_width": 1,
             "truncation_width": 0.1,
@@ -43,7 +43,7 @@ config_pyramid = {
             "source_on_wall": False,
             "frequency_center": 1.85,
             "frequency_width": 0.76,
-            "number_of_freqs": 8,
+            "number_of_freqs": 3,
             "cutoff": 4
         },
         "result": {}
@@ -108,14 +108,14 @@ else:
     config = config_pyramid
     pyramid.setup(config_pyramid["pyramid"])
     result = pyramid.simulate(config["simulate"])
-print(config)
-print(result)
-#print(result[0],result[1],result[2],result[3])
-#print(result[3])
+#print(config)
+#print(result)
 print('Simulation finished at:',datetime.datetime.now())
 output_ff = config["simulate"]["output_ff"]
 calculate_source_flux = config["simulate"]["calculate_source_flux"]
 #data = sim_to_json(config, result,output_ff, calculate_source_flux)
 #print('pyramid data:',data)
 config["result"] = result
+if config["simulate"]["output_ff"] == True:
+    config["result"]["fields"] = complex_to_polar_conv(config["result"]["fields"])
 write_result("db/test_simulate.json", config)
