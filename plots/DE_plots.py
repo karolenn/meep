@@ -169,9 +169,18 @@ def plot_far_field():
     radius = 2*math.pow(ph,2)*fcen*2*10
 
     x,y,z = unpack_3_list(ff_pos)
-    Pr_array_freq = get_poynting_per_frequency(Pr_array, 1)
+    Pr_array_freq = get_poynting_per_frequency(Pr_array, 2)
 
-    flux = get_flux(Pr_array_freq,math.pi/3,npts,radius)
+    flux_per_freq = get_flux(Pr_array_freq,math.pi/3,npts,radius)
+
+    
+    theta_pts = int(math.sqrt((npts-1)/2))
+    theta = math.pi / ff_angle
+
+
+
+    flux3 = get_flux_per_angle(Pr_array_freq, 3, npts, radius)
+    print(flux3)
 
 
     elements = int(1*npts/nfreq)
