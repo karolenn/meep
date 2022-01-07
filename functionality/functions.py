@@ -175,28 +175,41 @@ def get_flux(poyntingvalues, ff_angle, npts, radius):
 		flux += poyntingvalues[n]*surface_element
 	return flux
 
-def get_flux_per_angle(Pr_array_freq, total_angle, npts, radius):
+#get the cumulative flux per angle
+def get_cum_flux_per_angle(Pr_array_freq, total_angle, npts, radius):
 
 	theta_pts = int(math.sqrt((npts-1)/2))
 	theta = math.pi / total_angle
 	theta_angles = np.linspace(0+theta/theta_pts,theta,theta_pts)
-
 	phi_pts = theta_pts*2
 	phi = math.pi*2
 	phi_angles = np.linspace(0,phi-phi/phi_pts,phi_pts)
 	nr_samples_per_ring = len(phi_angles)
 	nr_rings = len(theta_angles)
 
-	flux_per_angle = []
+
+
+	cum_flux_per_angle = []
 
 	for n in range(nr_rings):
 		angle = theta_angles[n]
-		tmp = get_flux(Pr_array_freq[0:n*nr_samples_per_ring + 1],angle,npts,radius)
+		samples = (n+1)*nr_samples_per_ring + 1
+		npts = samples
+		tmp = get_flux(Pr_array_freq[0:samples],angle,npts,radius)
+		cum_flux_per_angle.append(tmp)
+
+	return cum_flux_per_angle
+
+#get the flux per angle given cumulative flux per angle
+def get_flux_per_angle(cum_flux_per_angle):
+	len_list = len(cum_flux_per_angle)
+	flux_per_angle = []
+	flux_per_angle.append(cum_flux_per_angle[0])
+	for n in range(1,len_list): 
+		tmp = cum_flux_per_angle[n] - flux_per_angle[n-1]
 		flux_per_angle.append(tmp)
-
-
-
 	return flux_per_angle
+
 
 ###Draw a point in 3d space from a uniform distribution
 #renamed from get_next to draw_uniform

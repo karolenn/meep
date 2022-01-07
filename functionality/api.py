@@ -31,8 +31,8 @@ def write_result(db, info):
     write(db, data)
 
 #extract data from the first pyramid in a db.json object
-def extract_data_from_db(db):
-    db = read("../db/{}.json".format(db))
+def extract_data_from_db(db,path_to_db):
+    db = read("{}/{}.json".format(path_to_db,db))
     ff = db[0]["result"]["fields"]
     ff = polar_to_complex_conv(ff)
     npts = len(ff)

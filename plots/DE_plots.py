@@ -6,6 +6,12 @@ import math
 sim_name = "DE_xpol_big"
 #sim_name = "DE_first_result_3"
 
+freqs = [1.4700000000000002, 1.5785714285714287, 1.6871428571428573, 1.7957142857142858, 1.9042857142857144, 2.012857142857143, 2.1214285714285714, 2.23]
+
+lambda_wl = []
+for n in range(len(freqs)):
+    lambda_wl.append(round(1000/freqs[n],1)) 
+colors = ['darkred','red', 'darkorange','limegreen','aquamarine','teal','navy', 'blue']
 def plot_LE(sim_name):
     db = read("../db/initial_results/{}.json".format(sim_name))
 
@@ -156,37 +162,61 @@ def plot_LE(sim_name):
     #print(source_flux_results)
 
 def plot_far_field():
-    db = read("../db/test_simulate.json")
-    far_field, npts, nfreq, ff_angle, ph, fcen = extract_data_from_db('test_simulate')
+    #db_name = "test_simulate"
+    db_name = "DE_xpol_ff"
+    #path = "../db"
+    path = "../db/initial_results"
+    print("{}/{}.json".format(path,db_name))
+    #path = "../db/initial_results/{}.json".format(db_name)
+    db = read("{}/{}.json".format(path,db_name))
+    ff_at_angle = db[0]["result"]["ff_at_angle"]
+    far_field, npts, nfreq, ff_angle, ph, fcen = extract_data_from_db(db_name,path)
     ff_values = return_field_values_from_ff(far_field)
     ff_pos = return_position_values_from_ff(far_field)
 
     Pr_array = calculate_poynting_values(ff_values)
-
-
-
-
     radius = 2*math.pow(ph,2)*fcen*2*10
-
     x,y,z = unpack_3_list(ff_pos)
-    Pr_array_freq = get_poynting_per_frequency(Pr_array, 2)
+    for k in range(nfreq):
+        freq = k
+        ff_at_angle_freq = ff_at_angle[freq]
+        Pr_array_freq = get_poynting_per_frequency(Pr_array, freq)
+        flux_per_freq = get_flux(Pr_array_freq,math.pi/ff_angle,npts,radius)
+        theta_pts = int(math.sqrt((npts-1)/2))
+        theta = math.pi / ff_angle
+        theta_angles = np.linspace(0+theta/theta_pts,theta,theta_pts)
+        cum_flux_per_angle = get_cum_flux_per_angle(Pr_array_freq, 3, npts, radius)
+        cum_flux_per_angle_norm = [100*i / ff_at_angle_freq for i in cum_flux_per_angle]
+        theta_angles_reversed = [i * -1 for i in theta_angles]
+        flux_conc = cum_flux_per_angle + cum_flux_per_angle[::-1]
+        theta_angles_conc = list(theta_angles)[::-1] + list(theta_angles_reversed)
+        theta_angles_degrees = [i * 180/math.pi for i in theta_angles]
+        plt.plot(theta_angles_degrees,cum_flux_per_angle_norm, label=str(lambda_wl[k])+"nm",color=colors[k])
+        plt.legend(loc='best')
+        plt.ylabel('(%) of far-field within angle')
+        plt.xlabel('degrees')
+        plt.savefig('angles.png')
+        plt.grid(visible=True)
 
-    flux_per_freq = get_flux(Pr_array_freq,math.pi/3,npts,radius)
+    plt.clf()
 
-    
-    theta_pts = int(math.sqrt((npts-1)/2))
-    theta = math.pi / ff_angle
-
-
-
-    flux3 = get_flux_per_angle(Pr_array_freq, 3, npts, radius)
-    print(flux3)
-
+    norm_val = max(Pr_array_freq)
+    Pr_array_freq_normed = [i / norm_val for i in Pr_array_freq]
 
     elements = int(1*npts/nfreq)
     X,Y = np.meshgrid(x,y)
-    Pr_mesh = np.meshgrid(Pr_array_freq,Pr_array_freq)
-    plt.hexbin(x,y,Pr_array_freq)
+    Pr_mesh = np.meshgrid(Pr_array_freq_normed,Pr_array_freq_normed)
+    #plt.Circle((0,0),15, fill=False)
+    #plt.plot()
+    plt.hexbin(x,y,Pr_array_freq_normed)
+    plt.colorbar(plt.hexbin(x,y,Pr_array_freq_normed))
+    figure, axes = plt.subplots()
+    draw_circle = plt.Circle((0.5, 0.5),5)
+
+    axes.set_aspect(1)
+    axes.add_artist(draw_circle)
+    plt.title('Circle')
+    plt.show()
     plt.savefig('flux2.png')
 
 

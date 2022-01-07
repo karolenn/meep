@@ -48,26 +48,7 @@ if __name__ == "__main__":
 	pyramid.setup(config["pyramid"])
 	result = pyramid.simulate(config["simulate"])
 	output_ff = config["simulate"]["output_ff"]
-	calculate_source_flux = config["simulate"]["calculate_source_flux"]
-	#data = sim_to_json(config, result,output_ff, calculate_source_flux)
 	config["result"] = result
+	if output_ff == True:
+		config["result"]["fields"] = complex_to_polar_conv(config["result"]["fields"])
 	write_result("db/initial_results/{}.json".format(sys.argv[1]), config)
-	#for k,v in data["result"].items():
-	#	print(k, v)
-	
-	# if (len(sys.argv)) != 7:
-	# 	print("Not enough arguments")
-	# 	exit(0)
-
-	# "1 unit distance is meep is thought of as 1 micrometer here."
-
-	# "Structure Geometry"
-	# resolution= int(sys.argv[1])					#resolution of the pyramid. Measured as number of pixels / unit distance
-	# simulation_time=int(sys.argv[2])				#simulation time for the sim. #Multiply by a and divide by c to get time in fs.
-	# source_position=float(sys.argv[3])					#pos of source measured	measured as fraction of tot. pyramid height from top. 
-	# pyramid_height=float(sys.argv[4])				#height of the pyramid in meep units 3.2
-	# pyramid_width=float(sys.argv[5])					#width measured from edge to edge 2.6
-	# dpml=float(sys.argv[6])
-	# pyramid = Pyramid()
-	# pyramid.simulate(resolution, simulation_time, source_position, pyramid_height, pyramid_width, dpml)
-	
