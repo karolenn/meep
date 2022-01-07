@@ -169,8 +169,9 @@ def plot_far_field():
     print("{}/{}.json".format(path,db_name))
     #path = "../db/initial_results/{}.json".format(db_name)
     db = read("{}/{}.json".format(path,db_name))
-    ff_at_angle = db[0]["result"]["ff_at_angle"]
-    far_field, npts, nfreq, ff_angle, ph, fcen = extract_data_from_db(db_name,path)
+    pyr = 1
+    ff_at_angle = db[pyr]["result"]["ff_at_angle"]
+    far_field, npts, nfreq, ff_angle, ph, fcen = extract_data_from_db(db_name,path, pyr)
     ff_values = return_field_values_from_ff(far_field)
     ff_pos = return_position_values_from_ff(far_field)
 
@@ -210,13 +211,6 @@ def plot_far_field():
     #plt.plot()
     plt.hexbin(x,y,Pr_array_freq_normed)
     plt.colorbar(plt.hexbin(x,y,Pr_array_freq_normed))
-    figure, axes = plt.subplots()
-    draw_circle = plt.Circle((0.5, 0.5),5)
-
-    axes.set_aspect(1)
-    axes.add_artist(draw_circle)
-    plt.title('Circle')
-    plt.show()
     plt.savefig('flux2.png')
 
 

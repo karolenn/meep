@@ -54,3 +54,4 @@ ax.scatter3D(x_r,y_r,z)
 #for n in range(range_npts):
 #	ax.text(x_r[n],y_r[n],z[n],n)
 plt.show()
+plt.savefig('fibb.png')

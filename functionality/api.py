@@ -31,15 +31,15 @@ def write_result(db, info):
     write(db, data)
 
 #extract data from the first pyramid in a db.json object
-def extract_data_from_db(db,path_to_db):
+def extract_data_from_db(db,path_to_db, pyr):
     db = read("{}/{}.json".format(path_to_db,db))
-    ff = db[0]["result"]["fields"]
+    ff = db[pyr]["result"]["fields"]
     ff = polar_to_complex_conv(ff)
     npts = len(ff)
-    nfreq = db[0]["pyramid"]["number_of_freqs"]
-    ff_angle = db[0]["simulate"]["ff_angle"]
-    ph = db[0]["pyramid"]["pyramid_height"]
-    fcen = db[0]["pyramid"]["frequency_center"]
+    nfreq = db[pyr]["pyramid"]["number_of_freqs"]
+    ff_angle = db[pyr]["simulate"]["ff_angle"]
+    ph = db[pyr]["pyramid"]["pyramid_height"]
+    fcen = db[pyr]["pyramid"]["frequency_center"]
     return ff, npts, nfreq, ff_angle, ph, fcen
 
 #given a list [[2,3,4],[6,7]] -> [2,3,4,6,7]
