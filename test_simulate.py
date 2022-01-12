@@ -106,15 +106,15 @@ if simulation == "balls":
 else:
     pyramid = Pyramid()
     config = config_pyramid
-    pyramid.setup(config_pyramid["pyramid"])
+    pyramid.setup(config_pyramid["pyramid"], config_pyramid["simulate"])
     result = pyramid.simulate(config["simulate"])
 #print(config)
 #print(result)
 print('Simulation finished at:',datetime.datetime.now())
 output_ff = config["simulate"]["output_ff"]
 calculate_source_flux = config["simulate"]["calculate_source_flux"]
-#data = sim_to_json(config, result,output_ff, calculate_source_flux)
-#print('pyramid data:',data)
+
+
 config["result"] = result
 if config["simulate"]["output_ff"] == True:
     config["result"]["fields"] = complex_to_polar_conv(config["result"]["fields"])
