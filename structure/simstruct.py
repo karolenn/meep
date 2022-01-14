@@ -466,18 +466,6 @@ class SimStruct():
 			sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,abs_source_position_z),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			#sim.plot2D(output_plane=mp.Volume(center=mp.Vector3(0,0,sz/2-sh-0.01),size=mp.Vector3(sx+2*dpml,sy+2*dpml,0)))
 			plt.savefig('foo3.pdf')
-			top_pyr =  sz/2-sh-pyramid_height_tot+truncation_height_tot
-			point1 = mp.Vector3(0,0,top_pyr+0.2)
-			eps1 = sim.get_epsilon_point(point1, 2.3)
-
-			point2 = mp.Vector3(0,0,top_pyr-0.2)
-			eps2 = sim.get_epsilon_point(point2, 2.3)
-
-			point3 = mp.Vector3(0,0,-0.4)
-			eps3 = sim.get_epsilon_point(point3, 2.3)
-
-			print('pts',point1, point2, point3)
-			print('eps:',eps1,eps2,eps3)
 
 		if use_fixed_time:
 			sim.run(
