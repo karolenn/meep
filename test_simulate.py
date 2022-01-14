@@ -37,7 +37,7 @@ config_pyramid = {
             "pyramid_height": 0.94,
             "pyramid_width": 1,
             "truncation_width": 0.1,
-            "CL_thickness": 0.1,
+            "CL_thickness": 0,
             "CL_material":"Ag",
             "source_direction": [1,0,0],
             "source_on_wall": False,

@@ -309,7 +309,6 @@ class SimStruct():
 		#"A gaussian with pulse source proportional to exp(-iwt-(t-t_0)^2/(2w^2))"
 		#Assuming a (MC_thickness) nm capping layer, (that is included in the total pyramid height and width)
 		#I can assume the inner pyramid to be pyramid height - 100 nm and pyramid width - 2*100 nm
-		inner_pyramid_height = pyramid_height_tot - self.CL_thickness
 
 		#"Source position"
 		if self.source_on_wall == True:
