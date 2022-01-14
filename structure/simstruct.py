@@ -364,7 +364,7 @@ class SimStruct():
 				#subpixel_tol=1e-4,
 				#subpixel_maxeval=1000,
 				dimensions=3,
-				default_material=GaN,
+				#default_material=GaN,
 				extra_materials=[CL_material],
 				material_function=materialFunction,
 				boundary_layers=pml_layer,
