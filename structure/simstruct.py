@@ -217,6 +217,7 @@ class SimStruct():
 		else:
 			truncation_height = 0
 
+		#variables used to keep track of pyramid size given a coating layer
 		if (self.CL_thickness > 0):
 			coating = True
 			#TODO: Make pyramid angle an input in sim_spec.TODO: for th_tot, is it correct to take - CL_thickness (?)
@@ -229,6 +230,7 @@ class SimStruct():
 
 		# "Function for creating pyramid"
 
+		#TODO: Move function definitions to pyramid.
 		#paints out a hexagon with the help of 4 straight lines in the big if statement
 		#here, v is measured from center to vertice. h is measured from center to edge.
 		def isInsidexy2(vec):
@@ -243,9 +245,20 @@ class SimStruct():
 			else:
 				return air
 
-		#GaN = mp.Medium(epsilon=20)
-		#CL_material = mp.Medium(epsilon=10)
-		#function to create truncated pyramid with metal coating on top
+		#function to create truncated pyramid
+		def truncPyramid(vec):
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height + truncation_height):
+				v=(self.pyramid_width/(2*self.pyramid_height))*vec.z+(self.pyramid_width/(2*self.pyramid_height))*(sh+self.pyramid_height-sz/2)
+				h=math.cos(math.pi/6)*v
+				k=1/(2*math.cos(math.pi/6))
+				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
+					return GaN
+				else:
+					return air
+			else:
+				return air			
+
+		#function to create truncated pyramid with coating on
 		def truncPyramidWithCoating(vec):
 			#TODO: Optimize function
 			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot):
@@ -267,14 +280,26 @@ class SimStruct():
 			else:
 				return air
 
+		#TODO: Clean up and move these functions
 		materialFunction = None
 		if material_functions == "truncPyramidWithCoating":
 			materialFunction = truncPyramidWithCoating
+			if self.CL_thickness <= 0:
+				print('###SIMULATION STOPPED###################################################################################')
+				print('WARNING: You are attempting to run material function '+material_functions,' with no capping layer depth.')
+				sys.exit()
 		elif material_functions == "isInsidexy2":
 			materialFunction = isInsidexy2
+		elif material_functions == "truncPyramid":
+			materialFunction = truncPyramid
 		else:
 			materialFunction = None
-		print('materialfunction: ',materialFunction)
+		print('materialfunction in use: ',materialFunction)
+
+		#TODO: Clean up, create more warning messages and move these functions
+		if self.CL_thickness > 0 and materialFunction != truncPyramidWithCoating:
+			print('WARNING: You have defined a Capping Layer (CL) thickness without using a pyramid creator function with a capping layer.')
+
 		###PML_LAYERS###################################################################
 
 		pml_layer=[mp.PML(dpml)]

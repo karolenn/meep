@@ -3,7 +3,7 @@ from functionality.functions import *
 from functionality.QWrapper_functions import unpack_3_list
 import matplotlib.pyplot as plt
 import math
-sim_name = "DE_xpol_big"
+sim_name = "DE_xpol_tot"
 #sim_name = "DE_first_result_3"
 
 freqs = [1.4700000000000002, 1.5785714285714287, 1.6871428571428573, 1.7957142857142858, 1.9042857142857144, 2.012857142857143, 2.1214285714285714, 2.23]
@@ -61,7 +61,6 @@ def plot_LE(sim_name):
 
         RE[k] = tmp
 
-    print(' ')
     #calculate Purcell
     for k in range(nfreq):
         tmp = [0]*len_db
@@ -83,12 +82,9 @@ def plot_LE(sim_name):
             source_flux = db[i]["result"]["source_flux"][k]
             try:
                 ff_angle = db[i]["result"]["ff_at_angle"][k]
-                print('here')
             except:
                 ff_angle = 0
-                print('now her')
             #print('s,t', source_flux, total_flux, total_flux / source_flux)
-            print(ff_angle, source_flux)
             tmp[i] = 100*ff_angle / source_flux
 
         LE[k] = tmp
@@ -108,8 +104,6 @@ def plot_LE(sim_name):
 
     colors = ['darkred','red', 'darkorange','limegreen','aquamarine','teal','navy', 'blue']
     for n in range(len(RE)):
-        #print('plot sp', source_pos)
-        #print('RE', RE[n])
         plt.title('3 μm wide pyramid. 1 - total flux / source flux.')
         plt.plot(source_pos, RE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('Absorption (%)')
@@ -214,6 +208,6 @@ def plot_far_field():
     plt.savefig('flux2.png')
 
 
-#plot_LE(sim_name)
+plot_LE(sim_name)
 
-plot_far_field()
+#plot_far_field()
