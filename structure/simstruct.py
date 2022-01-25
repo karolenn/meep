@@ -199,6 +199,28 @@ class SimStruct():
 		SiC = mp.Medium(epsilon=2.6465**2)
 		SubstrateEps = SiC				#substrate epsilon
 
+		#we have n,k assuming relationship between n,k, and epsilon (er, ei) is er = n^2-k^2 and ei = 2nk
+		if self.frequency_center == 1.85:
+			#green, wavelength 541
+			n = 1.0346
+			k = 4.8714
+			epsilon_r = n**2-k**2
+			epsilon_im = 2*n*k
+		elif self.frequency_center == 2.04:
+			#blue, wavelength 449
+			n =0.75754
+			k = 4.1783
+			epsilon_r = n**2-k**2
+			epsilon_im = 2*n*k
+		elif self.frequency_center == 1.58:
+			#red, wavelength 632
+			n = 1.2568
+			k = 5.5422 
+			epsilon_r = n**2-k**2
+			epsilon_im = 2*n*k
+		else:
+			print('Warning: Indium not defined properly.')
+		Indium = mp.Medium(epsilon = epsilon_r, D_conductivity=2*math.pi*self.frequency_center*epsilon_im/epsilon_r)
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
 		geometries=[]
 		#Substrate
@@ -220,10 +242,12 @@ class SimStruct():
 		#variables used to keep track of pyramid size given a coating layer
 		if (self.CL_thickness > 0):
 			coating = True
-			#TODO: Make pyramid angle an input in sim_spec.TODO: for th_tot, is it correct to take - CL_thickness (?)
+			#TODO: Make pyramid angle an input in sim_spec.TODO: for th_tot, is it correct to take - CL_thickness (?). Yes as it should at the CL_thickness of 0.1 at top
 			#increase size of pyramid to account for metal coating. Easier calculating material function this way.
 			pyramid_width_tot = self.pyramid_width + 2*self.CL_thickness 
+			#pyramid height assuming capping layer and no truncation
 			pyramid_height_tot = self.pyramid_height + self.CL_thickness*math.tan((math.pi*62)/180)
+			#height of truncation assuming capping layer
 			truncation_height_tot = truncation_height + self.CL_thickness*math.tan((math.pi*62)/180)-self.CL_thickness
 		else:
 			coating = False
@@ -280,6 +304,43 @@ class SimStruct():
 			else:
 				return air
 
+		#cumulative width
+		CL_width = [0.03, 0.06, 0.1]
+		CL_material_in = [mp.Medium(epsilon=10), mp.Medium(epsilon=20), mp.Medium(epsilon=30)]
+		#function to create truncated pyramid with mutliple coatings
+		def truncPyramidwithMultiCoating(vec):
+			#TODO: Optimize function
+			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot):
+				v=(pyramid_width_tot/(2*pyramid_height_tot))*vec.z+(pyramid_width_tot/(2*pyramid_height_tot))*(sh+pyramid_height_tot-sz/2)
+				h=math.cos(math.pi/6)*v
+				k=1/(2*math.cos(math.pi/6))
+				v_inner = v - self.CL_thickness
+				h_inner = h - self.CL_thickness
+				if (-h<=vec.x<=h and vec.y <= k*vec.x+v and vec.y <= -k*vec.x+v and vec.y >= k*vec.x-v and vec.y >= -k*vec.x-v):
+					while (vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot):
+						if (-h_inner<=vec.x<=h_inner and vec.y <= k*vec.x+v_inner and vec.y <= -k*vec.x+v_inner and vec.y >= k*vec.x-v_inner and vec.y >= -k*vec.x-v_inner and vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot + self.CL_thickness):
+							#inner pyramid, inside capping layer
+							return GaN
+						else:
+							if (-h_inner-CL_width[0]<=vec.x<=h_inner+CL_width[0] and vec.y <= k*vec.x+v_inner+CL_width[0] and vec.y <= -k*vec.x+v_inner+CL_width[0] and vec.y >= k*vec.x-v_inner-CL_width[0] and vec.y >= -k*vec.x-v_inner-CL_width[0] and vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot + (CL_width[2] - CL_width[0])):
+								#most inner capping layer
+								return CL_material_in[0]
+							if (-h_inner-CL_width[1]<=vec.x<=h_inner+CL_width[1] and vec.y <= k*vec.x+v_inner+CL_width[1] and vec.y <= -k*vec.x+v_inner+CL_width[1] and vec.y >= k*vec.x-v_inner-CL_width[1] and vec.y >= -k*vec.x-v_inner-CL_width[1] and vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot + (CL_width[1] - CL_width[0])):
+								#middle layer
+								return CL_material_in[1]
+							#outmost capping layer
+							return CL_material_in[2]
+
+				else:
+					return air
+			else:
+				return air
+		
+
+
+
+
+
 		#TODO: Clean up and move these functions
 		materialFunction = None
 		if material_functions == "truncPyramidWithCoating":
@@ -292,6 +353,8 @@ class SimStruct():
 			materialFunction = isInsidexy2
 		elif material_functions == "truncPyramid":
 			materialFunction = truncPyramid
+		elif material_functions == "truncPyramidwithMultiCoating":
+			materialFunction = truncPyramidwithMultiCoating
 		else:
 			materialFunction = None
 		print('materialfunction in use: ',materialFunction)
