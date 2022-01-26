@@ -10,7 +10,7 @@ import math as math
 import time
 
 if True:
-	from meep.materials import Al, GaN, Au, Ag, Si3N4
+	from meep.materials import Al, GaN, Au, Ag, Si3N4, Ni
 
 ###PARAMETERS FOR THE SIMULATION and PYRAMID##############################################
 
@@ -43,9 +43,9 @@ class SimStruct():
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
-		sx=self.pyramid_width*simulation_ratio						#size of the cell in xy-plane is measured as a fraction of pyramid width
+		sx=(self.pyramid_width+2*self.CL_thickness)*simulation_ratio*(8/10)						#size of the cell in xy-plane is measured as a fraction of pyramid width
 		sy=sx
-		sz=self.pyramid_height*simulation_ratio						#z-"height" of sim. cell measured as a fraction of pyramid height.		
+		sz=(self.pyramid_height+1*self.CL_thickness)*simulation_ratio*(8/10)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 		sh=substrate_height
 		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
@@ -305,8 +305,10 @@ class SimStruct():
 				return air
 
 		#cumulative width
-		CL_width = [0.03, 0.06, 0.1]
-		CL_material_in = [mp.Medium(epsilon=10), mp.Medium(epsilon=20), mp.Medium(epsilon=30)]
+		#thickness per layer, 0.005, 0.005, 0.3
+		CL_width = [0.005, 0.01, 0.31]
+		CL_material_in = [Ni, Au, Indium]
+		#CL_material_in = [mp.Medium(epsilon=10),mp.Medium(epsilon=20),mp.Medium(epsilon=30)]
 		#function to create truncated pyramid with mutliple coatings
 		def truncPyramidwithMultiCoating(vec):
 			#TODO: Optimize function
@@ -427,7 +429,8 @@ class SimStruct():
 				#subpixel_maxeval=1000,
 				dimensions=3,
 				#default_material=GaN,
-				extra_materials=[CL_material],
+				Courant=0.25,
+				extra_materials=[Au, Ni, Indium],
 				material_function=materialFunction,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,
@@ -533,7 +536,7 @@ class SimStruct():
 		if use_fixed_time:
 			sim.run(
 			mp.dft_ldos(self.frequency_center, self.frequency_width, self.number_of_freqs),
-		#	mp.at_beginning(mp.output_epsilon),
+			#mp.at_beginning(mp.output_epsilon),
 			#until_after_sources=mp.stop_when_fields_decayed(2,mp.Ey,mp.Vector3(0,0,sbs_cource_position+0.2),1e-2))
 			until=simulation_time)
 		else:
