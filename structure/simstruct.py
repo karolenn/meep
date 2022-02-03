@@ -10,7 +10,7 @@ import math as math
 import time
 
 if True:
-	from meep.materials import Al, GaN, Au, Ag, Si3N4, Ni
+	from meep.materials import Al, GaN, Au, Pd, Pt, Ag, Si3N4, Ni
 
 ###PARAMETERS FOR THE SIMULATION and PYRAMID##############################################
 
@@ -43,9 +43,9 @@ class SimStruct():
 
 		substrate_height=self.pyramid_height*substrate_ratio	#height of the substrate, measured as fraction of pyramid height
 		#"Cell size"
-		sx=(self.pyramid_width+2*self.CL_thickness)*simulation_ratio*(8/10)						#size of the cell in xy-plane is measured as a fraction of pyramid width
+		sx=(self.pyramid_width+2*self.CL_thickness)*simulation_ratio					#size of the cell in xy-plane is measured as a fraction of pyramid width
 		sy=sx
-		sz=(self.pyramid_height+1*self.CL_thickness)*simulation_ratio*(8/10)						#z-"height" of sim. cell measured as a fraction of pyramid height.		
+		sz=(self.pyramid_height+1*self.CL_thickness)*simulation_ratio						#z-"height" of sim. cell measured as a fraction of pyramid height.		
 		sh=substrate_height
 		padding=padding							##distance from pml_layers to flux regions so PML don't overlap flux regions
 		cell=mp.Vector3(sx+2*dpml,sy+2*dpml,sz+2*dpml)	 		#size of the simulation cell in meep units
@@ -54,7 +54,37 @@ class SimStruct():
 			CL_material = Au
 		elif self.CL_material == "Ag":
 			CL_material = Ag
+		elif self.CL_material == "Pd":
+			CL_material = Pd
+		elif self.CL_material == "Pt":
+			CL_material = Pt
+		elif self.CL_material == "In":
+						#we have n,k assuming relationship between n,k, and epsilon (er, ei) is er = n^2-k^2 and ei = 2nk
+			if self.frequency_center == 1.85:
+				#green, wavelength 541
+				n = 1.0346
+				#n=4.9
+				k = 4.8714
+				epsilon_r = n**2-k**2
+				epsilon_im = 2*n*k
+			elif self.frequency_center == 2.04:
+				#blue, wavelength 449
+				n =0.75754
+				k = 4.1783
+				epsilon_r = n**2-k**2
+				epsilon_im = 2*n*k
+			elif self.frequency_center == 1.58:
+				#red, wavelength 632
+				n = 1.2568
+				k = 5.5422 
+				epsilon_r = n**2-k**2
+				epsilon_im = 2*n*k
+			else:
+				print('Warning: Indium not defined properly.')
+			Indium = mp.Medium(epsilon = epsilon_r, D_conductivity=2*math.pi*self.frequency_center*epsilon_im/epsilon_r)
+			CL_material = Indium
 		else:
+			print('WARNING: Capping Layer material is in GaN, are you sure about that?')
 			CL_material = GaN
 		print('CL MATERIAL:', CL_material, self.CL_material)
 
@@ -199,28 +229,7 @@ class SimStruct():
 		SiC = mp.Medium(epsilon=2.6465**2)
 		SubstrateEps = SiC				#substrate epsilon
 
-		#we have n,k assuming relationship between n,k, and epsilon (er, ei) is er = n^2-k^2 and ei = 2nk
-		if self.frequency_center == 1.85:
-			#green, wavelength 541
-			n = 1.0346
-			k = 4.8714
-			epsilon_r = n**2-k**2
-			epsilon_im = 2*n*k
-		elif self.frequency_center == 2.04:
-			#blue, wavelength 449
-			n =0.75754
-			k = 4.1783
-			epsilon_r = n**2-k**2
-			epsilon_im = 2*n*k
-		elif self.frequency_center == 1.58:
-			#red, wavelength 632
-			n = 1.2568
-			k = 5.5422 
-			epsilon_r = n**2-k**2
-			epsilon_im = 2*n*k
-		else:
-			print('Warning: Indium not defined properly.')
-		Indium = mp.Medium(epsilon = epsilon_r, D_conductivity=2*math.pi*self.frequency_center*epsilon_im/epsilon_r)
+
 		#"Geometry to define the substrate and block of air to truncate the pyramid if self.truncation =/= 0"
 		geometries=[]
 		#Substrate
@@ -269,6 +278,8 @@ class SimStruct():
 			else:
 				return air
 
+
+
 		#function to create truncated pyramid
 		def truncPyramid(vec):
 			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-self.pyramid_height + truncation_height):
@@ -304,12 +315,15 @@ class SimStruct():
 			else:
 				return air
 
-		#cumulative width
-		#thickness per layer, 0.005, 0.005, 0.3
-		CL_width = [0.005, 0.01, 0.31]
-		CL_material_in = [Ni, Au, Indium]
-		#CL_material_in = [mp.Medium(epsilon=10),mp.Medium(epsilon=20),mp.Medium(epsilon=30)]
-		#function to create truncated pyramid with mutliple coatings
+		if material_functions == "truncPyramidwithMultiCoating":
+			#cumulative width
+			#thickness per layer, 0.005, 0.005, 0.3
+			CL_width = [0.005, 0.01, 0.015]
+			if CL_width[2] - self.CL_thickness != 0:
+				print('WARNING: Diff between CL_width and CL_thickness. They should be the same.')
+			CL_material_in = [Ni, Au, Au]
+			#CL_material_in = [mp.Medium(epsilon=10),mp.Medium(epsilon=20),mp.Medium(epsilon=30)]
+			#function to create truncated pyramid with mutliple coatings
 		def truncPyramidwithMultiCoating(vec):
 			#TODO: Optimize function
 			while (vec.z <= sz/2-sh and vec.z >= sz/2-sh-pyramid_height_tot+truncation_height_tot):
@@ -337,11 +351,6 @@ class SimStruct():
 					return air
 			else:
 				return air
-		
-
-
-
-
 
 		#TODO: Clean up and move these functions
 		materialFunction = None
@@ -362,8 +371,9 @@ class SimStruct():
 		print('materialfunction in use: ',materialFunction)
 
 		#TODO: Clean up, create more warning messages and move these functions
-		if self.CL_thickness > 0 and materialFunction != truncPyramidWithCoating:
+		if self.CL_thickness > 0 and material_functions != "truncPyramidWithCoating":
 			print('WARNING: You have defined a Capping Layer (CL) thickness without using a pyramid creator function with a capping layer.')
+
 
 		###PML_LAYERS###################################################################
 
@@ -429,8 +439,8 @@ class SimStruct():
 				#subpixel_maxeval=1000,
 				dimensions=3,
 				#default_material=GaN,
-				Courant=0.25,
-				extra_materials=[Au, Ni, Indium],
+				#Courant=0.25,
+				extra_materials=[CL_material],
 				material_function=materialFunction,
 				boundary_layers=pml_layer,
 				split_chunks_evenly=False,

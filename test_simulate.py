@@ -10,9 +10,9 @@ simulation = "pyramid"
 
 config_pyramid = {
         "simulate": {
-            "resolution":100,
+            "resolution": 100,
             "use_fixed_time": False,
-            "simulation_time": 2,
+            "simulation_time": 50,
             "dpml": 0.1,
             "padding": 0.025,
             "ff_pts": 800,
@@ -21,7 +21,7 @@ config_pyramid = {
             "use_symmetries": True,
             "calculate_flux": True,
             "calculate_source_flux": True,
-            "source_flux_pixel_size": 8,
+            "source_flux_pixel_size": 2,
             "ff_calculations": True,
             "ff_angle": 6,
             "fibb_sampling": True,
@@ -29,21 +29,21 @@ config_pyramid = {
             "substrate_ratio": "2/10",
             "output_ff": False,
             "geometry": False,
-            "material_function": "truncPyramid",
+            "material_function": "truncPyramidWithCoating",
             "polarization_in_plane": False
         },
         "pyramid": {
-            "source_position": [0,0,0.25],
+            "source_position": [0,0,0.03],
             "pyramid_height": 0.94,
             "pyramid_width": 1,
             "truncation_width": 0.1,
-            "CL_thickness": 0,
-            "CL_material":"Ag",
+            "CL_thickness": 0.1,
+            "CL_material":"Pd",
             "source_direction": [1,0,0],
             "source_on_wall": False,
             "frequency_center": 1.85,
             "frequency_width": 0.76,
-            "number_of_freqs": 3,
+            "number_of_freqs": 8,
             "cutoff": 4
         },
         "result": {}
@@ -108,8 +108,8 @@ else:
     config = config_pyramid
     pyramid.setup(config_pyramid["pyramid"])
     result = pyramid.simulate(config["simulate"])
-#print(config)
-#print(result)
+print(config)
+print(result)
 print('Simulation finished at:',datetime.datetime.now())
 output_ff = config["simulate"]["output_ff"]
 calculate_source_flux = config["simulate"]["calculate_source_flux"]
