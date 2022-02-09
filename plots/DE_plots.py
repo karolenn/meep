@@ -3,7 +3,9 @@ from functionality.functions import *
 from functionality.QWrapper_functions import unpack_3_list
 import matplotlib.pyplot as plt
 import math
-sim_name = "DE_xpol_tot"
+
+from pathlib import Path
+#sim_name = "DE_xpol_CL_Pd"
 #sim_name = "DE_first_result_3"
 
 freqs = [1.4700000000000002, 1.5785714285714287, 1.6871428571428573, 1.7957142857142858, 1.9042857142857144, 2.012857142857143, 2.1214285714285714, 2.23]
@@ -21,8 +23,11 @@ def plot_LE(sim_name):
     total_flux_results = [0]*len_db
     source_flux_results = [0]*len_db
     source_pos = [0]*len_db
-
-
+    freqs = [1.4700000000000002, 1.5785714285714287, 1.6871428571428573, 1.7957142857142858, 1.9042857142857144, 2.012857142857143, 2.1214285714285714, 2.23]
+    lambda_wl = []
+    for n in range(len(freqs)):
+        lambda_wl.append(round(1000/freqs[n],1)) 
+    colors = ['darkred','red', 'darkorange','limegreen','aquamarine','teal','navy', 'blue']
 
     total_flux_GaN = [0.00011428871, 0.0250669074, 0.8222765772, 5.30342497776, 6.72770614219, 1.68183821152, 0.08313836489, 0.00077824323]
     s_flux_GaN = [0.0001591884196414295, 0.025045174820939542, 0.8212780288510312, 5.293335569705324, 6.714833870606542, 1.6796636762639658, 0.08292949836437485, 0.0008176334840038225]
@@ -40,6 +45,8 @@ def plot_LE(sim_name):
 
     nfreq = db[0]["pyramid"]["number_of_freqs"]
 
+    pyramid_width = db[0]["pyramid"]["pyramid_width"]
+
     RE = [0]*len_db
     RE = [RE]*nfreq
 
@@ -49,14 +56,14 @@ def plot_LE(sim_name):
     for i in range(len_db):
         source_pos[i] = db[i]["pyramid"]["source_position"][2]*1000
 
-    #calculate RE
+    #calculate Absorption
     for k in range(nfreq):
         tmp = [0]*len_db
         tmp_purcell = 0
         for i in range(len_db):
             source_flux = db[i]["result"]["source_flux"][k]
             total_flux = db[i]["result"]["total_flux"][k]
-            #print('s,t', source_flux, total_flux, total_flux / source_flux)
+            #print('s,t', source_flux, total_flux, 100 - 100*total_flux / source_flux)
             tmp[i] = 100 - 100*total_flux / source_flux
 
         RE[k] = tmp
@@ -66,7 +73,7 @@ def plot_LE(sim_name):
         tmp = [0]*len_db
         for i in range(len_db):
             source_flux = db[i]["result"]["source_flux"][k]
-            flux_GaN = total_flux_GaN_big[k]
+            flux_GaN = total_flux_GaN[k]
             #print('s,g', source_flux, flux_GaN, source_flux / flux_GaN)
             tmp[i] = 100 * source_flux / flux_GaN
 
@@ -84,7 +91,7 @@ def plot_LE(sim_name):
                 ff_angle = db[i]["result"]["ff_at_angle"][k]
             except:
                 ff_angle = 0
-            #print('s,t', source_flux, total_flux, total_flux / source_flux)
+            #print('s,t', source_flux, ff_angle, 100*ff_angle / source_flux)
             tmp[i] = 100*ff_angle / source_flux
 
         LE[k] = tmp
@@ -104,64 +111,77 @@ def plot_LE(sim_name):
 
     colors = ['darkred','red', 'darkorange','limegreen','aquamarine','teal','navy', 'blue']
     for n in range(len(RE)):
-        plt.title('3 μm wide pyramid. 1 - total flux / source flux.')
+        plt.title('{} μm wide pyramid. 1 - total flux / source flux.'.format(pyramid_width))
         plt.plot(source_pos, RE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('Absorption (%)')
         plt.xlabel('source position (nm)')
         plt.grid(visible=True)
-        plt.legend(loc='best')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.tight_layout()
+
+
+    Path(sim_name).mkdir(parents=True, exist_ok=True)
 
     plt.show()
-    plt.savefig('Absorption.png')
+    plt.savefig(sim_name+'/'+'Absorption_{}.png'.format(sim_name), dpi=100)
     plt.clf()
 
     for n in range(len(LE)):
         #print('plot sp', source_pos)
         #print('LE', LE[n])
-        plt.title('3 μm wide pyramid. flux far_field / source flux.')
+        plt.title('{} μm wide pyramid. flux far_field / source flux.'.format(pyramid_width))
         plt.plot(source_pos, LE[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('far field LE (%)')
         plt.xlabel('source position (nm)')
         plt.grid(visible=True)
-        plt.legend(loc='best')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.tight_layout()
 
     plt.show()
-    plt.savefig('LE.png')
+    plt.savefig(sim_name+'/'+'LE_{}.png'.format(sim_name))
     plt.clf()
 
     for n in range(len(LE_bottom)):
         #print('plot sp', source_pos)
         #print('LE bottom of simulation', LE[n])
-        plt.title('3 μm wide pyramid. flux bottom / source flux.')
+        plt.title('{} μm wide pyramid. flux bottom / source flux.'.format(pyramid_width))
         plt.plot(source_pos, LE_bottom[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('bottom LE (%)')
         plt.xlabel('source position (nm)')
         plt.grid(visible=True)
-        plt.legend(loc='best')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.tight_layout()
 
     plt.show()
-    plt.savefig('LE_bottom.png')
+    plt.savefig(sim_name+'/'+'LE_bottom_{}.png'.format(sim_name))
     plt.clf()
 
     for n in range(len(Purcell)):
-        plt.title('3 μm wide pyramid. source flux (pyramid) / source flux (GaN).')
+        plt.title('{} μm wide pyramid. source flux (pyramid) / source flux (GaN).'.format(pyramid_width))
         plt.plot(source_pos, Purcell[n], marker='o', ls='--', label=str(lambda_wl[n])+"nm",color=colors[n])
         plt.ylabel('Purcell factor (%)')
         plt.xlabel('source position (nm)')
         plt.grid(visible=True)
-        plt.legend(loc='best')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.tight_layout()
 
-    plt.savefig('Purcell.png')
+    plt.savefig(sim_name+'/'+'Purcell_{}.png'.format(sim_name))
     #print(total_flux_results)
     #print(source_flux_results)
 
-def plot_far_field():
+def plot_far_field(db_name):
     #db_name = "test_simulate"
-    db_name = "DE_xpol_ff"
+    #db_name = "DE_xpol_ff"
     #path = "../db"
     path = "../db/initial_results"
     print("{}/{}.json".format(path,db_name))
     #path = "../db/initial_results/{}.json".format(db_name)
+
+    lambda_wl = []
+    for n in range(len(freqs)):
+        lambda_wl.append(round(1000/freqs[n],1)) 
+    colors = ['darkred','red', 'darkorange','limegreen','aquamarine','teal','navy', 'blue']
+
     db = read("{}/{}.json".format(path,db_name))
     pyr = 1
     ff_at_angle = db[pyr]["result"]["ff_at_angle"]
@@ -188,6 +208,7 @@ def plot_far_field():
         theta_angles_degrees = [i * 180/math.pi for i in theta_angles]
         plt.plot(theta_angles_degrees,cum_flux_per_angle_norm, label=str(lambda_wl[k])+"nm",color=colors[k])
         plt.legend(loc='best')
+        plt.title('Share of far field flux within angle')
         plt.ylabel('(%) of far-field within angle')
         plt.xlabel('degrees')
         plt.savefig('angles.png')
@@ -199,15 +220,52 @@ def plot_far_field():
     Pr_array_freq_normed = [i / norm_val for i in Pr_array_freq]
 
     elements = int(1*npts/nfreq)
-    X,Y = np.meshgrid(x,y)
+
+    theta_val = []
+    phi_val = []
+    for n in range(len(x)):
+        theta_val.append(math.acos(z[n]/radius))
+        if x[n] > 0:
+            phi_val.append(y[n]/x[n])
+        elif x[n] < 0 and y[n] >= 0:
+            phi_val.append(y[n]/x[n]+math.pi)
+        elif x[n] < 0 and y[n] < 0:
+            phi_val.append(y[n]/x[n] - math.pi)
+        elif x[n] == 0 and y[n] > 0:
+            phi_val.append(math.pi/2)
+        elif x[n] == 0 and y[n] < 0:
+            phi_val.append(-math.pi/2)
+        else: 
+            phi_val.append(0)
+
+
+    X,Y = np.meshgrid(theta_val,phi_val)
     Pr_mesh = np.meshgrid(Pr_array_freq_normed,Pr_array_freq_normed)
     #plt.Circle((0,0),15, fill=False)
     #plt.plot()
     plt.hexbin(x,y,Pr_array_freq_normed)
+    plt.title('Sampled flux density')
+    plt.xlabel('degrees')
+    plt.ylabel('degrees')
     plt.colorbar(plt.hexbin(x,y,Pr_array_freq_normed))
     plt.savefig('flux2.png')
 
 
-plot_LE(sim_name)
+#plot_LE(sim_name)
 
 #plot_far_field()
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) == 3 :
+        print('args: ',sys.argv)
+        if sys.argv[1] == "plot_LE":
+            plot_LE(sys.argv[2])
+        elif sys.argv[1] == "plot_far_field":
+            plot_far_field(sys.argv[2])
+        else:
+            print('Wrong input argument. First argument after DE_plots.py specifies which functions (plot_LE/plot_far_field) to use.')
+
+    else:
+        print("Specify function to run and db to use. Usage 'python DE_plots.py plot_LE DE_xpol_small' ")
+        exit(0)
